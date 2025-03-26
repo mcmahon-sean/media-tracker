@@ -1,1 +1,0 @@
- C:\\Users\\pbrew\\Documents\\School\\Spring\ 2025\\2279\ Systems\ Analysis\ and\ Design\\Assignments\\Final\ Project\ Development\\Final\ Project\ Design\\media_tracker\\.dart_tool\\flutter_build\\4c4a38c3b86da67cf25274510b9a59e8\\native_assets.yaml: 
