@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "dgSpecHash": "N9bt06TivQ8=",
+  "success": true,
+  "projectFilePath": "C:\\Users\\bondh\\OneDrive - MNSCU\\2025 Spring\\Systems Analysis and Design\\MediaTrackerAppRepo\\media-tracker\\Desktop\\media-tracker-desktop\\media-tracker-desktop\\media-tracker-desktop.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\bondh\\.nuget\\packages\\fontawesome.sharp\\6.6.0\\fontawesome.sharp.6.6.0.nupkg.sha512",
+    "C:\\Users\\bondh\\.nuget\\packages\\newtonsoft.json\\13.0.3\\newtonsoft.json.13.0.3.nupkg.sha512",
+    "C:\\Users\\bondh\\.nuget\\packages\\restsharp\\112.1.0\\restsharp.112.1.0.nupkg.sha512"
+  ],
+  "logs": []
+}
