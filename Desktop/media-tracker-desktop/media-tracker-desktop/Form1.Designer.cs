@@ -28,12 +28,32 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
-            this.Text = "Form1";
+            btnDBConnectionTest = new Button();
+            SuspendLayout();
+            // 
+            // btnDBConnectionTest
+            // 
+            btnDBConnectionTest.Location = new Point(29, 28);
+            btnDBConnectionTest.Name = "btnDBConnectionTest";
+            btnDBConnectionTest.Size = new Size(112, 34);
+            btnDBConnectionTest.TabIndex = 0;
+            btnDBConnectionTest.Text = "Test DB Connection";
+            btnDBConnectionTest.UseVisualStyleBackColor = true;
+            btnDBConnectionTest.Click += btnDBConnectionTest_Click;
+            // 
+            // Form1
+            // 
+            AutoScaleDimensions = new SizeF(10F, 25F);
+            AutoScaleMode = AutoScaleMode.Font;
+            ClientSize = new Size(800, 450);
+            Controls.Add(btnDBConnectionTest);
+            Name = "Form1";
+            Text = "Form1";
+            ResumeLayout(false);
         }
 
         #endregion
+
+        private Button btnDBConnectionTest;
     }
 }
