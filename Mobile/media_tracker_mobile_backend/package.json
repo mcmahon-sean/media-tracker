@@ -1,0 +1,16 @@
+{
+  "name": "media_tracker_mobile_backend",
+  "version": "1.0.0",
+  "description": "Backend for Media Tracker app",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon src/server.js"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.21.2",
+    "nodemon": "^3.1.9"
+  },
+  "type": "module"
+}
