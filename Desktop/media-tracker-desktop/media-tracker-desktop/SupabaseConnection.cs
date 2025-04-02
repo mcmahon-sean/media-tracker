@@ -17,10 +17,10 @@ namespace media_tracker_desktop
         // Used to allow CRUD operations on the DB.
         // In Supabase, it may be found under the Authentication tab, then Users.
         // May change.
-        private string userEmailDB = "";
-        private string userPasswordDB = "";
+        private string userEmailDB = "serviceaccount@gmail.com";
+        private string userPasswordDB = "testaccount";
 
-        public SupabaseConnection(string userEmailDB, string userPasswordDB)
+        public SupabaseConnection()
         {
             InitializeDB();
         }

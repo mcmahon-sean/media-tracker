@@ -19,10 +19,10 @@ namespace media_tracker_desktop
             // enter the user and password here for testing.
             // If the Supabase [Enable read access for all users] policy is enabled, 
             // signing in shouldn't be necessary.
-            string userEmailDB = "";
-            string userPasswordDB = "";
+            //string userEmailDB = "";
+            //string userPasswordDB = "";
 
-            Client connection = new SupabaseConnection(userEmailDB, userPasswordDB).GetClient();
+            Client connection = new SupabaseConnection().GetClient();
 
             // Username is the table model. Can change the model to test a table.
             var records = await connection.From<Username>().Get();
