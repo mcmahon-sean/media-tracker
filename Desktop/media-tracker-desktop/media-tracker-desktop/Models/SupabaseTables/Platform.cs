@@ -8,16 +8,16 @@ using System.Threading.Tasks;
 
 namespace media_tracker_desktop.Models.SupabaseTables
 {
-    [Table("Platforms")]
+    [Table("platforms")]
     public class Platform : BaseModel
     {
-        [PrimaryKey("PlatformID")]
+        [PrimaryKey("platform_id")]
         public int PlatformID { get; set; }
 
-        [Column("PlatformName")]
+        [Column("platform_name")]
         public string PlatformName { get; set; } = string.Empty;
 
-        [Column("APIKey")]
+        [Column("api_key")]
         public string APIKey { get; set; } = string.Empty;
     }
 }

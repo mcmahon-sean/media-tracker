@@ -8,22 +8,22 @@ using System.Threading.Tasks;
 
 namespace media_tracker_desktop.Models.SupabaseTables
 {
-    [Table("Users")]
+    [Table("users")]
     public class User : BaseModel
     {
-        [PrimaryKey("Username")]
+        [PrimaryKey("username")]
         public string Username { get; set; } = string.Empty;
 
-        [Column("FirstName")]
+        [Column("first_name")]
         public string FirstName { get; set; } = string.Empty;
 
-        [Column("LastName")]
+        [Column("last_name")]
         public string LastName { get; set; } = string.Empty;
 
-        [Column("Email")]
+        [Column("email")]
         public string Email { get; set; } = string.Empty;
 
-        [Column("Password")]
+        [Column("password")]
         public string Password { get; set; } = string.Empty;
     }
 }

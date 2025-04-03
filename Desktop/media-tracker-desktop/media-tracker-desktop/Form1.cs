@@ -30,14 +30,41 @@ namespace media_tracker_desktop
 
             Client connection = new SupabaseConnection().GetClient();
 
-            // Username is the table model. Can change the model to test a table.
-            var records = await connection.From<Media>().Get();
+            // test connection ----------
+            //TestSupabaseConnection(connection);
+
+            // test viewing tables -----------
+            // to test different table, go to method.
+            TestSupabaseViewTable(connection);
+
+        }
+
+        private async void TestSupabaseConnection(Client connection)
+        {
+            string testDisplay = "";
+
+            var param = new Dictionary<string, string>
+            {
+                {"app", "Desktop" }
+            };
+
+            var data = await connection.Rpc("testconnectionwitharguments", param);
+
+            testDisplay = data.Content.ToString();
+
+            MessageBox.Show(testDisplay);
+        }
+
+        private async void TestSupabaseViewTable(Client connection)
+        {
+            // Change the object type of the .From method to a different table model for testing.
+            var records = await connection.From<UserFavorite>().Get();
 
             string testDisplay = "";
 
             foreach (var record in records.Models)
             {
-                testDisplay += $"{record.MediaID} - {record.PlatformID} - {record.MediaTypeID} - {record.MediaPlatID} - {record.Title} - {record.Album} - {record.Artist}\n";
+                testDisplay += $"{record.ToString}\n";
             }
 
             MessageBox.Show(testDisplay);

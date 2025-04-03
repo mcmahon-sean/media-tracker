@@ -8,13 +8,13 @@ using System.Threading.Tasks;
 
 namespace media_tracker_desktop.Models.SupabaseTables
 {
-    [Table("MediaTypes")]
+    [Table("mediatypes")]
     public class MediaType : BaseModel
     {
-        [PrimaryKey("MediaTypeID")]
+        [PrimaryKey("media_type_id")]
         public int MediaTypeID { get; set; }
 
-        [Column("MediaType")]
+        [Column("media_type")]
         public string MediaTypeName { get; set; } = string.Empty;
     }
 }

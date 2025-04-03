@@ -8,34 +8,34 @@ using System.Threading.Tasks;
 
 namespace media_tracker_desktop.Models.SupabaseTables
 {
-    [Table("Media")]
+    [Table("media")]
     public class Media : BaseModel
     {
-        [PrimaryKey("MediaID")]
+        [PrimaryKey("media_id")]
         public int MediaID { get; set; }
 
 
-        [Column("PlatformID")]
+        [Column("platform_id")]
         public int PlatformID { get; set; }
 
 
-        [Column("MediaTypeID")]
+        [Column("media_type_id")]
         public int MediaTypeID { get; set; }
 
 
-        [Column("MediaPlatID")]
+        [Column("media_plat_id")]
         public string MediaPlatID { get; set; } = string.Empty;
 
 
-        [Column("Title")]
+        [Column("title")]
         public string Title { get; set; } = string.Empty;
 
 
-        [Column("Album")]
+        [Column("album")]
         public string Album { get; set; } = string.Empty;
 
 
-        [Column("Artist")]
+        [Column("artist")]
         public string Artist { get; set; } = string.Empty;
     }
 }

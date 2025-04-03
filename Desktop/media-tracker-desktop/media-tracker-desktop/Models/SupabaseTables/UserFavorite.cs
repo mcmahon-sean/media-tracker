@@ -8,16 +8,16 @@ using System.Threading.Tasks;
 
 namespace media_tracker_desktop.Models.SupabaseTables
 {
-    [Table("UserFavorites")]
+    [Table("userfavorites")]
     public class UserFavorite : BaseModel
     {
-        [PrimaryKey("Username")]
+        [PrimaryKey("username")]
         public string Username { get; set; } = string.Empty;
 
-        [Column("MediaID")]
+        [Column("media_id")]
         public int MediaID { get; set; }
 
-        [Column("Favorite")]
+        [Column("favorites")]
         public bool Favorite { get; set; }
     }
 }
