@@ -14,20 +14,26 @@ namespace media_tracker_desktop.Models.SupabaseTables
         [PrimaryKey("MediaID")]
         public int MediaID { get; set; }
 
+
         [Column("PlatformID")]
         public int PlatformID { get; set; }
+
 
         [Column("MediaTypeID")]
         public int MediaTypeID { get; set; }
 
+
         [Column("MediaPlatID")]
         public string MediaPlatID { get; set; } = string.Empty;
+
 
         [Column("Title")]
         public string Title { get; set; } = string.Empty;
 
+
         [Column("Album")]
         public string Album { get; set; } = string.Empty;
+
 
         [Column("Artist")]
         public string Artist { get; set; } = string.Empty;

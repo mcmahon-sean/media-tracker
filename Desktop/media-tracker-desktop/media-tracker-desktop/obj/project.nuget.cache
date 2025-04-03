@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "KFHJVEqr9Og=",
+  "dgSpecHash": "RyIriR2ch9s=",
   "success": true,
-  "projectFilePath": "C:\\Users\\bondh\\OneDrive - MNSCU\\2025 Spring\\Systems Analysis and Design\\MediaTrackerAppRepo\\media-tracker\\Desktop\\media-tracker-desktop\\media-tracker-desktop\\media-tracker-desktop.csproj",
+  "projectFilePath": "C:\\Users\\bondh\\OneDrive - MNSCU\\MTRepo\\media-tracker\\Desktop\\media-tracker-desktop\\media-tracker-desktop\\media-tracker-desktop.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\bondh\\.nuget\\packages\\bcrypt.net-next\\4.0.3\\bcrypt.net-next.4.0.3.nupkg.sha512",
     "C:\\Users\\bondh\\.nuget\\packages\\fontawesome.sharp\\6.6.0\\fontawesome.sharp.6.6.0.nupkg.sha512",

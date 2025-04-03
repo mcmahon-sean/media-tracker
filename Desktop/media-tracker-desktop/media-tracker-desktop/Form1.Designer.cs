@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             btnDBConnectionTest = new Button();
+            btnTestSteam = new Button();
             SuspendLayout();
             // 
             // btnDBConnectionTest
@@ -41,11 +42,22 @@
             btnDBConnectionTest.UseVisualStyleBackColor = true;
             btnDBConnectionTest.Click += btnDBConnectionTest_Click;
             // 
+            // btnTestSteam
+            // 
+            btnTestSteam.Location = new Point(178, 28);
+            btnTestSteam.Name = "btnTestSteam";
+            btnTestSteam.Size = new Size(112, 34);
+            btnTestSteam.TabIndex = 1;
+            btnTestSteam.Text = "Test steam";
+            btnTestSteam.UseVisualStyleBackColor = true;
+            btnTestSteam.Click += btnTestSteam_Click;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 450);
+            Controls.Add(btnTestSteam);
             Controls.Add(btnDBConnectionTest);
             Name = "Form1";
             Text = "Form1";
@@ -55,5 +67,6 @@
         #endregion
 
         private Button btnDBConnectionTest;
+        private Button btnTestSteam;
     }
 }
