@@ -1,8 +1,10 @@
 ﻿using Supabase;
+using Supabase.Functions;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -10,27 +12,32 @@ namespace media_tracker_desktop
 {
     public class SupabaseConnection
     {
-        private Client client;
+        private Supabase.Client client;
         private dynamic session;
 
         // Store a user's email and password.
         // Used to allow CRUD operations on the DB.
         // In Supabase, it may be found under the Authentication tab, then Users.
         // May change.
-        private string userEmailDB = "";
-        private string userPasswordDB = "";
+        private string userEmailDB = "serviceaccount@gmail.com";
+        private string userPasswordDB = "testaccount";
 
         public SupabaseConnection(string userEmailDB, string userPasswordDB)
         {
-            InitializeDB();
+            _ = InitializeDB();
         }
 
         // Getter: Retrieve the database connection.
         // The object returned allows one to perform CRUD operations on the database.
-        public Client GetClient()
+        public Supabase.Client GetClient()
         {
             return client;
         }
+
+        //public static Supabase.Functions.Client ExecuteFunction(string functionName)
+        //{
+            
+        //}
 
         // Getter: Retrieve the session.
         // The object returned allows one to view the session's expiration, etc.
@@ -58,7 +65,7 @@ namespace media_tracker_desktop
                 };
 
                 // Create connection.
-                client = new Client(supabaseBaseUrl, supabaseApiKey, supabaseOptions);
+                client = new Supabase.Client(supabaseBaseUrl, supabaseApiKey, supabaseOptions);
 
                 // Connect to DB.
                 await client.InitializeAsync();

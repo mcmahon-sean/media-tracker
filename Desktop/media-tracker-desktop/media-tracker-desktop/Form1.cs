@@ -1,5 +1,9 @@
 using media_tracker_desktop.Models;
 using Supabase;
+using Supabase.Functions;
+using System.Collections.ObjectModel;
+using System.Net.Http;
+using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 
 namespace media_tracker_desktop
@@ -19,20 +23,30 @@ namespace media_tracker_desktop
             // enter the user and password here for testing.
             // If the Supabase [Enable read access for all users] policy is enabled, 
             // signing in shouldn't be necessary.
-            string userEmailDB = "";
-            string userPasswordDB = "";
+            string userEmailDB = "serviceaccount@gmail.com";
+            string userPasswordDB = "8f65dee5-8557-4da7-9d27-3bbba7a8bf4a";
 
-            Client connection = new SupabaseConnection(userEmailDB, userPasswordDB).GetClient();
+            Supabase.Client connection = new SupabaseConnection(userEmailDB, userPasswordDB).GetClient();
 
             // Username is the table model. Can change the model to test a table.
-            var records = await connection.From<Username>().Get();
+            //var records = await connection.From<Username>().Get();
+
+            //var records = await connection.From<MediaTypes>().Get();
 
             string testDisplay = "";
 
-            foreach (var record in records.Models)
+            //var data = await connection.Rpc("testconnection", null);
+
+            //testDisplay = data.Content.ToString();
+
+
+            var param = new Dictionary<string, string>
             {
-                testDisplay += $"{record.Name} - {record.Age}\n";
-            }
+                {"app", "Desktop" }
+            };
+
+            var data = await connection.Rpc("testconnectionwitharguments", param);
+            testDisplay = data.Content.ToString();
 
             MessageBox.Show(testDisplay);
         }
