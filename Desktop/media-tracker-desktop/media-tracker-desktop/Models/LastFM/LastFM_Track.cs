@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace media_tracker_desktop.Models.LastFM
 {
+    // This model represents each track object in the track array in the recenttracks json object returned by the user.getRecentTracks endpoint of LastFM API.
     public class LastFM_Track
     {
         [JsonProperty("name")]
@@ -14,34 +15,87 @@ namespace media_tracker_desktop.Models.LastFM
 
 
         [JsonProperty("artist")]
-        public string Artist { get; } = string.Empty;
+        private LastFM_Track_Artist Artist { get; }
+
+        public string ArtistName
+        {
+            get
+            {
+                return Artist.Text;
+            }
+        }
 
 
         [JsonProperty("album")]
-        public string Album { get; } = string.Empty;
+        private LastFM_Track_Album Album { get; }
+
+        public string AlbumName
+        {
+            get
+            {
+                return Album.Text;
+            }
+        }
 
 
         [JsonProperty("url")]
         public string Url { get; } = string.Empty;
 
 
-        [JsonProperty("timestamp")]
-        public int? Timestamp { get; }
+        [JsonProperty("date")]
+        private LastFM_Track_Date? Date { get; }
+
+        public int? Timestamp
+        {
+            get
+            {
+                // If there is no list of images, return null.
+                if (Date == null)
+                {
+                    return null;
+                }
+                // Else,
+                else
+                {
+                    return Date.Uts;
+                }
+            }
+        }
 
 
-        [JsonProperty("imageUrl")]
-        public string? ImageUrl { get; }
+        // Just reusing the LastFM_Artist_Image since making a new one (LastFM_Track_Image) would just be identical.
+        // If there are any differences between the two, then a new one is recommended.
+        [JsonProperty("image")]
+        private List<LastFM_Artist_Image>? Image { get; }
+
+        public string? ImageUrl
+        {
+            get
+            {
+                // If there is no list of images, return null.
+                if (Image == null)
+                {
+                    return null;
+                }
+                // Else,
+                else
+                {
+                    // Return the url of the last image that is not null or empty.
+                    return Image.Where(image => !string.IsNullOrEmpty(image?.Text)).LastOrDefault()?.Text;
+                }
+            }
+        }
 
 
         [JsonConstructor]
-        public LastFM_Track(string name, string artist, string album, string url, int? timestamp, string? imageUrl)
+        public LastFM_Track(string name, LastFM_Track_Artist artist, LastFM_Track_Album album, string url, LastFM_Track_Date? date, List<LastFM_Artist_Image>? image)
         {
             this.Name = name;
             this.Artist = artist;
             this.Album = album;
             this.Url = url;
-            this.Timestamp = timestamp;
-            this.ImageUrl = imageUrl;
+            this.Date = date;
+            this.Image = image;
         }
     }
 }

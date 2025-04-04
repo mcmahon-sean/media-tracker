@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace media_tracker_desktop.Models.TMDB
 {
+    // This model represents a movie object.
     public class TMDB_Movie
     {
         [JsonProperty("id")]

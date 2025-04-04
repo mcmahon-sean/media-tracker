@@ -1,6 +1,8 @@
 using media_tracker_desktop.Models;
+using media_tracker_desktop.Models.LastFM;
 using media_tracker_desktop.Models.Steam;
 using media_tracker_desktop.Models.SupabaseTables;
+using media_tracker_desktop.Models.TMDB;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using RestSharp;
@@ -31,11 +33,11 @@ namespace media_tracker_desktop
             Client connection = new SupabaseConnection().GetClient();
 
             // test connection ----------
-            //TestSupabaseConnection(connection);
+            TestSupabaseConnection(connection);
 
             // test viewing tables -----------
             // to test different table, go to method.
-            TestSupabaseViewTable(connection);
+            //TestSupabaseViewTable(connection);
 
         }
 
@@ -93,16 +95,257 @@ namespace media_tracker_desktop
                 var steamJson = JObject.Parse(response.Content);
 
                 // retrieve the games property of the json object and convert it back to a json string
-                var steamUserGamesJsonString = steamJson.Root["response"]["games"].ToString();
+                var steamUserGamesJson = steamJson.Root["response"]["games"];
 
                 // pass the json string to deserialize each game into steam_model objects
-                List<Steam_Model> steamUserGames = JsonConvert.DeserializeObject<List<Steam_Model>>(steamUserGamesJsonString);
+                List<Steam_Model> steamUserGames = JsonConvert.DeserializeObject<List<Steam_Model>>(steamUserGamesJson.ToString());
 
                 string message = "";
 
                 foreach (Steam_Model game in steamUserGames)
                 {
                     message += $"{game.Name} - {game.RTimeLastPlayed} - {game.AppID} \n";
+                }
+
+                MessageBox.Show(message);
+            }
+        }
+
+        private async void btnTestLastFMArtist_Click(object sender, EventArgs e)
+        {
+            string lastFMUrl = ConfigurationManager.AppSettings["LastFMApiBaseUrl"];
+            string lastFMApiKey = ConfigurationManager.AppSettings["LastFMApiKey"];
+            string lastFMUsername = ConfigurationManager.AppSettings["LastFMApiUsername"];
+
+            // initialize client
+            var client = new RestClient();
+
+            // pass the url to request
+            var request = new RestRequest(lastFMUrl);
+
+            request.AddParameter("method", "user.getTopArtists");
+            request.AddParameter("user", lastFMUsername);
+            request.AddParameter("api_key", lastFMApiKey);
+            request.AddParameter("limit", 5);
+            request.AddParameter("format", "json");
+
+            // retrieve the response
+            var response = await client.ExecuteAsync(request);
+
+            if (response.IsSuccessful)
+            {
+                // Convert content to json object.
+                var topArtistsJson = JObject.Parse(response.Content);
+
+                // Retrieve the array of artist from the json object and convert it back to string.
+                var artistsJson = topArtistsJson.Root["topartists"]["artist"];
+
+                // Deserialize
+                List<LastFM_Artist> artists = JsonConvert.DeserializeObject<List<LastFM_Artist>>(artistsJson.ToString());
+
+                string message = "";
+
+                foreach (LastFM_Artist artist in artists)
+                {
+                    message += $"{artist.Name} - {artist.ImageUrl} \n";
+                }
+
+                MessageBox.Show(message);
+            }
+        }
+
+        private async void btnTestLastFMTrack_Click(object sender, EventArgs e)
+        {
+            string lastFMUrl = ConfigurationManager.AppSettings["LastFMApiBaseUrl"];
+            string lastFMApiKey = ConfigurationManager.AppSettings["LastFMApiKey"];
+            string lastFMUsername = ConfigurationManager.AppSettings["LastFMApiUsername"];
+
+            // initialize client
+            var client = new RestClient();
+
+            // pass the url to request
+            var request = new RestRequest(lastFMUrl);
+
+            request.AddParameter("method", "user.getRecentTracks");
+            request.AddParameter("user", lastFMUsername);
+            request.AddParameter("api_key", lastFMApiKey);
+            request.AddParameter("limit", 5);
+            request.AddParameter("format", "json");
+
+            // retrieve the response
+            var response = await client.ExecuteAsync(request);
+
+            if (response.IsSuccessful)
+            {
+                // Convert content to json object.
+                var recentTracksJson = JObject.Parse(response.Content);
+
+                // Retrieve the array of artist from the json object and convert it back to string.
+                var tracksJson = recentTracksJson.Root["recenttracks"]["track"];
+
+                // Deserialize
+                List<LastFM_Track> tracks = JsonConvert.DeserializeObject<List<LastFM_Track>>(tracksJson.ToString());
+
+                string message = "";
+
+                foreach (LastFM_Track track in tracks)
+                {
+                    message += $"{track.ArtistName} - {track.ImageUrl} - {track.Timestamp} \n";
+                }
+
+                MessageBox.Show(message);
+            }
+        }
+
+        private async void btnTestLastFMUser_Click(object sender, EventArgs e)
+        {
+            string lastFMUrl = ConfigurationManager.AppSettings["LastFMApiBaseUrl"];
+            string lastFMApiKey = ConfigurationManager.AppSettings["LastFMApiKey"];
+            string lastFMUsername = ConfigurationManager.AppSettings["LastFMApiUsername"];
+
+            // initialize client
+            var client = new RestClient();
+
+            // pass the url to request
+            var request = new RestRequest(lastFMUrl);
+
+            request.AddParameter("method", "user.getInfo");
+            request.AddParameter("user", lastFMUsername);
+            request.AddParameter("api_key", lastFMApiKey);
+            request.AddParameter("format", "json");
+
+            // retrieve the response
+            var response = await client.ExecuteAsync(request);
+
+            if (response.IsSuccessful)
+            {
+                // Convert content to json object.
+                var userInfoJson = JObject.Parse(response.Content);
+
+                // Retrieve the array of artist from the json object and convert it back to string.
+                var userJson = userInfoJson.Root["user"];
+
+                // Deserialize
+                LastFM_User userInfo = JsonConvert.DeserializeObject<LastFM_User>(userJson.ToString());
+
+
+                MessageBox.Show($"{userInfo.Name} - {userInfo.IsSubscriber} - {userInfo.RegisteredAt}");
+            }
+        }
+
+        private async void btnTestTMDBAccount_Click(object sender, EventArgs e)
+        {
+            string tmdbBaseUrl = ConfigurationManager.AppSettings["TMDBApiBaseUrl"];
+            string tmdbAuthToken = ConfigurationManager.AppSettings["TMDBApiAuthToken"];
+            string tmdbUser = ConfigurationManager.AppSettings["TMDBApiUser"];
+
+            string tmdbUrl = $"{tmdbBaseUrl}{tmdbUser}";
+
+            // initialize client
+            var client = new RestClient();
+
+            // pass the url to request
+            var request = new RestRequest(tmdbUrl);
+
+            request.AddHeader("Authorization", $"Bearer {tmdbAuthToken}");
+
+            // retrieve the response
+            var response = await client.ExecuteAsync(request);
+
+            if (response.IsSuccessful)
+            {
+                // Deserialize
+                TMDB_Account accountInfo = JsonConvert.DeserializeObject<TMDB_Account>(response.Content);
+
+
+                MessageBox.Show($"{accountInfo.ID} - {accountInfo.Username}");
+            }
+        }
+
+        private async void btnTestTMDBMovie_Click(object sender, EventArgs e)
+        {
+            string tmdbBaseUrl = ConfigurationManager.AppSettings["TMDBApiBaseUrl"];
+            string tmdbAuthToken = ConfigurationManager.AppSettings["TMDBApiAuthToken"];
+            string tmdbUser = ConfigurationManager.AppSettings["TMDBApiUser"];
+
+            string tmdbUrl = $"{tmdbBaseUrl}{tmdbUser}/rated/movies";
+
+            // initialize client
+            var client = new RestClient();
+
+            // pass the url to request
+            var request = new RestRequest(tmdbUrl);
+
+            request.AddParameter("language", "en-US");
+            request.AddParameter("page", 1);
+            request.AddParameter("sort_by", "created_at.desc");
+
+            request.AddHeader("Authorization", $"Bearer {tmdbAuthToken}");
+
+            // retrieve the response
+            var response = await client.ExecuteAsync(request);
+
+            if (response.IsSuccessful)
+            {
+                // Convert content to json object.
+                var movieResultJson = JObject.Parse(response.Content);
+
+                // Retrieve the array of artist from the json object and convert it back to string.
+                var movieJson = movieResultJson.Root["results"];
+
+                // Deserialize
+                List<TMDB_Movie> movies = JsonConvert.DeserializeObject<List<TMDB_Movie>>(movieJson.ToString());
+
+                string message = "";
+
+                foreach (TMDB_Movie movie in movies)
+                {
+                    message += $"{movie.ID} - {movie.Title} - {movie.Overview} \n\n";
+                }
+
+                MessageBox.Show(message);
+            }
+        }
+
+        private async void btnTestTMDBTVShow_Click(object sender, EventArgs e)
+        {
+            string tmdbBaseUrl = ConfigurationManager.AppSettings["TMDBApiBaseUrl"];
+            string tmdbAuthToken = ConfigurationManager.AppSettings["TMDBApiAuthToken"];
+            string tmdbUser = ConfigurationManager.AppSettings["TMDBApiUser"];
+
+            string tmdbUrl = $"{tmdbBaseUrl}{tmdbUser}/favorite/tv";
+
+            // initialize client
+            var client = new RestClient();
+
+            // pass the url to request
+            var request = new RestRequest(tmdbUrl);
+
+            request.AddParameter("language", "en-US");
+            request.AddParameter("page", 1);
+            request.AddParameter("sort_by", "created_at.asc");
+
+            request.AddHeader("Authorization", $"Bearer {tmdbAuthToken}");
+
+            // retrieve the response
+            var response = await client.ExecuteAsync(request);
+
+            if (response.IsSuccessful)
+            {
+                // Convert content to json object.
+                var tvShowResultJson = JObject.Parse(response.Content);
+
+                // Retrieve the array of artist from the json object and convert it back to string.
+                var tvShowJson = tvShowResultJson.Root["results"];
+
+                // Deserialize
+                List<TMDB_TV_Show> tvShows = JsonConvert.DeserializeObject<List<TMDB_TV_Show>>(tvShowJson.ToString());
+
+                string message = "";
+
+                foreach (TMDB_TV_Show tvShow in tvShows)
+                {
+                    message += $"{tvShow.ID} - {tvShow.Name} - {tvShow.Overview} \n\n";
                 }
 
                 MessageBox.Show(message);

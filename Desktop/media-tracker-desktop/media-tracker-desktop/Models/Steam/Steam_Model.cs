@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace media_tracker_desktop.Models.Steam
 {
+    // This model represents each game object in the games array in the response json object returned by the GetOwnedGames endpoint of the SteamAPI.
     public class Steam_Model
     {
         [JsonProperty("appid")]
