@@ -1,17 +1,15 @@
 import 'package:flutter/material.dart';
 import 'screens/home_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await dotenv.load(); // Load the .env file that stores the url and key
 
   // Initializes the Supabase client with your project's URL and anonymous public key.
   // This must be done before using any Supabase features in your app.
   await Supabase.initialize(
-    url: dotenv.env['SUPABASE_URL']!,
-    anonKey: dotenv.env['SUPABASE_ANON_KEY']!,
+    url: 'https://hrqakudeaalvgstpupdu.supabase.co/',
+    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhycWFrdWRlYWFsdmdzdHB1cGR1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI5NDk3MzAsImV4cCI6MjA1ODUyNTczMH0.k30q2Ndf-YI0RPGiwllMGJFPYMp5XoRQilCktlMmqFU',
   );
 
   runApp(MyApp());
