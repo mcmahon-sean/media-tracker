@@ -1,8 +1,48 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'media_screen.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Ensures that the following callback (_showConnectionMessage)
+    // runs after the first frame is rendered, so context is available
+    // for showing a SnackBar (which needs a Scaffold to be built).
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _showConnectionMessage();
+    });
+  }
+
+  // This function calls a Supabase stored procedure and shows the result in a SnackBar.
+  Future<void> _showConnectionMessage() async {
+    try {
+      // Makes an RPC (remote procedure call) to the stored procedure 'testconnectionwitharguments'
+      // It passes a parameter 'app' with value 'Mobile'
+      final result = await Supabase.instance.client.rpc(
+        'testconnectionwitharguments',
+        params: {'app': 'Mobile'},
+      );
+
+      // If the call is successful, show a SnackBar with the result
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(result.toString())));
+    } catch (e) {
+      // If there’s an error (e.g., procedure not found, bad params),
+      // catch it and show an error SnackBar instead
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error: $e')));
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
