@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'media_screen.dart';
+import 'auth/login_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -53,10 +53,10 @@ class _HomeScreenState extends State<HomeScreen> {
           onPressed: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => MediaScreen()),
+              MaterialPageRoute(builder: (context) => LoginScreen()),
             );
           },
-          child: Text('Go to Media'),
+          child: Text('Login'),
         ),
       ),
     );
