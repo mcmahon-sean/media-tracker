@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:media_tracker_test/screens/auth/register_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'auth/login_screen.dart';
 
@@ -49,14 +50,35 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: AppBar(title: Text('Home')),
       body: Center(
-        child: ElevatedButton(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => LoginScreen()),
-            );
-          },
-          child: Text('Login'),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => LoginScreen()),
+                    );
+                  },
+                  child: Text('Login'),
+                ),
+              ],
+            ),
+            Row(
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => RegisterScreen()),
+                    );
+                  },
+                  child: Text('Sign Up'),
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );

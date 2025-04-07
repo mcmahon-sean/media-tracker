@@ -20,72 +20,95 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void login() async {
-    //we'll have to add further value testing to the controllers
-    //making sure they're not null and whatnot
-    //but we can add that next week.
-    //we'll also have to add proper error messages, but for now
-    //this works
-    try {
-      // Makes an RPC (remote procedure call) to the stored procedure 'login'
-      // It passes the username and password
-      final result = await Supabase.instance.client.rpc(
-        'login',
-        params: {
-          'usernamevar': usernameController.text,
-          'passwordvar': passwordController.text,
-        },
-      );
-
-      // If the call is successful, show a SnackBar with the result
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(result.toString())));
-
-      if (result == true) {
-        //gets the related ID's
-        final steamID = await Supabase.instance.client
-            .from('useraccounts')
-            .select('user_platform_id')
-            .eq('username', usernameController.text)
-            .eq('platform_id', 1);
-        final lastfmID = await Supabase.instance.client
-            .from('useraccounts')
-            .select('user_platform_id')
-            .eq('username', usernameController.text)
-            .eq('platform_id', 2);
-        final imdbID = await Supabase.instance.client
-            .from('useraccounts')
-            .select('user_platform_id')
-            .eq('username', usernameController.text)
-            .eq('platform_id', 3);
-
-        //clears the controllers
-        usernameController.clear();
-        passwordController.clear();
-
-        //sets the ids in ApiServices
-        //we'll have to test to make sure they're not null
-        //but we can fix that up next week
-        ApiServices.steamUserId = steamID[0]['user_platform_id'].toString();
-        ApiServices.lastFmUser = lastfmID[0]['user_platform_id'].toString();
-        ApiServices.tmdbUser = imdbID[0]['user_platform_id'].toString();
-
-        //sends to media screen
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => MediaScreen()),
+    if (usernameController.text.replaceAll(' ', '') != '' &&
+        passwordController.text.replaceAll(' ', '') != '') {
+      try {
+        // Makes an RPC (remote procedure call) to the stored procedure 'login'
+        // It passes the username and password
+        final result = await Supabase.instance.client.rpc(
+          'login',
+          params: {
+            'usernamevar': usernameController.text,
+            'passwordvar': passwordController.text,
+          },
         );
-      } else {
+
+        if (result == true) {
+          //gets the related ID's
+          final steamID = await Supabase.instance.client
+              .from('useraccounts')
+              .select('user_platform_id')
+              .eq('username', usernameController.text)
+              .eq('platform_id', 1);
+          final lastfmID = await Supabase.instance.client
+              .from('useraccounts')
+              .select('user_platform_id')
+              .eq('username', usernameController.text)
+              .eq('platform_id', 2);
+          final imdbID = await Supabase.instance.client
+              .from('useraccounts')
+              .select('user_platform_id')
+              .eq('username', usernameController.text)
+              .eq('platform_id', 3);
+
+          //clears the controllers
+          usernameController.clear();
+          passwordController.clear();
+
+          //sets the ids in ApiServices
+          ApiServices.steamUserId = steamID[0]['user_platform_id'].toString();
+          ApiServices.lastFmUser = lastfmID[0]['user_platform_id'].toString();
+          ApiServices.tmdbUser = imdbID[0]['user_platform_id'].toString();
+
+          //sends to media screen
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => MediaScreen()),
+          );
+        } else {
+          showDialog(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                title: Text('Wrong Username/Password'),
+                content: Text('Wrong password or account doesn\'t exsist.'),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: const Text('Okay'),
+                  ),
+                ],
+              );
+            },
+          );
+        }
+      } catch (e) {
+        // If there’s an error (e.g., procedure not found, bad params),
+        // catch it and show an error SnackBar instead
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text(result.toString())));
+        ).showSnackBar(SnackBar(content: Text('Error: $e')));
       }
-    } catch (e) {
-      // If there’s an error (e.g., procedure not found, bad params),
-      // catch it and show an error SnackBar instead
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Error: $e')));
+    } else {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text('Invalid Input'),
+            content: Text('Please enter a valid username and password.'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: const Text('Okay'),
+              ),
+            ],
+          );
+        },
+      );
     }
   }
 
