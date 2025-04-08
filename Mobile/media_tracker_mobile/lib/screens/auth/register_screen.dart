@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:media_tracker_test/screens/media_screen.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:bcrypt/bcrypt.dart';
+import '../../services/auth_service.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -11,98 +10,74 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreen extends State<RegisterScreen> {
-  TextEditingController usernameController = TextEditingController();
-  TextEditingController passwordController = TextEditingController();
-  TextEditingController emailController = TextEditingController();
-  TextEditingController firstNameController = TextEditingController();
-  TextEditingController lastNameController = TextEditingController();
+  final usernameController = TextEditingController();
+  final passwordController = TextEditingController();
+  final emailController = TextEditingController();
+  final firstNameController = TextEditingController();
+  final lastNameController = TextEditingController();
+  final authService = AuthService();
 
-  @override
-  void initState() {
-    super.initState();
-  }
+  void register() async {
+    if (usernameController.text.trim().isEmpty ||
+        passwordController.text.trim().isEmpty ||
+        emailController.text.trim().isEmpty ||
+        firstNameController.text.trim().isEmpty) {
+      showDialog(
+        context: context,
+        builder:
+            (_) => AlertDialog(
+              title: Text('Invalid Input'),
+              content: Text('Please enter valid information.'),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text('Okay'),
+                ),
+              ],
+            ),
+      );
+      return;
+    }
 
-  void login() async {
-    if (usernameController.text.replaceAll(' ', '') != '' &&
-        passwordController.text.replaceAll(' ', '') != '' &&
-        emailController.text.replaceAll(' ', '') != '' &&
-        firstNameController.text.replaceAll(' ', '') != '') {
-      try {
-        final hashedPassword = BCrypt.hashpw(
-          passwordController.text,
-          BCrypt.gensalt(),
+    try {
+      final success = await authService.register(
+        username: usernameController.text.trim(),
+        password: passwordController.text,
+        firstName: firstNameController.text.trim(),
+        lastName: lastNameController.text.trim(),
+        email: emailController.text.trim(),
+      );
+
+      if (success) {
+        usernameController.clear();
+        passwordController.clear();
+        emailController.clear();
+        firstNameController.clear();
+        lastNameController.clear();
+
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => MediaScreen()),
         );
-
-        final updatedHash = hashedPassword.replaceFirst('\$2a\$', '\$2b\$');
-        // Makes an RPC (remote procedure call) to the stored procedure 'login'
-        // It passes the username and password
-        final result = await Supabase.instance.client.rpc(
-          'CreateUser',
-          params: {
-            'usernamevar': usernameController.text,
-            'firstnamevar': firstNameController.text,
-            'lastnamevar': lastNameController.text,
-            'emailvar': emailController.text,
-            'passwordvar': updatedHash,
-          },
-        );
-
-        if (result == true) {
-          //clears controllers
-          usernameController.clear();
-          passwordController.clear();
-          emailController.clear();
-          firstNameController.clear();
-          lastNameController.clear();
-
-          //sends to media screen
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => MediaScreen()),
-          );
-        } else {
-          showDialog(
-            context: context,
-            builder: (context) {
-              return AlertDialog(
+      } else {
+        showDialog(
+          context: context,
+          builder:
+              (_) => AlertDialog(
                 title: Text('Username Already Exists'),
                 actions: [
                   TextButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    child: const Text('Okay'),
+                    onPressed: () => Navigator.pop(context),
+                    child: Text('Okay'),
                   ),
                 ],
-              );
-            },
-          );
-        }
-      } catch (e) {
-        // If there’s an error (e.g., procedure not found, bad params),
-        // catch it and show an error SnackBar instead
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Error: $e')));
-      }
-    } else {
-      showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: Text('Invalid Input'),
-            content: Text('Please enter a valid information.'),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: const Text('Okay'),
               ),
-            ],
-          );
-        },
-      );
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error: $e')));
     }
   }
 
@@ -177,7 +152,7 @@ class _RegisterScreen extends State<RegisterScreen> {
             ),
             Row(
               children: [
-                ElevatedButton(onPressed: login, child: Text('Sign Up')),
+                ElevatedButton(onPressed: register, child: Text('Sign Up')),
               ],
             ),
           ],
