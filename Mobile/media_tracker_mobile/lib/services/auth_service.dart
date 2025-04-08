@@ -1,6 +1,11 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:bcrypt/bcrypt.dart';
 import '../config/api_connections.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+final authServiceProvider = Provider<AuthService>((ref) {
+  return AuthService();
+});
 
 class AuthService {
   final supabase = Supabase.instance.client;

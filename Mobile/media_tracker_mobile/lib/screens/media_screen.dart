@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:media_tracker_test/providers/auth_provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/lastfm/lastfm_artist.dart';
 import '../models/lastfm/lastfm_track.dart';
@@ -11,14 +13,14 @@ import '../services/media_api/steam_service.dart';
 import '../services/media_api/lastfm_service.dart';
 import '../services/media_api/tmdb_service.dart';
 
-class MediaScreen extends StatefulWidget {
+class MediaScreen extends ConsumerStatefulWidget {
   const MediaScreen({super.key});
 
   @override
-  _MediaScreenState createState() => _MediaScreenState();
+  ConsumerState<MediaScreen> createState() => _MediaScreenState();
 }
 
-class _MediaScreenState extends State<MediaScreen> {
+class _MediaScreenState extends ConsumerState<MediaScreen> {
   int _selectedIndex = 0;
 
   // Steam
@@ -112,8 +114,12 @@ class _MediaScreenState extends State<MediaScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final auth = ref.watch(authProvider);
+    //final isLoggedIn = auth.isLoggedIn;
+    final firstName = auth.firstName;
+
     return Scaffold(
-      appBar: AppBar(title: Text('Media Platform')),
+      appBar: AppBar(title: Text('$firstName\'s Platform')),
       body: _buildBody(),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
