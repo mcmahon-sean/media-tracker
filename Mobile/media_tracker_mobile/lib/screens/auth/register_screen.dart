@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:media_tracker_test/screens/media_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:bcrypt/bcrypt.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -27,6 +28,12 @@ class _RegisterScreen extends State<RegisterScreen> {
         emailController.text.replaceAll(' ', '') != '' &&
         firstNameController.text.replaceAll(' ', '') != '') {
       try {
+        final hashedPassword = BCrypt.hashpw(
+          passwordController.text,
+          BCrypt.gensalt(),
+        );
+
+        final updatedHash = hashedPassword.replaceFirst('\$2a\$', '\$2b\$');
         // Makes an RPC (remote procedure call) to the stored procedure 'login'
         // It passes the username and password
         final result = await Supabase.instance.client.rpc(
@@ -36,7 +43,7 @@ class _RegisterScreen extends State<RegisterScreen> {
             'firstnamevar': firstNameController.text,
             'lastnamevar': lastNameController.text,
             'emailvar': emailController.text,
-            'passwordvar': passwordController.text,
+            'passwordvar': updatedHash,
           },
         );
 
@@ -103,7 +110,8 @@ class _RegisterScreen extends State<RegisterScreen> {
   Widget build(BuildContext context) {
     return (Scaffold(
       appBar: AppBar(title: Text('Sign Up')),
-      body: Padding(
+      body: SingleChildScrollView(
+        // Padding(
         padding: const EdgeInsets.all(50),
         child: Column(
           children: [
@@ -173,6 +181,7 @@ class _RegisterScreen extends State<RegisterScreen> {
               ],
             ),
           ],
+          // ),
         ),
       ),
     ));
