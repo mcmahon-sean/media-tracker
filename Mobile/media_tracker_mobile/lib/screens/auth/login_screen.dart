@@ -26,7 +26,7 @@ class _LoginScreenState extends State<LoginScreen> {
         // Makes an RPC (remote procedure call) to the stored procedure 'login'
         // It passes the username and password
         final result = await Supabase.instance.client.rpc(
-          'login',
+          'AuthenticateUser',
           params: {
             'usernamevar': usernameController.text,
             'passwordvar': passwordController.text,
