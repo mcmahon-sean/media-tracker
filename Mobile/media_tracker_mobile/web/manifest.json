@@ -1,6 +1,6 @@
 {
-    "name": "media_tracker_mobile",
-    "short_name": "media_tracker_mobile",
+    "name": "media_tracker_test",
+    "short_name": "media_tracker_test",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
