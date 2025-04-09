@@ -45,7 +45,7 @@ class _LoginScreenState extends State<LoginScreen> {
               .select('user_platform_id')
               .eq('username', usernameController.text)
               .eq('platform_id', 2);
-          final imdbID = await Supabase.instance.client
+          final tmdbID = await Supabase.instance.client
               .from('useraccounts')
               .select('user_platform_id')
               .eq('username', usernameController.text)
@@ -56,9 +56,15 @@ class _LoginScreenState extends State<LoginScreen> {
           passwordController.clear();
 
           //sets the ids in ApiServices
-          ApiServices.steamUserId = steamID[0]['user_platform_id'].toString();
-          ApiServices.lastFmUser = lastfmID[0]['user_platform_id'].toString();
-          ApiServices.tmdbUser = imdbID[0]['user_platform_id'].toString();
+          if (steamID.isNotEmpty) {
+            ApiServices.steamUserId = steamID[0]['user_platform_id'].toString();
+          }
+          if (lastfmID.isNotEmpty) {
+            ApiServices.lastFmUser = lastfmID[0]['user_platform_id'].toString();
+          }
+          if (tmdbID.isNotEmpty) {
+            ApiServices.tmdbUser = tmdbID[0]['user_platform_id'].toString();
+          }
 
           //sends to media screen
           Navigator.push(
