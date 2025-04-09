@@ -1,20 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:media_tracker_test/screens/media_screen.dart';
 import '../../services/auth_service.dart';
 
-class LoginScreen extends StatefulWidget {
+class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 
   @override
   _LoginScreenState createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginScreenState extends ConsumerState<LoginScreen> {
   final usernameController = TextEditingController();
   final passwordController = TextEditingController();
-  final authService = AuthService();
 
   void login() async {
+    final authService = ref.read(authServiceProvider);
     if (usernameController.text.trim().isEmpty ||
         passwordController.text.trim().isEmpty) {
       showDialog(
@@ -35,6 +36,8 @@ class _LoginScreenState extends State<LoginScreen> {
     }
 
     try {
+      // Attempt to log in using the AuthService's login method
+      // It sends the trimmed username and password to Supabase for authentication
       final success = await authService.login(
         usernameController.text.trim(),
         passwordController.text.trim(),

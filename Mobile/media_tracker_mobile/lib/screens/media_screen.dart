@@ -45,6 +45,7 @@ class _MediaScreenState extends ConsumerState<MediaScreen> {
     _loadPlatformData(_selectedIndex); // Load Steam by default
   }
 
+  // Load the data for the selected platform based on index
   void _loadPlatformData(int index) {
     switch (index) {
       case 0:
@@ -56,17 +57,17 @@ class _MediaScreenState extends ConsumerState<MediaScreen> {
       case 2:
         if (_topArtists.isEmpty || _recentTracks.isEmpty) _loadLastFmData();
         break;
-      // TMDB to be added later
     }
   }
 
+  // Fetches and sets Steam game data
   Future<void> _loadSteamGames() async {
     setState(() => _isLoadingSteam = true);
     try {
       final games = await fetchSteamGames();
       setState(() {
-        _steamGames = games;
-        _isLoadingSteam = false;
+        _steamGames = games; // Set game list
+        _isLoadingSteam = false; // Stop loading
       });
     } catch (e) {
       print('Steam load error: $e');
@@ -74,6 +75,7 @@ class _MediaScreenState extends ConsumerState<MediaScreen> {
     }
   }
 
+  // Fetches and sets Last.fm user data
   Future<void> _loadLastFmData() async {
     setState(() => _isLoadingLastFm = true);
     try {
@@ -82,10 +84,10 @@ class _MediaScreenState extends ConsumerState<MediaScreen> {
       final tracks = await fetchLastFmRecentTracks();
 
       setState(() {
-        _lastFmUser = user;
-        _topArtists = artists;
-        _recentTracks = tracks;
-        _isLoadingLastFm = false;
+        _lastFmUser = user; // Get user profile
+        _topArtists = artists; // Get top artists
+        _recentTracks = tracks; // Get recent tracks
+        _isLoadingLastFm = false; // Stop loading
       });
     } catch (e) {
       print('Last.fm load error: $e');
@@ -93,6 +95,7 @@ class _MediaScreenState extends ConsumerState<MediaScreen> {
     }
   }
 
+  // Fetches and sets TMDB user data
   Future<void> _loadTmdbData() async {
     setState(() => _isLoadingTmdb = true);
     try {
@@ -101,10 +104,10 @@ class _MediaScreenState extends ConsumerState<MediaScreen> {
       final shows = await TMDBService.fetchFavoriteTvShows();
 
       setState(() {
-        _tmdbAccount = account;
-        _ratedMovies = movies;
-        _favoriteTvShows = shows;
-        _isLoadingTmdb = false;
+        _tmdbAccount = account; // Get user profile
+        _ratedMovies = movies; // Get rated movies
+        _favoriteTvShows = shows; // Get favorite shows
+        _isLoadingTmdb = false; // Stop loading
       });
     } catch (e) {
       print('TMDB load error: $e');
@@ -115,11 +118,10 @@ class _MediaScreenState extends ConsumerState<MediaScreen> {
   @override
   Widget build(BuildContext context) {
     final auth = ref.watch(authProvider);
-    //final isLoggedIn = auth.isLoggedIn;
     final firstName = auth.firstName;
 
     return Scaffold(
-      appBar: AppBar(title: Text('$firstName\'s Platform')),
+      appBar: AppBar(title: Text('$firstName\'s Media')),
       body: _buildBody(),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,

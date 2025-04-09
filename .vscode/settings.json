@@ -3,6 +3,12 @@
         "TMDB"
     ],
     "cSpell.words": [
-        "prefs"
+        "emailvar",
+        "firstnamevar",
+        "lastnamevar",
+        "passwordvar",
+        "prefs",
+        "useraccounts",
+        "usernamevar"
     ]
 }

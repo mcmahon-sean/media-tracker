@@ -1,23 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:media_tracker_test/screens/media_screen.dart';
 import '../../services/auth_service.dart';
 
-class RegisterScreen extends StatefulWidget {
+class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});
 
   @override
   _RegisterScreen createState() => _RegisterScreen();
 }
 
-class _RegisterScreen extends State<RegisterScreen> {
+class _RegisterScreen extends ConsumerState<RegisterScreen> {
   final usernameController = TextEditingController();
   final passwordController = TextEditingController();
   final emailController = TextEditingController();
   final firstNameController = TextEditingController();
   final lastNameController = TextEditingController();
-  final authService = AuthService();
 
   void register() async {
+    final authService = ref.read(authServiceProvider);
     if (usernameController.text.trim().isEmpty ||
         passwordController.text.trim().isEmpty ||
         emailController.text.trim().isEmpty ||
@@ -40,6 +41,8 @@ class _RegisterScreen extends State<RegisterScreen> {
     }
 
     try {
+      // Attempt to register a new user using the AuthService's register method
+      // This sends all required user data to Supabase, calling a stored procedure on the backend
       final success = await authService.register(
         username: usernameController.text.trim(),
         password: passwordController.text,
