@@ -19,6 +19,8 @@ namespace media_tracker_desktop
             InitializeComponent();
         }
 
+        private Client connection;
+
         // Testing
         private async void btnDBConnectionTest_Click(object sender, EventArgs e)
         {
@@ -30,15 +32,126 @@ namespace media_tracker_desktop
             //string userEmailDB = "";
             //string userPasswordDB = "";
 
-            Client connection = new SupabaseConnection().GetClient();
+            connection = new SupabaseConnection().GetClient();
 
             // test connection ----------
             TestSupabaseConnection(connection);
 
             // test viewing tables -----------
             // to test different table, go to method.
-            //TestSupabaseViewTable(connection);
+            TestSupabaseViewTable(connection);
 
+        }
+
+        // Testing user create. Normally should be done in a separate form.
+        private async void btnTestUserCreate_Click(object sender, EventArgs e)
+        {
+            if (connection == null)
+            {
+                MessageBox.Show("Not connected to the DB.");
+                return;
+            }
+
+            UserAccount account = new UserAccount(connection);
+
+            // variable was used to control a while loop, which loops again if the user didn't enter valid fields to create a new user.
+            bool validUser = false;
+
+            string username = "testDesktopUser";
+            string firstName = "testDesktopFN";
+            string lastName = "testDesktopLN";
+            string email = "testDesktop@email.com";
+            string password = "testDesktopPassword";
+
+            UserRegistrationParam newUser = null;
+
+            // try catch block is implemented since the SupabaseUserRegistration object throws exception as a means of validation.
+            try
+            {
+                newUser = new UserRegistrationParam(username, firstName, lastName, email, password);
+
+                // If the user object is not null,
+                if (newUser != null)
+                {
+                    // Create the user.
+                    (bool userCreated, string message) result = await account.CreateUser(newUser);
+
+                    // If the creation is successful,
+                    if (result.userCreated)
+                    {
+                        MessageBox.Show($"User: {newUser.Username} created.");
+
+                        validUser = true;
+                    }
+                    else
+                    {
+                        MessageBox.Show(result.message);
+
+                        validUser = false;
+                    }
+                }
+                else
+                {
+                    validUser = false;
+                }
+            }
+            catch (Exception error)
+            {
+                validUser = false;
+            }
+        }
+
+        private async void btnTestUserLogin_Click(object sender, EventArgs e)
+        {
+            if (connection == null)
+            {
+                MessageBox.Show("Not connected to the DB.");
+                return;
+            }
+
+            UserAccount account = new UserAccount(connection);
+
+            bool validUser = false;
+
+            string username = "testDesktopUser";
+            string password = "testDesktopPassword";
+
+            UserLoginParam user = null;
+
+            // try catch block is implemented since the SupabaseUserLogin object throws exception as a means of validation.
+            try
+            {
+                user = new UserLoginParam(username, password);
+
+                // If the user object is not null,
+                if (user != null)
+                {
+                    // Create the user.
+                    (bool userAuthenticated, string message) result = await account.AuthenticateUser(user);
+
+                    // If the user is authenticated,
+                    if (result.userAuthenticated)
+                    {
+                        MessageBox.Show($"{user.Username} logged in.");
+
+                        validUser = true;
+                    }
+                    else
+                    {
+                        MessageBox.Show(result.message);
+
+                        validUser = false;
+                    }
+                }
+                else
+                {
+                    validUser = false;
+                }
+            }
+            catch (Exception error)
+            {
+                validUser = false;
+            }
         }
 
         private async void TestSupabaseConnection(Client connection)
@@ -60,13 +173,13 @@ namespace media_tracker_desktop
         private async void TestSupabaseViewTable(Client connection)
         {
             // Change the object type of the .From method to a different table model for testing.
-            var records = await connection.From<UserFavorite>().Get();
+            var records = await connection.From<User>().Get();
 
             string testDisplay = "";
 
             foreach (var record in records.Models)
             {
-                testDisplay += $"{record.ToString}\n";
+                testDisplay += $"{record.Username} | {record.FirstName} | {record.LastName} | {record.Email} | {record.Password}\n\n";
             }
 
             MessageBox.Show(testDisplay);
@@ -351,5 +464,7 @@ namespace media_tracker_desktop
                 MessageBox.Show(message);
             }
         }
+
+        
     }
 }

@@ -36,6 +36,8 @@
             btnTestTMDBAccount = new Button();
             btnTestTMDBMovie = new Button();
             btnTestTMDBTVShow = new Button();
+            btnTestUserCreate = new Button();
+            btnTestUserLogin = new Button();
             SuspendLayout();
             // 
             // btnDBConnectionTest
@@ -118,11 +120,33 @@
             btnTestTMDBTVShow.UseVisualStyleBackColor = true;
             btnTestTMDBTVShow.Click += btnTestTMDBTVShow_Click;
             // 
+            // btnTestUserCreate
+            // 
+            btnTestUserCreate.Location = new Point(26, 96);
+            btnTestUserCreate.Name = "btnTestUserCreate";
+            btnTestUserCreate.Size = new Size(160, 34);
+            btnTestUserCreate.TabIndex = 8;
+            btnTestUserCreate.Text = "Test User Create";
+            btnTestUserCreate.UseVisualStyleBackColor = true;
+            btnTestUserCreate.Click += btnTestUserCreate_Click;
+            // 
+            // btnTestUserLogin
+            // 
+            btnTestUserLogin.Location = new Point(26, 151);
+            btnTestUserLogin.Name = "btnTestUserLogin";
+            btnTestUserLogin.Size = new Size(160, 34);
+            btnTestUserLogin.TabIndex = 9;
+            btnTestUserLogin.Text = "Test User Login";
+            btnTestUserLogin.UseVisualStyleBackColor = true;
+            btnTestUserLogin.Click += btnTestUserLogin_Click;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 450);
+            Controls.Add(btnTestUserLogin);
+            Controls.Add(btnTestUserCreate);
             Controls.Add(btnTestTMDBTVShow);
             Controls.Add(btnTestTMDBMovie);
             Controls.Add(btnTestTMDBAccount);
@@ -146,5 +170,7 @@
         private Button btnTestTMDBAccount;
         private Button btnTestTMDBMovie;
         private Button btnTestTMDBTVShow;
+        private Button btnTestUserCreate;
+        private Button btnTestUserLogin;
     }
 }
