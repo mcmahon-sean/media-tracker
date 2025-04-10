@@ -19,12 +19,33 @@ class _LoginScreenState extends State<LoginScreen> {
     super.initState();
   }
 
+  @override
+  void dispose() {
+    usernameController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
+
+  Future<String?> _getPlatformID(String username, int platformId) async {
+    try {
+      final response = await Supabase.instance.client
+          .from('useraccounts')
+          .select('user_platform_id')
+          .eq('username', username)
+          .eq('platform_id', platformId)
+          .maybeSingle();
+
+      return response?['user_platform_id']?.toString();
+    } catch (e) {
+      print('Error fetching platform ID for $platformId: $e');
+      return null;
+    }
+  }
+
   void login() async {
-    if (usernameController.text.replaceAll(' ', '') != '' &&
-        passwordController.text.replaceAll(' ', '') != '') {
+    if (usernameController.text.trim().isNotEmpty &&
+        passwordController.text.trim().isNotEmpty) {
       try {
-        // Makes an RPC (remote procedure call) to the stored procedure 'login'
-        // It passes the username and password
         final result = await Supabase.instance.client.rpc(
           'AuthenticateUser',
           params: {
@@ -34,93 +55,58 @@ class _LoginScreenState extends State<LoginScreen> {
         );
 
         if (result == true) {
-          //gets the related ID's
-          final steamID = await Supabase.instance.client
-              .from('useraccounts')
-              .select('user_platform_id')
-              .eq('username', usernameController.text)
-              .eq('platform_id', 1);
-          final lastfmID = await Supabase.instance.client
-              .from('useraccounts')
-              .select('user_platform_id')
-              .eq('username', usernameController.text)
-              .eq('platform_id', 2);
-          final tmdbID = await Supabase.instance.client
-              .from('useraccounts')
-              .select('user_platform_id')
-              .eq('username', usernameController.text)
-              .eq('platform_id', 3);
+          final steamID =
+              await _getPlatformID(usernameController.text, 1);
+          final lastfmID =
+              await _getPlatformID(usernameController.text, 2);
+          final imdbID =
+              await _getPlatformID(usernameController.text, 3);
 
-          //clears the controllers
           usernameController.clear();
           passwordController.clear();
 
-          //sets the ids in ApiServices
-          if (steamID.isNotEmpty) {
-            ApiServices.steamUserId = steamID[0]['user_platform_id'].toString();
-          }
-          if (lastfmID.isNotEmpty) {
-            ApiServices.lastFmUser = lastfmID[0]['user_platform_id'].toString();
-          }
-          if (tmdbID.isNotEmpty) {
-            ApiServices.tmdbUser = tmdbID[0]['user_platform_id'].toString();
-          }
+          ApiServices.steamUserId = steamID ?? "";
+          ApiServices.lastFmUser = lastfmID ?? "";
+          ApiServices.tmdbUser = imdbID ?? "";
 
-          //sends to media screen
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => MediaScreen()),
           );
         } else {
-          showDialog(
-            context: context,
-            builder: (context) {
-              return AlertDialog(
-                title: Text('Wrong Username/Password'),
-                content: Text('Wrong password or account doesn\'t exsist.'),
-                actions: [
-                  TextButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    child: const Text('Okay'),
-                  ),
-                ],
-              );
-            },
-          );
+          _showAlertDialog(
+              'Wrong Username/Password', 'Incorrect login details.');
         }
       } catch (e) {
-        // If there’s an error (e.g., procedure not found, bad params),
-        // catch it and show an error SnackBar instead
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Error: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $e')),
+        );
       }
     } else {
-      showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: Text('Invalid Input'),
-            content: Text('Please enter a valid username and password.'),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: const Text('Okay'),
-              ),
-            ],
-          );
-        },
-      );
+      _showAlertDialog(
+          'Invalid Input', 'Please enter both username and password.');
     }
+  }
+
+  void _showAlertDialog(String title, String message) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(title),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Okay'),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return (Scaffold(
+    return Scaffold(
       appBar: AppBar(title: Text('Login')),
       body: Padding(
         padding: const EdgeInsets.all(50),
@@ -145,6 +131,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: TextField(
                     controller: passwordController,
                     maxLength: 50,
+                    obscureText: true,
                     decoration: InputDecoration(label: Text('Password')),
                   ),
                 ),
@@ -158,6 +145,6 @@ class _LoginScreenState extends State<LoginScreen> {
           ],
         ),
       ),
-    ));
+    );
   }
 }
