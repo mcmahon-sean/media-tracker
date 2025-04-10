@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'screens/home_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'models/theme.dart' as theme;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -21,38 +22,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Media Tracker',
-      theme: ThemeData(
-        scaffoldBackgroundColor: Color.fromARGB(255, 48, 48, 48),
-        textTheme: TextTheme(
-          headlineLarge: TextStyle(color: Colors.white)
-        ),
-        appBarTheme: AppBarTheme(
-          backgroundColor: Color.fromARGB(255, 16, 16, 16), 
-          surfaceTintColor: Colors.black,
-          foregroundColor: Colors.white
-        ),
-        elevatedButtonTheme: ElevatedButtonThemeData(
-          style: ButtonStyle(
-            backgroundColor: WidgetStateProperty.all<Color>(Color.fromARGB(255, 96, 96, 96)),
-            foregroundColor: WidgetStateProperty.all<Color>(Colors.white)
-          )
-        ),
-        bottomNavigationBarTheme: BottomNavigationBarThemeData(
-          backgroundColor: Color.fromARGB(255, 16, 16, 16),
-          unselectedItemColor: Colors.white70,
-          selectedIconTheme: IconThemeData(size: 32),
-          selectedItemColor: Colors.white,
-          selectedLabelStyle: TextStyle(fontSize: 16)
-        ),
-        listTileTheme: ListTileThemeData(
-          titleTextStyle: TextStyle(
-            color: Colors.white,
-            fontSize: 16,
-            fontWeight: FontWeight.bold
-          ),
-          subtitleTextStyle: TextStyle(color: Colors.white)
-        )
-      ),
+      theme: theme.themeData,
       home: HomeScreen(),
     );
   }
