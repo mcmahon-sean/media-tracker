@@ -57,11 +57,14 @@ namespace media_tracker_desktop
             // variable was used to control a while loop, which loops again if the user didn't enter valid fields to create a new user.
             bool validUser = false;
 
-            string username = "testDesktopUser";
+
+            // Default Username = "testDesktopUser"
+            // Default Password = "testDesktopPassword"
+            string username = txtUsername.Text;
             string firstName = "testDesktopFN";
             string lastName = "testDesktopLN";
             string email = "testDesktop@email.com";
-            string password = "testDesktopPassword";
+            string password = txtPassword.Text;
 
             UserRegistrationParam newUser = null;
 
@@ -113,8 +116,11 @@ namespace media_tracker_desktop
 
             bool validUser = false;
 
-            string username = "testDesktopUser";
-            string password = "testDesktopPassword";
+            // Default Username = "testDesktopUser"
+            // Default Password = "testDesktopPassword"
+
+            string username = txtUsername.Text;
+            string password = txtPassword.Text;
 
             UserLoginParam user = null;
 

@@ -38,6 +38,10 @@
             btnTestTMDBTVShow = new Button();
             btnTestUserCreate = new Button();
             btnTestUserLogin = new Button();
+            txtUsername = new TextBox();
+            txtPassword = new TextBox();
+            LblUsername = new Label();
+            lblPassword = new Label();
             SuspendLayout();
             // 
             // btnDBConnectionTest
@@ -122,7 +126,7 @@
             // 
             // btnTestUserCreate
             // 
-            btnTestUserCreate.Location = new Point(26, 96);
+            btnTestUserCreate.Location = new Point(26, 196);
             btnTestUserCreate.Name = "btnTestUserCreate";
             btnTestUserCreate.Size = new Size(160, 34);
             btnTestUserCreate.TabIndex = 8;
@@ -132,7 +136,7 @@
             // 
             // btnTestUserLogin
             // 
-            btnTestUserLogin.Location = new Point(26, 151);
+            btnTestUserLogin.Location = new Point(26, 156);
             btnTestUserLogin.Name = "btnTestUserLogin";
             btnTestUserLogin.Size = new Size(160, 34);
             btnTestUserLogin.TabIndex = 9;
@@ -140,11 +144,49 @@
             btnTestUserLogin.UseVisualStyleBackColor = true;
             btnTestUserLogin.Click += btnTestUserLogin_Click;
             // 
+            // txtUsername
+            // 
+            txtUsername.Location = new Point(26, 82);
+            txtUsername.Name = "txtUsername";
+            txtUsername.Size = new Size(190, 31);
+            txtUsername.TabIndex = 10;
+            txtUsername.Text = "testDesktopUser";
+            // 
+            // txtPassword
+            // 
+            txtPassword.Location = new Point(26, 119);
+            txtPassword.Name = "txtPassword";
+            txtPassword.Size = new Size(190, 31);
+            txtPassword.TabIndex = 11;
+            txtPassword.Text = "testDesktopPassword";
+            // 
+            // LblUsername
+            // 
+            LblUsername.AutoSize = true;
+            LblUsername.Location = new Point(222, 82);
+            LblUsername.Name = "LblUsername";
+            LblUsername.Size = new Size(91, 25);
+            LblUsername.TabIndex = 14;
+            LblUsername.Text = "Username";
+            // 
+            // lblPassword
+            // 
+            lblPassword.AutoSize = true;
+            lblPassword.Location = new Point(222, 119);
+            lblPassword.Name = "lblPassword";
+            lblPassword.Size = new Size(87, 25);
+            lblPassword.TabIndex = 15;
+            lblPassword.Text = "Password";
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 450);
+            Controls.Add(lblPassword);
+            Controls.Add(LblUsername);
+            Controls.Add(txtPassword);
+            Controls.Add(txtUsername);
             Controls.Add(btnTestUserLogin);
             Controls.Add(btnTestUserCreate);
             Controls.Add(btnTestTMDBTVShow);
@@ -158,6 +200,7 @@
             Name = "Form1";
             Text = "Form1";
             ResumeLayout(false);
+            PerformLayout();
         }
 
         #endregion
@@ -172,5 +215,9 @@
         private Button btnTestTMDBTVShow;
         private Button btnTestUserCreate;
         private Button btnTestUserLogin;
+        private TextBox txtUsername;
+        private TextBox txtPassword;
+        private Label LblUsername;
+        private Label lblPassword;
     }
 }
