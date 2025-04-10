@@ -11,20 +11,18 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  TextEditingController usernameController = TextEditingController();
-  TextEditingController passwordController = TextEditingController();
+   final _formKey = GlobalKey<FormState>();
+    // for teh form valididation
+  final TextEditingController usernameController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
 
-  @override
-  void initState() {
-    super.initState();
-  }
+ 
 
   void login() async {
-    if (usernameController.text.replaceAll(' ', '') != '' &&
-        passwordController.text.replaceAll(' ', '') != '') {
+   //  Validate al the fields first
+    if (_formKey.currentState!.validate()) {
       try {
-        // Makes an RPC (remote procedure call) to the stored procedure 'login'
-        // It passes the username and password
+        // RPC to 'login' stored procedure with username and password
         final result = await Supabase.instance.client.rpc(
           'login',
           params: {
@@ -33,8 +31,8 @@ class _LoginScreenState extends State<LoginScreen> {
           },
         );
 
-        if (result == true) {
-          //gets the related ID's
+         if (result == true) {
+          // Retrieve platform IDs for the logged-in user
           final steamID = await Supabase.instance.client
               .from('useraccounts')
               .select('user_platform_id')
@@ -66,22 +64,18 @@ class _LoginScreenState extends State<LoginScreen> {
             MaterialPageRoute(builder: (context) => MediaScreen()),
           );
         } else {
-          showDialog(
+         showDialog(
             context: context,
-            builder: (context) {
-              return AlertDialog(
-                title: Text('Wrong Username/Password'),
-                content: Text('Wrong password or account doesn\'t exsist.'),
-                actions: [
-                  TextButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    child: const Text('Okay'),
-                  ),
-                ],
-              );
-            },
+            builder: (context) => AlertDialog(
+              title: const Text('Wrong Username/Password'),
+              content: const Text('Wrong password or account doesn\'t exist.'),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Okay'),
+                ),
+              ],
+            ),
           );
         }
       } catch (e) {
@@ -89,69 +83,61 @@ class _LoginScreenState extends State<LoginScreen> {
         // catch it and show an error SnackBar instead
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('Error: $e')));
+        ).showSnackBar(SnackBar(content: Text('Error: $e')),
+
+        );
+      
       }
-    } else {
-      showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: Text('Invalid Input'),
-            content: Text('Please enter a valid username and password.'),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: const Text('Okay'),
-              ),
-            ],
-          );
-        },
-      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return (Scaffold(
-      appBar: AppBar(title: Text('Login')),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Login'),
+        centerTitle: true, 
+   
+      ),
+      
       body: Padding(
-        padding: const EdgeInsets.all(50),
-        child: Column(
-          children: [
-            Row(
-              children: [
-                SizedBox(
-                  width: 300,
-                  child: TextField(
-                    controller: usernameController,
-                    maxLength: 50,
-                    decoration: InputDecoration(label: Text('Username')),
-                  ),
+        padding: const EdgeInsets.all(24.0),
+        child: Form(
+          key: _formKey,
+          child: ListView(
+            children: [
+              TextFormField(
+                controller: usernameController,
+                maxLength: 50,
+                decoration: const InputDecoration(
+                  labelText: 'Username',
+                  labelStyle: TextStyle(color: Color.fromARGB(179, 0, 0, 0)),
                 ),
-              ],
-            ),
-            Row(
-              children: [
-                SizedBox(
-                  width: 300,
-                  child: TextField(
-                    controller: passwordController,
-                    maxLength: 50,
-                    decoration: InputDecoration(label: Text('Password')),
-                  ),
+                style: const TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
+                validator: (value) =>
+                    value == null || value.isEmpty ? 'Username is required' : null,
+              ),
+              TextFormField(
+                controller: passwordController,
+                maxLength: 50,
+                obscureText: true,
+                decoration: const InputDecoration(
+                  labelText: 'Password',
+                  labelStyle: TextStyle(color: Color.fromARGB(179, 0, 0, 0)),
                 ),
-              ],
-            ),
-            Row(
-              children: [
-                ElevatedButton(onPressed: login, child: Text('Login')),
-              ],
-            ),
-          ],
+                style: const TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
+                validator: (value) =>
+                    value == null || value.isEmpty ? 'Password is required' : null,
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: login,
+                child: const Text('Login'),
+              ),
+            ],
+          ),
         ),
       ),
-    ));
+    );
   }
 }

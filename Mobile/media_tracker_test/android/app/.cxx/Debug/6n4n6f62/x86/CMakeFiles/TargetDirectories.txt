@@ -1,0 +1,2 @@
+C:/media tracker PROJECT/media-tracker/Mobile/media_tracker_test/android/app/.cxx/Debug/6n4n6f62/x86/CMakeFiles/edit_cache.dir
+C:/media tracker PROJECT/media-tracker/Mobile/media_tracker_test/android/app/.cxx/Debug/6n4n6f62/x86/CMakeFiles/rebuild_cache.dir
