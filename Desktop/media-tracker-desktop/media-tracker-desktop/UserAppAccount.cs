@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace media_tracker_desktop
 {
-    public class UserAccount
+    public class UserAppAccount
     {
         // Stored Procedure Names
         private const string CREATE_USER_SP_NAME = "CreateUser";
@@ -33,7 +33,7 @@ namespace media_tracker_desktop
         }
 
         // Constructor
-        public UserAccount(Client connection)
+        public UserAppAccount(Client connection)
         {
             _connection = EnsureConnectionNotNull(connection);
         }
