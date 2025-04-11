@@ -11,7 +11,7 @@
         $first = $_POST['first_name'];
         $last = $_POST['last_name'] ?? null;
         $email = $_POST['email'];
-        $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
+        $password = $_POST['password'];
 
         $stmt = $pdo->prepare("SELECT public.\"CreateUser\"(?, ?, ?, ?, ?)");
         $stmt->execute([$username, $first, $last, $email, $password]);
