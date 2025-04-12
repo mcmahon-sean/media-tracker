@@ -20,6 +20,7 @@ namespace media_tracker_desktop
         }
 
         private Client connection;
+        public Client GetConnection() { return connection; }
 
         //Button code copied from Form1.cs
         private async void btnTestUserCreate_Click(object sender, EventArgs e)
@@ -39,9 +40,9 @@ namespace media_tracker_desktop
             // Default Username = "testDesktopUser"
             // Default Password = "testDesktopPassword"
             string username = txtUsername.Text;
-            string firstName = "testDesktopFN";
-            string lastName = "testDesktopLN";
-            string email = "testDesktop@email.com";
+            string firstName = txtFN.Text;
+            string lastName = txtLN.Text;
+            string email = txtEmail.Text;
             string password = txtPassword.Text;
 
             UserRegistrationParam newUser = null;

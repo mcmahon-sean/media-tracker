@@ -29,6 +29,9 @@
         private void InitializeComponent()
         {
             panel1 = new Panel();
+            label7 = new Label();
+            lblEmail = new Label();
+            txtEmail = new TextBox();
             label5 = new Label();
             label3 = new Label();
             label2 = new Label();
@@ -36,15 +39,15 @@
             UNErr = new Label();
             btnRegister = new Button();
             btnCancel = new Button();
-            label4 = new Label();
+            lblConfirm = new Label();
             txtConfirm = new TextBox();
             PWLabel = new Label();
             txtPassword = new TextBox();
-            LNameLabel = new Label();
+            lblLN = new Label();
             txtLN = new TextBox();
-            FNameLabel = new Label();
+            lblFN = new Label();
             txtFN = new TextBox();
-            UNLabel = new Label();
+            lblUsername = new Label();
             txtUsername = new TextBox();
             panel2 = new Panel();
             SignUpLabel = new Label();
@@ -55,6 +58,9 @@
             // panel1
             // 
             panel1.BackColor = SystemColors.GrayText;
+            panel1.Controls.Add(label7);
+            panel1.Controls.Add(lblEmail);
+            panel1.Controls.Add(txtEmail);
             panel1.Controls.Add(label5);
             panel1.Controls.Add(label3);
             panel1.Controls.Add(label2);
@@ -62,15 +68,15 @@
             panel1.Controls.Add(UNErr);
             panel1.Controls.Add(btnRegister);
             panel1.Controls.Add(btnCancel);
-            panel1.Controls.Add(label4);
+            panel1.Controls.Add(lblConfirm);
             panel1.Controls.Add(txtConfirm);
             panel1.Controls.Add(PWLabel);
             panel1.Controls.Add(txtPassword);
-            panel1.Controls.Add(LNameLabel);
+            panel1.Controls.Add(lblLN);
             panel1.Controls.Add(txtLN);
-            panel1.Controls.Add(FNameLabel);
+            panel1.Controls.Add(lblFN);
             panel1.Controls.Add(txtFN);
-            panel1.Controls.Add(UNLabel);
+            panel1.Controls.Add(lblUsername);
             panel1.Controls.Add(txtUsername);
             panel1.Controls.Add(panel2);
             panel1.Location = new Point(12, 12);
@@ -78,12 +84,41 @@
             panel1.Size = new Size(776, 426);
             panel1.TabIndex = 0;
             // 
+            // label7
+            // 
+            label7.AutoSize = true;
+            label7.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            label7.ForeColor = Color.Red;
+            label7.Location = new Point(590, 313);
+            label7.Name = "label7";
+            label7.Size = new Size(55, 21);
+            label7.TabIndex = 21;
+            label7.Text = "xyxyxy";
+            // 
+            // lblEmail
+            // 
+            lblEmail.AutoSize = true;
+            lblEmail.Font = new Font("Sans Serif Collection", 11.9999981F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            lblEmail.ForeColor = SystemColors.HighlightText;
+            lblEmail.Location = new Point(250, 300);
+            lblEmail.Name = "lblEmail";
+            lblEmail.Size = new Size(128, 54);
+            lblEmail.TabIndex = 20;
+            lblEmail.Text = "Email Address";
+            // 
+            // txtEmail
+            // 
+            txtEmail.Location = new Point(386, 311);
+            txtEmail.Name = "txtEmail";
+            txtEmail.Size = new Size(198, 23);
+            txtEmail.TabIndex = 19;
+            // 
             // label5
             // 
             label5.AutoSize = true;
             label5.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
             label5.ForeColor = Color.Red;
-            label5.Location = new Point(590, 324);
+            label5.Location = new Point(590, 272);
             label5.Name = "label5";
             label5.Size = new Size(55, 21);
             label5.TabIndex = 18;
@@ -94,7 +129,7 @@
             label3.AutoSize = true;
             label3.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
             label3.ForeColor = Color.Red;
-            label3.Location = new Point(590, 270);
+            label3.Location = new Point(590, 230);
             label3.Name = "label3";
             label3.Size = new Size(55, 21);
             label3.TabIndex = 17;
@@ -105,7 +140,7 @@
             label2.AutoSize = true;
             label2.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
             label2.ForeColor = Color.Red;
-            label2.Location = new Point(590, 216);
+            label2.Location = new Point(590, 186);
             label2.Name = "label2";
             label2.Size = new Size(55, 21);
             label2.TabIndex = 16;
@@ -116,7 +151,7 @@
             label1.AutoSize = true;
             label1.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
             label1.ForeColor = Color.Red;
-            label1.Location = new Point(590, 162);
+            label1.Location = new Point(590, 146);
             label1.Name = "label1";
             label1.Size = new Size(55, 21);
             label1.TabIndex = 15;
@@ -142,12 +177,13 @@
             btnRegister.TabIndex = 13;
             btnRegister.Text = "Register";
             btnRegister.UseVisualStyleBackColor = true;
+            btnRegister.Click += btnTestUserCreate_Click;
             // 
             // btnCancel
             // 
             btnCancel.Font = new Font("Sans Serif Collection", 11.9999981F, FontStyle.Regular, GraphicsUnit.Point, 0);
             btnCancel.ImageAlign = ContentAlignment.MiddleRight;
-            btnCancel.Location = new Point(278, 372);
+            btnCancel.Location = new Point(263, 372);
             btnCancel.Name = "btnCancel";
             btnCancel.Size = new Size(98, 40);
             btnCancel.TabIndex = 12;
@@ -155,20 +191,20 @@
             btnCancel.TextAlign = ContentAlignment.TopCenter;
             btnCancel.UseVisualStyleBackColor = true;
             // 
-            // label4
+            // lblConfirm
             // 
-            label4.AutoSize = true;
-            label4.Font = new Font("Sans Serif Collection", 11.9999981F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            label4.ForeColor = SystemColors.HighlightText;
-            label4.Location = new Point(214, 315);
-            label4.Name = "label4";
-            label4.Size = new Size(162, 54);
-            label4.TabIndex = 11;
-            label4.Text = "Confirm Password";
+            lblConfirm.AutoSize = true;
+            lblConfirm.Font = new Font("Sans Serif Collection", 11.9999981F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            lblConfirm.ForeColor = SystemColors.HighlightText;
+            lblConfirm.Location = new Point(216, 259);
+            lblConfirm.Name = "lblConfirm";
+            lblConfirm.Size = new Size(162, 54);
+            lblConfirm.TabIndex = 11;
+            lblConfirm.Text = "Confirm Password";
             // 
             // txtConfirm
             // 
-            txtConfirm.Location = new Point(386, 326);
+            txtConfirm.Location = new Point(386, 270);
             txtConfirm.Name = "txtConfirm";
             txtConfirm.Size = new Size(198, 23);
             txtConfirm.TabIndex = 10;
@@ -178,7 +214,7 @@
             PWLabel.AutoSize = true;
             PWLabel.Font = new Font("Sans Serif Collection", 11.9999981F, FontStyle.Regular, GraphicsUnit.Point, 0);
             PWLabel.ForeColor = SystemColors.HighlightText;
-            PWLabel.Location = new Point(278, 261);
+            PWLabel.Location = new Point(280, 217);
             PWLabel.Name = "PWLabel";
             PWLabel.Size = new Size(98, 54);
             PWLabel.TabIndex = 9;
@@ -186,57 +222,57 @@
             // 
             // txtPassword
             // 
-            txtPassword.Location = new Point(386, 272);
+            txtPassword.Location = new Point(386, 228);
             txtPassword.Name = "txtPassword";
             txtPassword.Size = new Size(198, 23);
             txtPassword.TabIndex = 8;
             // 
-            // LNameLabel
+            // lblLN
             // 
-            LNameLabel.AutoSize = true;
-            LNameLabel.Font = new Font("Sans Serif Collection", 11.9999981F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            LNameLabel.ForeColor = SystemColors.HighlightText;
-            LNameLabel.Location = new Point(278, 207);
-            LNameLabel.Name = "LNameLabel";
-            LNameLabel.Size = new Size(101, 54);
-            LNameLabel.TabIndex = 7;
-            LNameLabel.Text = "Last Name";
+            lblLN.AutoSize = true;
+            lblLN.Font = new Font("Sans Serif Collection", 11.9999981F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            lblLN.ForeColor = SystemColors.HighlightText;
+            lblLN.Location = new Point(280, 173);
+            lblLN.Name = "lblLN";
+            lblLN.Size = new Size(101, 54);
+            lblLN.TabIndex = 7;
+            lblLN.Text = "Last Name";
             // 
             // txtLN
             // 
-            txtLN.Location = new Point(386, 218);
+            txtLN.Location = new Point(386, 184);
             txtLN.Name = "txtLN";
             txtLN.Size = new Size(198, 23);
             txtLN.TabIndex = 6;
             // 
-            // FNameLabel
+            // lblFN
             // 
-            FNameLabel.AutoSize = true;
-            FNameLabel.Font = new Font("Sans Serif Collection", 11.9999981F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            FNameLabel.ForeColor = SystemColors.HighlightText;
-            FNameLabel.Location = new Point(278, 153);
-            FNameLabel.Name = "FNameLabel";
-            FNameLabel.Size = new Size(103, 54);
-            FNameLabel.TabIndex = 5;
-            FNameLabel.Text = "First Name";
+            lblFN.AutoSize = true;
+            lblFN.Font = new Font("Sans Serif Collection", 11.9999981F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            lblFN.ForeColor = SystemColors.HighlightText;
+            lblFN.Location = new Point(280, 133);
+            lblFN.Name = "lblFN";
+            lblFN.Size = new Size(103, 54);
+            lblFN.TabIndex = 5;
+            lblFN.Text = "First Name";
             // 
             // txtFN
             // 
-            txtFN.Location = new Point(386, 164);
+            txtFN.Location = new Point(386, 144);
             txtFN.Name = "txtFN";
             txtFN.Size = new Size(198, 23);
             txtFN.TabIndex = 4;
             // 
-            // UNLabel
+            // lblUsername
             // 
-            UNLabel.AutoSize = true;
-            UNLabel.Font = new Font("Sans Serif Collection", 11.9999981F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            UNLabel.ForeColor = SystemColors.HighlightText;
-            UNLabel.Location = new Point(278, 94);
-            UNLabel.Name = "UNLabel";
-            UNLabel.Size = new Size(102, 54);
-            UNLabel.TabIndex = 3;
-            UNLabel.Text = "Username";
+            lblUsername.AutoSize = true;
+            lblUsername.Font = new Font("Sans Serif Collection", 11.9999981F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            lblUsername.ForeColor = SystemColors.HighlightText;
+            lblUsername.Location = new Point(281, 94);
+            lblUsername.Name = "lblUsername";
+            lblUsername.Size = new Size(102, 54);
+            lblUsername.TabIndex = 3;
+            lblUsername.Text = "Username";
             // 
             // txtUsername
             // 
@@ -286,15 +322,15 @@
         private Panel panel1;
         private Panel panel2;
         private Label SignUpLabel;
-        private Label UNLabel;
+        private Label lblUsername;
         private TextBox txtUsername;
-        private Label label4;
+        private Label lblConfirm;
         private TextBox txtConfirm;
         private Label PWLabel;
         private TextBox txtPassword;
-        private Label LNameLabel;
+        private Label lblLN;
         private TextBox txtLN;
-        private Label FNameLabel;
+        private Label lblFN;
         private TextBox txtFN;
         private Button btnRegister;
         private Button btnCancel;
@@ -303,5 +339,8 @@
         private Label label2;
         private Label label1;
         private Label UNErr;
+        private Label label7;
+        private Label lblEmail;
+        private TextBox txtEmail;
     }
 }

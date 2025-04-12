@@ -104,6 +104,15 @@ namespace media_tracker_desktop
             }
         }
 
+        //(Jacob A, 4/12) Opens the signup page, logging in as the user on successful account creation.
+        private async void btnUserSignupForm_Click(object sender, EventArgs e)
+        {
+            if (connection == null)
+            {
+                MessageBox.Show("Not connected to the DB.");
+                return;
+            }
+        }
         private async void btnTestUserLogin_Click(object sender, EventArgs e)
         {
             if (connection == null)
