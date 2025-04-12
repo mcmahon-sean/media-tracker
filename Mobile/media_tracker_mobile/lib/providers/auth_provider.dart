@@ -1,14 +1,17 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+// Currently have the token information commented out until we can get a token returned from the DB
+
 // Represents the authenticated user's state
 class AuthState {
   final String? username;
   final String? firstName;
   final String? lastName;
   final String? email;
+  //final String? token;
 
   // A computed property that returns true if the user is logged in
-  bool get isLoggedIn => username != null;
+  bool get isLoggedIn => username != null; // && token != null;
 
   // Constructor for creating an AuthState instance with optional fields
   const AuthState({
@@ -16,6 +19,7 @@ class AuthState {
     this.firstName,
     this.lastName,
     this.email,
+    //this.token,
   });
 
   // Creates a new AuthState based on the current state,
@@ -25,12 +29,14 @@ class AuthState {
     String? firstName,
     String? lastName,
     String? email,
+    //String? token,
   }) {
     return AuthState(
       username: username ?? this.username,
       firstName: firstName ?? this.firstName,
       lastName: lastName ?? this.lastName,
       email: email ?? this.email,
+      //token: token ?? this.token,
     );
   }
 
@@ -49,12 +55,14 @@ class AuthNotifier extends StateNotifier<AuthState> {
     required String firstName,
     required String lastName,
     required String email,
+    //required String token,
   }) {
     state = AuthState(
       username: username,
       firstName: firstName,
       lastName: lastName,
       email: email,
+      //token: token,
     );
   }
 
