@@ -14,6 +14,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   final usernameController = TextEditingController();
   final passwordController = TextEditingController();
 
+  @override
+  void dispose() {
+    usernameController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
+
   void login() async {
     final authService = ref.read(authServiceProvider);
     if (usernameController.text.trim().isEmpty ||
@@ -75,7 +82,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return (Scaffold(
+    return Scaffold(
       appBar: AppBar(title: Text('Login')),
       body: Padding(
         padding: const EdgeInsets.all(50),
@@ -100,6 +107,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   child: TextField(
                     controller: passwordController,
                     maxLength: 50,
+                    obscureText: true,
                     decoration: InputDecoration(label: Text('Password')),
                   ),
                 ),
@@ -113,6 +121,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           ],
         ),
       ),
-    ));
+    );
   }
 }
