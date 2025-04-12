@@ -12,8 +12,26 @@ final authServiceProvider = Provider<AuthService>((ref) {
 // AuthService handles login and registration logic using Supabase
 class AuthService {
   final supabase = Supabase.instance.client;
-  final Ref ref; // Reference to Riverpod's Ref, used to interact with other providers
+  final Ref
+  ref; // Reference to Riverpod's Ref, used to interact with other providers
   AuthService(this.ref); // Constructor accepting the ref object from Riverpod
+
+  Future<String?> _getPlatformID(String username, int platformId) async {
+    try {
+      final response =
+          await Supabase.instance.client
+              .from('useraccounts')
+              .select('user_platform_id')
+              .eq('username', username)
+              .eq('platform_id', platformId)
+              .maybeSingle();
+
+      return response!['user_platform_id'].toString();
+    } catch (e) {
+      print('Error fetching platform ID for $platformId: $e');
+      return null;
+    }
+  }
 
   // Logs in a user by calling a stored procedure and loading their profile info
   Future<bool> login(String username, String password) async {
@@ -25,39 +43,24 @@ class AuthService {
 
     if (result == true) {
       // Fetch user's basic profile information (first name, last name, email)
-      final userInfo = await supabase 
+      final userInfo = await supabase
           .from('users')
           .select('first_name, last_name, email')
           .eq('username', username);
 
       // Fetch linked platform IDs (Steam, Last.fm, TMDB) from the useraccounts table
-      final steamID = await supabase 
-          .from('useraccounts')
-          .select('user_platform_id')
-          .eq('username', username)
-          .eq('platform_id', 1);
-
-      final lastfmID = await supabase
-          .from('useraccounts')
-          .select('user_platform_id')
-          .eq('username', username)
-          .eq('platform_id', 2);
-
-      final tmdbID = await supabase
-          .from('useraccounts')
-          .select('user_platform_id')
-          .eq('username', username)
-          .eq('platform_id', 3);
-
-       // If the Steam ID, last.fm ID, or TMDB ID exists, assign them globally via ApiServices
-      if (steamID.isNotEmpty) {
-        ApiServices.steamUserId = steamID[0]['user_platform_id'].toString();
+      // If the Steam ID, last.fm ID, or TMDB ID exists, assign them globally via ApiServices
+      final steamID = await _getPlatformID(username, 1);
+      if (steamID != null && steamID.isNotEmpty) {
+        ApiServices.steamUserId = steamID;
       }
-      if (lastfmID.isNotEmpty) {
-        ApiServices.lastFmUser = lastfmID[0]['user_platform_id'].toString();
+      final lastfmID = await _getPlatformID(username, 2);
+      if (lastfmID != null && lastfmID.isNotEmpty) {
+        ApiServices.lastFmUser = lastfmID;
       }
-      if (tmdbID.isNotEmpty) {
-        ApiServices.tmdbUser = tmdbID[0]['user_platform_id'].toString();
+      final tmdbID = await _getPlatformID(username, 3);
+      if (tmdbID != null && tmdbID.isNotEmpty) {
+        ApiServices.tmdbUser = tmdbID;
       }
 
       // If user profile data was found, update the global auth state using authProvider
