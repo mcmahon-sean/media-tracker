@@ -1,23 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:media_tracker_test/config/api_connections.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:media_tracker_test/screens/media_screen.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../services/auth_service.dart';
 
-class LoginScreen extends StatefulWidget {
+class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 
   @override
   _LoginScreenState createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
-  TextEditingController usernameController = TextEditingController();
-  TextEditingController passwordController = TextEditingController();
-
-  @override
-  void initState() {
-    super.initState();
-  }
+class _LoginScreenState extends ConsumerState<LoginScreen> {
+  final usernameController = TextEditingController();
+  final passwordController = TextEditingController();
 
   @override
   void dispose() {
@@ -26,82 +21,63 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  Future<String?> _getPlatformID(String username, int platformId) async {
-    try {
-      final response = await Supabase.instance.client
-          .from('useraccounts')
-          .select('user_platform_id')
-          .eq('username', username)
-          .eq('platform_id', platformId)
-          .maybeSingle();
-
-      return response?['user_platform_id']?.toString();
-    } catch (e) {
-      print('Error fetching platform ID for $platformId: $e');
-      return null;
-    }
-  }
-
   void login() async {
-    if (usernameController.text.trim().isNotEmpty &&
-        passwordController.text.trim().isNotEmpty) {
-      try {
-        final result = await Supabase.instance.client.rpc(
-          'AuthenticateUser',
-          params: {
-            'usernamevar': usernameController.text,
-            'passwordvar': passwordController.text,
-          },
+    final authService = ref.read(authServiceProvider);
+    if (usernameController.text.trim().isEmpty ||
+        passwordController.text.trim().isEmpty) {
+      showDialog(
+        context: context,
+        builder:
+            (_) => AlertDialog(
+              title: Text('Invalid Input'),
+              content: Text('Please enter a valid username and password.'),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text('Okay'),
+                ),
+              ],
+            ),
+      );
+      return;
+    }
+
+    try {
+      // Attempt to log in using the AuthService's login method
+      // It sends the trimmed username and password to Supabase for authentication
+      final success = await authService.login(
+        usernameController.text.trim(),
+        passwordController.text.trim(),
+      );
+
+      if (success) {
+        usernameController.clear();
+        passwordController.clear();
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => MediaScreen()),
         );
-
-        if (result == true) {
-          final steamID =
-              await _getPlatformID(usernameController.text, 1);
-          final lastfmID =
-              await _getPlatformID(usernameController.text, 2);
-          final imdbID =
-              await _getPlatformID(usernameController.text, 3);
-
-          usernameController.clear();
-          passwordController.clear();
-
-          ApiServices.steamUserId = steamID ?? "";
-          ApiServices.lastFmUser = lastfmID ?? "";
-          ApiServices.tmdbUser = imdbID ?? "";
-
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => MediaScreen()),
-          );
-        } else {
-          _showAlertDialog(
-              'Wrong Username/Password', 'Incorrect login details.');
-        }
-      } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
+      } else {
+        showDialog(
+          context: context,
+          builder:
+              (_) => AlertDialog(
+                title: Text('Wrong Username/Password'),
+                content: Text('Wrong password or account doesn\'t exist.'),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: Text('Okay'),
+                  ),
+                ],
+              ),
         );
       }
-    } else {
-      _showAlertDialog(
-          'Invalid Input', 'Please enter both username and password.');
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error: $e')));
     }
-  }
-
-  void _showAlertDialog(String title, String message) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(title),
-        content: Text(message),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Okay'),
-          ),
-        ],
-      ),
-    );
   }
 
   @override
