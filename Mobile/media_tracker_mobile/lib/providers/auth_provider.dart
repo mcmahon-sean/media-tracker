@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:media_tracker_test/config/api_connections.dart';
 
 // Currently have the token information commented out until we can get a token returned from the DB
 
@@ -68,7 +69,13 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
   // Clears the state, effectively logging the user out
   void logout() {
+    // Clear the auth state
     state = AuthState.empty();
+
+    // Clear any global third-party API user ids
+    ApiServices.steamUserId = "";
+    ApiServices.lastFmUser = "";
+    ApiServices.tmdbUser = "";
   }
 }
 

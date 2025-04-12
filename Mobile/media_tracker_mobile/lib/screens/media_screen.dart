@@ -12,6 +12,7 @@ import '../models/tmdb/tmdb_tv_show.dart';
 import '../services/media_api/steam_service.dart';
 import '../services/media_api/lastfm_service.dart';
 import '../services/media_api/tmdb_service.dart';
+import 'home_screen.dart';
 
 class MediaScreen extends ConsumerStatefulWidget {
   const MediaScreen({super.key});
@@ -121,7 +122,24 @@ class _MediaScreenState extends ConsumerState<MediaScreen> {
     final firstName = auth.firstName;
 
     return Scaffold(
-      appBar: AppBar(title: Text('$firstName\'s Media')),
+      appBar: AppBar(
+        title: Text('$firstName\'s Media'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            color: Colors.grey,
+            tooltip: 'Logout',
+            onPressed: () {
+              // Clear auth state
+              ref.read(authProvider.notifier).logout();
+              // Navigate back to the home screen
+              Navigator.of(context).pushReplacement(
+                MaterialPageRoute(builder: (_) => const HomeScreen()),
+              );
+            },
+          ),
+        ],
+      ),
       body: _buildBody(),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
