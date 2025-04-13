@@ -35,13 +35,18 @@ class AuthService {
 
   // Logs in a user by calling a stored procedure and loading their profile info
   Future<bool> login(String username, String password) async {
-    // Call a Postgres RPC (stored procedure) to authenticate user credentials
-    final result = await supabase.rpc(
-      'AuthenticateUser',
-      params: {'usernamevar': username, 'passwordvar': password},
-    );
+    try {
+      // Call the PostgreSQL RPC to authenticate and get a token
+      final result = await supabase.rpc(
+        'auth_user',
+        params: {'username_input': username, 'password_input': password},
+      );
 
-    if (result == true) {
+      // If token is null or empty, login failed
+      if (result == null || result is! String || result.isEmpty) {
+        return false;
+      }
+
       // Fetch user's basic profile information (first name, last name, email)
       final userInfo = await supabase
           .from('users')
@@ -72,11 +77,14 @@ class AuthService {
               firstName: userInfo[0]['first_name'] ?? '',
               lastName: userInfo[0]['last_name'] ?? '',
               email: userInfo[0]['email'] ?? '',
+              token: result,
             );
       }
       return true;
+    } catch (e) {
+      print('Login failed: $e');
+      return false;
     }
-    return false;
   }
 
   // Registers a new user using a stored procedure

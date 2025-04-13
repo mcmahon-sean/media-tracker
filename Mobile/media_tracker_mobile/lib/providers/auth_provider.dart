@@ -9,7 +9,7 @@ class AuthState {
   final String? firstName;
   final String? lastName;
   final String? email;
-  //final String? token;
+  final String? token;
 
   // A computed property that returns true if the user is logged in
   bool get isLoggedIn => username != null; // && token != null;
@@ -20,7 +20,7 @@ class AuthState {
     this.firstName,
     this.lastName,
     this.email,
-    //this.token,
+    this.token,
   });
 
   // Creates a new AuthState based on the current state,
@@ -30,14 +30,14 @@ class AuthState {
     String? firstName,
     String? lastName,
     String? email,
-    //String? token,
+    String? token,
   }) {
     return AuthState(
       username: username ?? this.username,
       firstName: firstName ?? this.firstName,
       lastName: lastName ?? this.lastName,
       email: email ?? this.email,
-      //token: token ?? this.token,
+      token: token ?? this.token,
     );
   }
 
@@ -56,14 +56,14 @@ class AuthNotifier extends StateNotifier<AuthState> {
     required String firstName,
     required String lastName,
     required String email,
-    //required String token,
+    required String token,
   }) {
     state = AuthState(
       username: username,
       firstName: firstName,
       lastName: lastName,
       email: email,
-      //token: token,
+      token: token,
     );
   }
 
