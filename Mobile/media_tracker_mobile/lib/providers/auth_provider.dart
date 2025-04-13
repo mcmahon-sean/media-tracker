@@ -12,7 +12,7 @@ class AuthState {
   final String? token;
 
   // A computed property that returns true if the user is logged in
-  bool get isLoggedIn => username != null; // && token != null;
+  bool get isLoggedIn => username != null && token != null;
 
   // Constructor for creating an AuthState instance with optional fields
   const AuthState({
