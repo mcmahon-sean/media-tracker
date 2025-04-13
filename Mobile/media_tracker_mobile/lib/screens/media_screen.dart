@@ -13,6 +13,7 @@ import '../services/media_api/steam_service.dart';
 import '../services/media_api/lastfm_service.dart';
 import '../services/media_api/tmdb_service.dart';
 import 'home_screen.dart';
+import 'widgets/drawer_menu.dart';
 
 class MediaScreen extends ConsumerStatefulWidget {
   const MediaScreen({super.key});
@@ -139,6 +140,15 @@ class _MediaScreenState extends ConsumerState<MediaScreen> {
             },
           ),
         ],
+      ),
+      drawer: DrawerMenu(
+        firstName: firstName ?? '',
+        onSectionSelected: (index) {
+          setState(() {
+            _selectedIndex = index;
+          });
+          _loadPlatformData(index);
+        }
       ),
       body: _buildBody(),
       bottomNavigationBar: BottomNavigationBar(
