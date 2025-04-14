@@ -16,7 +16,7 @@ class AuthService {
   ref; // Reference to Riverpod's Ref, used to interact with other providers
   AuthService(this.ref); // Constructor accepting the ref object from Riverpod
 
-  Future<String?> _getPlatformID(String username, int platformId) async {
+  Future<String?> getPlatformID(String username, int platformId) async {
     try {
       final response =
           await Supabase.instance.client
@@ -55,15 +55,15 @@ class AuthService {
 
       // Fetch linked platform IDs (Steam, Last.fm, TMDB) from the useraccounts table
       // If the Steam ID, last.fm ID, or TMDB ID exists, assign them globally via ApiServices
-      final steamID = await _getPlatformID(username, 1);
+      final steamID = await getPlatformID(username, 1);
       if (steamID != null && steamID.isNotEmpty) {
         ApiServices.steamUserId = steamID;
       }
-      final lastfmID = await _getPlatformID(username, 2);
+      final lastfmID = await getPlatformID(username, 2);
       if (lastfmID != null && lastfmID.isNotEmpty) {
         ApiServices.lastFmUser = lastfmID;
       }
-      final tmdbID = await _getPlatformID(username, 3);
+      final tmdbID = await getPlatformID(username, 3);
       if (tmdbID != null && tmdbID.isNotEmpty) {
         ApiServices.tmdbUser = tmdbID;
       }

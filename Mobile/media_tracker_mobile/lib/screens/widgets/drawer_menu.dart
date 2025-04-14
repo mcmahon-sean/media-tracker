@@ -28,8 +28,8 @@ class DrawerMenu extends ConsumerWidget {
           ListTile(
             title: const Text('Link Media Services'),
             onTap: () {
-              onSectionSelected(0);
               Navigator.pop(context);
+              Navigator.pushNamed(context, '/linkAccounts');
             },
           ),
           ListTile(
