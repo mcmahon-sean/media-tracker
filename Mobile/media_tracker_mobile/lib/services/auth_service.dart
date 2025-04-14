@@ -78,6 +78,9 @@ class AuthService {
               lastName: userInfo[0]['last_name'] ?? '',
               email: userInfo[0]['email'] ?? '',
               token: result,
+              steamID: steamID,
+              lastFmUsername: lastfmID,
+              tmdbSessionId: tmdbID
             );
       }
       return true;

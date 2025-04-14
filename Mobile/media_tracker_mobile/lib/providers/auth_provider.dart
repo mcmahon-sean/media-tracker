@@ -1,8 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:media_tracker_test/config/api_connections.dart';
 
-// Currently have the token information commented out until we can get a token returned from the DB
-
 // Represents the authenticated user's state
 class AuthState {
   final String? username;
@@ -10,9 +8,15 @@ class AuthState {
   final String? lastName;
   final String? email;
   final String? token;
+  final String? steamId;
+  final String? tmdbSessionId;
+  final String? lastFmUsername;
 
   // A computed property that returns true if the user is logged in
   bool get isLoggedIn => username != null && token != null;
+
+  // A computed property that returns true if the user has linked third party API services
+  bool get anyMediaLinked => steamId != null || tmdbSessionId != null || lastFmUsername != null;
 
   // Constructor for creating an AuthState instance with optional fields
   const AuthState({
@@ -21,6 +25,9 @@ class AuthState {
     this.lastName,
     this.email,
     this.token,
+    this.steamId,
+    this.tmdbSessionId,
+    this.lastFmUsername,
   });
 
   // Creates a new AuthState based on the current state,
@@ -31,6 +38,9 @@ class AuthState {
     String? lastName,
     String? email,
     String? token,
+    String? steamId,
+    String? tmdbSessionId,
+    String? lastFmUsername,
   }) {
     return AuthState(
       username: username ?? this.username,
@@ -38,6 +48,9 @@ class AuthState {
       lastName: lastName ?? this.lastName,
       email: email ?? this.email,
       token: token ?? this.token,
+      steamId: steamId ?? this.steamId,
+      tmdbSessionId: tmdbSessionId ?? this.tmdbSessionId,
+      lastFmUsername: lastFmUsername ?? this.lastFmUsername
     );
   }
 
@@ -57,6 +70,9 @@ class AuthNotifier extends StateNotifier<AuthState> {
     required String lastName,
     required String email,
     required String token,
+    String? steamID,
+    String? tmdbSessionId,
+    String? lastFmUsername
   }) {
     state = AuthState(
       username: username,
@@ -64,6 +80,9 @@ class AuthNotifier extends StateNotifier<AuthState> {
       lastName: lastName,
       email: email,
       token: token,
+      steamId: steamID,
+      tmdbSessionId: tmdbSessionId,
+      lastFmUsername: lastFmUsername
     );
   }
 

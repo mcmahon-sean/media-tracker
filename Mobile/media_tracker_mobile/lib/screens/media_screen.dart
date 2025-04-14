@@ -13,6 +13,7 @@ import '../services/media_api/steam_service.dart';
 import '../services/media_api/lastfm_service.dart';
 import '../services/media_api/tmdb_service.dart';
 import 'home_screen.dart';
+import 'widgets/drawer_menu.dart';
 
 class MediaScreen extends ConsumerStatefulWidget {
   const MediaScreen({super.key});
@@ -48,15 +49,18 @@ class _MediaScreenState extends ConsumerState<MediaScreen> {
 
   // Load the data for the selected platform based on index
   void _loadPlatformData(int index) {
+    final auth = ref.read(authProvider);
     switch (index) {
       case 0:
-        if (_steamGames.isEmpty) _loadSteamGames();
+        if (auth.steamId != null && _steamGames.isEmpty) _loadSteamGames();
         break;
       case 1:
-        if (_tmdbAccount == null) _loadTmdbData();
+        if (auth.tmdbSessionId != null && _tmdbAccount == null) _loadTmdbData();
         break;
       case 2:
-        if (_topArtists.isEmpty || _recentTracks.isEmpty) _loadLastFmData();
+        if (auth.lastFmUsername != null &&
+            (_topArtists.isEmpty || _recentTracks.isEmpty))
+          _loadLastFmData();
         break;
     }
   }
@@ -66,12 +70,13 @@ class _MediaScreenState extends ConsumerState<MediaScreen> {
     setState(() => _isLoadingSteam = true);
     try {
       final games = await fetchSteamGames();
-      setState(() {
-        _steamGames = games; // Set game list
-        _isLoadingSteam = false; // Stop loading
-      });
+      setState(() => _steamGames = games); // Set game list
     } catch (e) {
       print('Steam load error: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Failed to load Steam data. Try again later.")),
+      );
+    } finally {
       setState(() => _isLoadingSteam = false);
     }
   }
@@ -140,6 +145,15 @@ class _MediaScreenState extends ConsumerState<MediaScreen> {
           ),
         ],
       ),
+      drawer: DrawerMenu(
+        firstName: firstName ?? '',
+        onSectionSelected: (index) {
+          setState(() {
+            _selectedIndex = index;
+          });
+          _loadPlatformData(index);
+        },
+      ),
       body: _buildBody(),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
@@ -165,19 +179,62 @@ class _MediaScreenState extends ConsumerState<MediaScreen> {
   }
 
   Widget _buildBody() {
+    final auth = ref.watch(authProvider);
+    // final noAccountsLinked =
+    //     auth.steamId == null &&
+    //     auth.tmdbSessionId == null &&
+    //     auth.lastFmUsername == null;
+
+    // if (noAccountsLinked) {
+    //   return _noMediaLinkedPrompt();
+    // }
+
     switch (_selectedIndex) {
       case 0:
-        return _isLoadingSteam ? _loading() : _buildSteamList();
+        if (_isLoadingSteam) return _loading();
+        if (auth.steamId == null) return _noMediaLinkedPrompt("Steam");
+        return _buildSteamList();
       case 1:
-        return _isLoadingTmdb ? _loading() : _buildTmdbSection();
+        if (_isLoadingTmdb) return _loading();
+        if (auth.tmdbSessionId == null) return _noMediaLinkedPrompt("TMDB");
+        return _buildTmdbSection();
       case 2:
-        return _isLoadingLastFm ? _loading() : _buildLastFmSection();
+        if (_isLoadingLastFm) return _loading();
+        if (auth.lastFmUsername == null) return _noMediaLinkedPrompt("Last.fm");
+        return _buildLastFmSection();
       default:
         return Center(child: Text("Coming soon..."));
     }
   }
 
   Widget _loading() => const Center(child: CircularProgressIndicator());
+
+  Widget _noMediaLinkedPrompt(String platform) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.link_off, size: 64, color: Colors.grey),
+            SizedBox(height: 16),
+            Text(
+              "$platform account not linked",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+            ),
+            SizedBox(height: 12),
+            ElevatedButton.icon(
+              icon: Icon(Icons.link),
+              label: Text("Link $platform Account"),
+              onPressed: () {
+                Navigator.pushNamed(context, '/linkAccounts');
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
   Widget _buildSteamList() {
     return ListView.builder(
