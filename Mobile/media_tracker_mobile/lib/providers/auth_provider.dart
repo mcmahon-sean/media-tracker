@@ -16,7 +16,8 @@ class AuthState {
   bool get isLoggedIn => username != null && token != null;
 
   // A computed property that returns true if the user has linked third party API services
-  bool get anyMediaLinked => steamId != null || tmdbSessionId != null || lastFmUsername != null;
+  bool get anyMediaLinked =>
+      steamId != null || tmdbSessionId != null || lastFmUsername != null;
 
   // Constructor for creating an AuthState instance with optional fields
   const AuthState({
@@ -41,6 +42,9 @@ class AuthState {
     String? steamId,
     String? tmdbSessionId,
     String? lastFmUsername,
+    bool clearSteamId = false,
+    bool clearTmdbSessionId = false,
+    bool clearLastFmUsername = false,
   }) {
     return AuthState(
       username: username ?? this.username,
@@ -48,9 +52,11 @@ class AuthState {
       lastName: lastName ?? this.lastName,
       email: email ?? this.email,
       token: token ?? this.token,
-      steamId: steamId ?? this.steamId,
-      tmdbSessionId: tmdbSessionId ?? this.tmdbSessionId,
-      lastFmUsername: lastFmUsername ?? this.lastFmUsername
+      steamId: clearSteamId ? null : (steamId ?? this.steamId),
+      tmdbSessionId:
+          clearTmdbSessionId ? null : (tmdbSessionId ?? this.tmdbSessionId),
+      lastFmUsername:
+          clearLastFmUsername ? null : (lastFmUsername ?? this.lastFmUsername),
     );
   }
 
@@ -72,7 +78,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
     required String token,
     String? steamID,
     String? tmdbSessionId,
-    String? lastFmUsername
+    String? lastFmUsername,
   }) {
     state = AuthState(
       username: username,
@@ -82,7 +88,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
       token: token,
       steamId: steamID,
       tmdbSessionId: tmdbSessionId,
-      lastFmUsername: lastFmUsername
+      lastFmUsername: lastFmUsername,
     );
   }
 
@@ -95,6 +101,22 @@ class AuthNotifier extends StateNotifier<AuthState> {
     ApiServices.steamUserId = "";
     ApiServices.lastFmUser = "";
     ApiServices.tmdbUser = "";
+  }
+
+  // Update methods when a user links third party API service
+  void updateSteamId(String? id) {
+    state = state.copyWith(steamId: id, clearSteamId: id == null);
+  }
+
+  void updateTmdbSessionId(String? id) {
+    state = state.copyWith(tmdbSessionId: id, clearTmdbSessionId: id == null);
+  }
+
+  void updateLastFmUsername(String? username) {
+    state = state.copyWith(
+      lastFmUsername: username,
+      clearLastFmUsername: username == null,
+    );
   }
 }
 
