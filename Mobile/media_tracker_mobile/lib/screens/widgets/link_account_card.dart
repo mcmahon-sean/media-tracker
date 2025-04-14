@@ -36,7 +36,11 @@ class _LinkAccountCardState extends ConsumerState<LinkAccountCard> {
   @override
   void didUpdateWidget(covariant LinkAccountCard oldWidget) {
     super.didUpdateWidget(oldWidget);
-    // When the account is unlinked externally
+    // Case 1: The linkedValue was cleared externally (e.g., user unlinked account)
+    // This ensures the UI resets to the "link" state
+    // _editMode is turned off to avoid showing the edit field
+    // _showCredential is turned off so no masked value shows
+    // The controller is cleared so the input field is blank
     if (oldWidget.linkedValue != widget.linkedValue &&
         widget.linkedValue == null) {
       setState(() {
@@ -46,7 +50,10 @@ class _LinkAccountCardState extends ConsumerState<LinkAccountCard> {
       });
     }
 
-    // When it's linked or updated (still keeps old behavior)
+    // Case 2: A new value was linked externally or updated
+    // This ensures the controller reflects the updated linkedValue
+    // Only updates if the user is not currently editing (_editMode == false)
+    // Prevents overwriting any in-progress edits
     if (oldWidget.linkedValue != widget.linkedValue &&
         widget.linkedValue != null &&
         !_editMode) {
@@ -168,7 +175,7 @@ class _LinkAccountCardState extends ConsumerState<LinkAccountCard> {
                             label: const Text('Unlink'),
                             onPressed: () {
                               widget
-                                  .onUnlink(); // ✅ properly calls external clear logic
+                                  .onUnlink(); // properly calls external clear logic
                               setState(() {
                                 _showCredential = false;
                                 _editMode = false;

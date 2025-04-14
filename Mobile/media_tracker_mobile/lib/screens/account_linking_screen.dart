@@ -24,7 +24,7 @@ class AccountLinkingScreen extends ConsumerWidget {
               linkedValue: auth.steamId,
               onLink: (id) => notifier.updateSteamId(id),
               onUnlink: () => notifier.updateSteamId(null),
-              onEdit: () {}, // Optional: you can handle UI state separately
+              onEdit: () {},
             ),
             LinkAccountCard(
               platformName: 'Last.fm',
