@@ -180,14 +180,6 @@ class _MediaScreenState extends ConsumerState<MediaScreen> {
 
   Widget _buildBody() {
     final auth = ref.watch(authProvider);
-    // final noAccountsLinked =
-    //     auth.steamId == null &&
-    //     auth.tmdbSessionId == null &&
-    //     auth.lastFmUsername == null;
-
-    // if (noAccountsLinked) {
-    //   return _noMediaLinkedPrompt();
-    // }
 
     switch (_selectedIndex) {
       case 0:
