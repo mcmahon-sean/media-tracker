@@ -31,7 +31,7 @@ namespace media_tracker_desktop
                 return;
             }
 
-            UserAppAccount account = new UserAppAccount(connection);
+            UserAppAccount.ConnectToDB(connection);
 
             // variable was used to control a while loop, which loops again if the user didn't enter valid fields to create a new user.
             bool validUser = false;
@@ -56,7 +56,7 @@ namespace media_tracker_desktop
                 if (newUser != null)
                 {
                     // Create the user.
-                    (bool userCreated, string message) result = await account.CreateUser(newUser);
+                    (bool userCreated, string message) result = await UserAppAccount.CreateUser(newUser);
 
                     // If the creation is successful,
                     if (result.userCreated)

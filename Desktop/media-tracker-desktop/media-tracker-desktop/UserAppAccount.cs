@@ -9,37 +9,37 @@ using System.Threading.Tasks;
 
 namespace media_tracker_desktop
 {
-    public class UserAppAccount
+    public static class UserAppAccount
     {
         // Stored Procedure Names
         private const string CREATE_USER_SP_NAME = "CreateUser";
         private const string AUTHENTICATE_USER_SP_NAME = "AuthenticateUser";
 
-        private Client _connection;
+        private static Client _connection;
 
-        private bool _userLoggedIn = false;
-        private string _username = string.Empty;
+        private static bool _userLoggedIn = false;
+        private static string _username = string.Empty;
 
         // Method: Returns bool if a user is logged in.
-        public bool UserLoggedIn
+        public static bool UserLoggedIn
         {
             get { return _userLoggedIn; }
         }
 
         // Method: Returns the username of the logged in user.
-        public string Username
+        public static string Username
         {
             get { return _username; }
         }
 
-        // Constructor
-        public UserAppAccount(Client connection)
+        // Method: Connect to the DB using the passed connection.
+        public static void ConnectToDB(Client dbConnection)
         {
-            _connection = EnsureConnectionNotNull(connection);
+            _connection = EnsureConnectionNotNull(dbConnection);
         }
 
         // Method: Ensures that connection is not null.
-        private Client EnsureConnectionNotNull(Client conn)
+        private static Client EnsureConnectionNotNull(Client conn)
         {
             if (conn == null)
             {
@@ -57,7 +57,7 @@ namespace media_tracker_desktop
         /// <returns>
         /// Returns a (bool, string) tuple. Boolean indicates if the process of creating the user is successful. String is the message to help with debugging.
         /// </returns>
-        public async Task<(bool, string)> CreateUser(UserRegistrationParam newUser)
+        public static async Task<(bool, string)> CreateUser(UserRegistrationParam newUser)
         {
             // If the user object is null,
             if (newUser == null)
@@ -107,7 +107,7 @@ namespace media_tracker_desktop
         /// <param name="connection">Connection to the DB.</param>
         /// <param name="user"></param>
         /// <returns>Returns a (bool, string) tuple. Boolean indicates if the process of authenticating is successful. String is the message to help with debugging.</returns>
-        public async Task<(bool, string)> AuthenticateUser(UserLoginParam user)
+        public static async Task<(bool, string)> AuthenticateUser(UserLoginParam user)
         {
             // Since we are attempting to log in a new user, current user is logged out.
             LogOut();
@@ -159,7 +159,7 @@ namespace media_tracker_desktop
             }
         }
 
-        public void LogOut()
+        public static void LogOut()
         {
             _username = string.Empty;
             _userLoggedIn = false;

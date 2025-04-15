@@ -25,7 +25,10 @@ namespace media_tracker_desktop
         public SigninForm(Client client)
         {
             // Assign the passed connection to our field
-            connection = client;
+            //connection = client;
+
+            UserAppAccount.ConnectToDB(client);
+
             InitializeComponent();
         }
 
@@ -39,7 +42,7 @@ namespace media_tracker_desktop
                 return;
             }
 
-            UserAppAccount account = new UserAppAccount(connection);
+            
 
             bool validUser = false;
 
@@ -59,7 +62,7 @@ namespace media_tracker_desktop
                 if (user != null)
                 {
                     // Create the user.
-                    (bool userAuthenticated, string message) result = await account.AuthenticateUser(user);
+                    (bool userAuthenticated, string message) result = await UserAppAccount.AuthenticateUser(user);
 
                     // If the user is authenticated,
                     if (result.userAuthenticated)
