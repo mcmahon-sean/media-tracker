@@ -42,6 +42,13 @@
             txtPassword = new TextBox();
             LblUsername = new Label();
             lblPassword = new Label();
+            btnLinkSteam = new Button();
+            btnLinkLastFm = new Button();
+            btnLinkTmdb = new Button();
+            btnGetUser = new Button();
+            btnCheckSteam = new Button();
+            btnCheckLastFM = new Button();
+            btnCheckTMDB = new Button();
             SuspendLayout();
             // 
             // btnDBConnectionTest
@@ -178,11 +185,88 @@
             lblPassword.TabIndex = 15;
             lblPassword.Text = "Password";
             // 
+            // btnLinkSteam
+            // 
+            btnLinkSteam.Location = new Point(29, 372);
+            btnLinkSteam.Name = "btnLinkSteam";
+            btnLinkSteam.Size = new Size(125, 34);
+            btnLinkSteam.TabIndex = 16;
+            btnLinkSteam.Text = "Link Steam";
+            btnLinkSteam.UseVisualStyleBackColor = true;
+            btnLinkSteam.Click += btnLinkSteam_Click;
+            // 
+            // btnLinkLastFm
+            // 
+            btnLinkLastFm.Location = new Point(178, 372);
+            btnLinkLastFm.Name = "btnLinkLastFm";
+            btnLinkLastFm.Size = new Size(135, 34);
+            btnLinkLastFm.TabIndex = 17;
+            btnLinkLastFm.Text = "Link LastFM";
+            btnLinkLastFm.UseVisualStyleBackColor = true;
+            btnLinkLastFm.Click += btnLinkLastFm_Click;
+            // 
+            // btnLinkTmdb
+            // 
+            btnLinkTmdb.Location = new Point(326, 372);
+            btnLinkTmdb.Name = "btnLinkTmdb";
+            btnLinkTmdb.Size = new Size(135, 34);
+            btnLinkTmdb.TabIndex = 18;
+            btnLinkTmdb.Text = "Link TMDB";
+            btnLinkTmdb.UseVisualStyleBackColor = true;
+            btnLinkTmdb.Click += btnLinkTmdb_Click;
+            // 
+            // btnGetUser
+            // 
+            btnGetUser.Location = new Point(479, 372);
+            btnGetUser.Name = "btnGetUser";
+            btnGetUser.Size = new Size(171, 34);
+            btnGetUser.TabIndex = 19;
+            btnGetUser.Text = "Get Username";
+            btnGetUser.UseVisualStyleBackColor = true;
+            btnGetUser.Click += btnGetUser_Click;
+            // 
+            // btnCheckSteam
+            // 
+            btnCheckSteam.Location = new Point(29, 332);
+            btnCheckSteam.Name = "btnCheckSteam";
+            btnCheckSteam.Size = new Size(125, 34);
+            btnCheckSteam.TabIndex = 20;
+            btnCheckSteam.Text = "Check Steam";
+            btnCheckSteam.UseVisualStyleBackColor = true;
+            btnCheckSteam.Click += btnCheckSteam_Click;
+            // 
+            // btnCheckLastFM
+            // 
+            btnCheckLastFM.Location = new Point(178, 332);
+            btnCheckLastFM.Name = "btnCheckLastFM";
+            btnCheckLastFM.Size = new Size(135, 34);
+            btnCheckLastFM.TabIndex = 21;
+            btnCheckLastFM.Text = "Check LastFM";
+            btnCheckLastFM.UseVisualStyleBackColor = true;
+            btnCheckLastFM.Click += btnCheckLastFM_Click;
+            // 
+            // btnCheckTMDB
+            // 
+            btnCheckTMDB.Location = new Point(326, 332);
+            btnCheckTMDB.Name = "btnCheckTMDB";
+            btnCheckTMDB.Size = new Size(135, 34);
+            btnCheckTMDB.TabIndex = 22;
+            btnCheckTMDB.Text = "Check TMDB";
+            btnCheckTMDB.UseVisualStyleBackColor = true;
+            btnCheckTMDB.Click += btnCheckTMDB_Click;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 450);
+            Controls.Add(btnCheckTMDB);
+            Controls.Add(btnCheckLastFM);
+            Controls.Add(btnCheckSteam);
+            Controls.Add(btnGetUser);
+            Controls.Add(btnLinkTmdb);
+            Controls.Add(btnLinkLastFm);
+            Controls.Add(btnLinkSteam);
             Controls.Add(lblPassword);
             Controls.Add(LblUsername);
             Controls.Add(txtPassword);
@@ -219,5 +303,12 @@
         private TextBox txtPassword;
         private Label LblUsername;
         private Label lblPassword;
+        private Button btnLinkSteam;
+        private Button btnLinkLastFm;
+        private Button btnLinkTmdb;
+        private Button btnGetUser;
+        private Button btnCheckSteam;
+        private Button btnCheckLastFM;
+        private Button btnCheckTMDB;
     }
 }

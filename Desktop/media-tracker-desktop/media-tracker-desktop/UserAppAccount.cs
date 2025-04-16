@@ -1,10 +1,15 @@
 ﻿using media_tracker_desktop.Models;
 using media_tracker_desktop.Models.SupabaseTables;
+using Microsoft.IdentityModel.Tokens;
+using RestSharp;
 using Supabase;
 using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
+using System.Net;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -15,6 +20,7 @@ namespace media_tracker_desktop
         // Stored Procedure Names
         private const string CREATE_USER_SP_NAME = "CreateUser";
         private const string AUTHENTICATE_USER_SP_NAME = "AuthenticateUser";
+        private const string ADD_THIRD_PARTY_ID = "add_3rd_party_id";
         private const int STEAM_PLATFORM_ID = 1;
         private const int LASTFM_PLATFORM_ID = 2;
         private const int TMDB_PLATFORM_ID = 3;
@@ -57,6 +63,20 @@ namespace media_tracker_desktop
         public static string Email
         {
             get { return _email; }
+        }
+
+        //Getter Methods for the Platform Ids because I didnt want to memorize them :P
+        public static int SteamPlatformID
+        {
+            get { return STEAM_PLATFORM_ID; }
+        }
+        public static int LastFMPlatformID
+        {
+            get { return LASTFM_PLATFORM_ID; }
+        }
+        public static int TMDBPlatformID
+        {
+            get { return TMDB_PLATFORM_ID;}
         }
 
         // Method: Returns the user's LastFM id.
@@ -257,6 +277,36 @@ namespace media_tracker_desktop
             _userLastFmID = string.Empty;
             _userSteamID= string.Empty;
             _userTmdbID = string.Empty;
+        }
+
+        public static async Task<(bool, string)> AddThirdPartyId(int? PlatformId, string UserPlatformId)
+        {
+            var parameters = new{
+                username_input = _username,
+                platform_id_input = PlatformId,
+                user_plat_id_input = UserPlatformId
+            };
+            if (!PlatformId.HasValue)
+            {
+                return (false, "Platform ID is null.");
+            }
+            if (_connection == null)
+            {
+                return (false, "Connection is null.");
+            }
+            try{
+                var response = await _connection.Rpc(ADD_THIRD_PARTY_ID, parameters);
+                string returnedString = response.Content.ToString();
+                if (returnedString.IsNullOrEmpty()){
+                    return (false, "Database did not return a string value.");
+                }
+                return (true, returnedString);
+            }
+            catch (Exception error)
+            {
+                return (false, error.Message);
+
+            }
         }
     }
 }

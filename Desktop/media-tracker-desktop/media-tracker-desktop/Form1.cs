@@ -55,7 +55,7 @@ namespace media_tracker_desktop
                 return;
             }
 
-            
+
 
             // variable was used to control a while loop, which loops again if the user didn't enter valid fields to create a new user.
             bool validUser = false;
@@ -275,13 +275,17 @@ namespace media_tracker_desktop
 
             MessageBox.Show(testDisplay);
         }
-
         private async void btnTestSteam_Click(object sender, EventArgs e)
         {
             //string steamUrl = ConfigurationManager.AppSettings["SteamApiOwnedGamesUrl"];
 
             // it doesn't seem to work if I put this in App.config, hence why it's here, otherwise, ideally, the above commented out code would be used.
-            string steamUrl = "http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=5553B2F6E49998D47EB298C086A05084&steamid=76561198012120830&include_appinfo=1&format=json";
+            string steamBaseUrl = ConfigurationManager.AppSettings["SteamApiBaseUrl"];
+            string steamApiKey = ConfigurationManager.AppSettings["steamApiKey"];
+            string steamFormat = ConfigurationManager.AppSettings["SteamAPIFormat"];
+            string steamUserID = UserAppAccount.UserSteamID;
+            string steamIncludes = "&include_appinfo=1&include_played_free_games=1&format=json";
+            string steamUrl = $"{steamBaseUrl}?key={steamApiKey}&steamid={steamUserID}&include_appinfo=1&format={steamFormat}";
 
             // initialize client
             var client = new RestClient();
@@ -556,6 +560,96 @@ namespace media_tracker_desktop
             }
         }
 
+        // Test Method to make sure UserAppAccount is returning a username after logging in
+        private void btnGetUser_Click(object sender, EventArgs e)
+        {
+            if (UserAppAccount.UserLoggedIn)
+            {
+                MessageBox.Show(UserAppAccount.Username);
+            }
+            else
+            {
+                MessageBox.Show("User Not Logged in");
+            }
+
+        }
+        private async void AccountLinking(int PlatformID, string UserPlatformID){
+            try{
+                if (!UserAppAccount.UserLoggedIn){
+                    MessageBox.Show("User Not Logged in");
+                }
+                if (connection == null){
+                    MessageBox.Show("Not connected to the DB.");
+                }
+                var UserPlatformId = UserPlatformID;
+                var PlatformId = PlatformID;
+                
+                (bool linkAdded, string response) result = await UserAppAccount.AddThirdPartyId(PlatformId, UserPlatformId);
+                if (result.linkAdded){
+                    MessageBox.Show($"Success!: {result.response}");
+                }
+                else{
+                    MessageBox.Show($"Failed: {result.response}");
+                }
+            }
+            catch(Exception ex){
+                MessageBox.Show($"Error: {ex.Message}");
+            }
+        }
+
+        private async void btnLinkSteam_Click(object sender, EventArgs e)
+        {
+            string steamID = "76561199378709292";
+            AccountLinking(UserAppAccount.SteamPlatformID, steamID);
+        }
+
+        private void btnLinkLastFm_Click(object sender, EventArgs e)
+        {
+            string lastFMUsername = ConfigurationManager.AppSettings["LastFMApiUsername"]; 
+            AccountLinking(UserAppAccount.LastFMPlatformID, lastFMUsername);
+        }
         
+        private void btnLinkTmdb_Click(object sender, EventArgs e)
+        {
+            string tmdbUser = ConfigurationManager.AppSettings["TMDBApiUser"]; 
+            AccountLinking(UserAppAccount.TMDBPlatformID, tmdbUser);
+        }
+
+        private void btnCheckTMDB_Click(object sender, EventArgs e)
+        {
+            if(UserAppAccount.UserLoggedIn)
+            {
+                MessageBox.Show($"TMDB Account Linked: {UserAppAccount.UserTmdbID}");
+            }
+            else
+            {
+                MessageBox.Show("User Not Logged in");
+            }
+        }
+
+        private void btnCheckLastFM_Click(object sender, EventArgs e)
+        {
+            if(UserAppAccount.UserLoggedIn)
+            {
+                MessageBox.Show($"LastFM Account Linked: {UserAppAccount.UserLastFmID}");
+            }
+            else
+            {
+                MessageBox.Show("User Not Logged in");
+            }
+        }
+
+        private void btnCheckSteam_Click(object sender, EventArgs e)
+        {
+            if(UserAppAccount.UserLoggedIn)
+            {
+                MessageBox.Show($"Steam Account Linked: {UserAppAccount.UserSteamID}");
+            }
+            else
+            {
+                MessageBox.Show("User Not Logged in");
+            }
+
+        }
     }
 }

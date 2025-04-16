@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("media-tracker-desktop")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b698cb867abaa33eac2c75ba6ae42befba58cc15")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+2661a0b8b0719fb7e2f6329e30abc9a5c2e51292")]
 [assembly: System.Reflection.AssemblyProductAttribute("media-tracker-desktop")]
 [assembly: System.Reflection.AssemblyTitleAttribute("media-tracker-desktop")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
