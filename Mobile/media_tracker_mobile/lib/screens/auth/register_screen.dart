@@ -19,16 +19,33 @@ class _RegisterScreen extends ConsumerState<RegisterScreen> {
 
   void register() async {
     final authService = ref.read(authServiceProvider);
-    if (usernameController.text.trim().isEmpty ||
-        passwordController.text.trim().isEmpty ||
-        emailController.text.trim().isEmpty ||
-        firstNameController.text.trim().isEmpty) {
+    // A map of the TextEditingControllers for the required fields and an associated error message
+    Map<TextEditingController, String> fieldInputMessages = {
+      usernameController: "Please enter a username.",
+      passwordController: "Please enter a password.",
+      emailController: "Please enter a valid email address.",
+      firstNameController: "Please enter your first name."
+    };
+    
+    RegExp emailPattern = RegExp(r'.+@.+'); // Simple Regex pattern for validating email address
+
+    String validationMessage = "";
+
+    // Iterates through all controllers in the fieldInputMessages map and adds their error message if empty
+    fieldInputMessages.forEach((k, v) => validationMessage += k.text.trim().isEmpty ? "$v\n" : "" );
+
+    // Adds a validation message if emailController isn't empty and doesn't match the Regex pattern.
+    if (emailController.text.trim().isNotEmpty && !emailPattern.hasMatch(emailController.text.trim())) {
+      validationMessage += "Please enter a valid email address.";
+    }
+
+    if (validationMessage != "") {
       showDialog(
         context: context,
         builder:
             (_) => AlertDialog(
               title: Text('Invalid Input'),
-              content: Text('Please enter valid information.'),
+              content: Text(validationMessage, style: TextStyle(color: Colors.black)),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(context),

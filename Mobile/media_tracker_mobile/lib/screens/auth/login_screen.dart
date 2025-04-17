@@ -30,7 +30,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         builder:
             (_) => AlertDialog(
               title: Text('Invalid Input'),
-              content: Text('Please enter a valid username and password.'),
+              content: Text('Please enter a valid username and password.', style: TextStyle(color: Colors.black)),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(context),
