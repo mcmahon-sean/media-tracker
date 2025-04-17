@@ -1,0 +1,52 @@
+# .NET build folders
+bin/
+obj/
+
+# Visual Studio files
+.vs/
+*.user
+*.suo
+*.cache
+
+# Build results
+[Dd]ebug/
+[Rr]elease/
+[Bb]in/
+[Oo]bj/
+
+# NuGet Packages
+*.nupkg
+packages/
+*.nuget.props
+*.nuget.targets
+
+# IDE specific files
+.vscode/
+.idea/
+
+# Environment Files
+.env
+.env.local
+appsettings.*.json
+!appsettings.json
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Node.js dependencies
+node_modules/
+
+# Build output
+wwwroot/dist/
+dist/
+build/
+
+# Testing
+coverage/
+TestResults/
+
+# OS specific files
+.DS_Store
+Thumbs.db
