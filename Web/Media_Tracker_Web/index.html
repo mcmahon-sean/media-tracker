@@ -8,16 +8,23 @@
     <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="styles.css"> 
 </head>
-<body>
+<body class="bg-dark-primary">
 
     <div class="container-fluid">
         <div class="row">
           
-            <nav class="col-md-2 d-none d-md-block sidebar">
-               
+            <nav class="col-md-2 d-none d-md-block sidebar bg-dark-secondary">
+
+                <div>
+                    <a class="btn btn-dark w-100" id="btn-home" href="index.html" role="button">
+                        Home
+                    </a>
+                </div>
+                <hr>
                 <div class="dropdown">
-                    <a class="btn btn-dark dropdown-toggle w-100" href="#" role="button" data-bs-toggle="dropdown">
-                        Music
+                    <a class="btn btn-dark dropdown-toggle w-100 media-tab" href="#" role="button" data-bs-toggle="dropdown">
+                        <img src="assets/images/icons/icon_music.svg" class="tab-icon me-2">
+                        Last.fm
                     </a>
                     <ul class="dropdown-menu">
                         <li><a class="dropdown-item" href="php/music/get-all.php">All Music</a></li>
@@ -31,8 +38,9 @@
 
                 
                 <div class="dropdown mt-2">
-                    <a class="btn btn-dark dropdown-toggle w-100" href="#" role="button" data-bs-toggle="dropdown">
-                         Movies
+                    <a class="btn btn-dark dropdown-toggle w-100 media-tab" href="#" role="button" data-bs-toggle="dropdown">
+                        <img src="assets/images/icons/icon_movies.svg" class="tab-icon me-2">
+                        TMDB
                     </a>
                     <ul class="dropdown-menu">
                         <li><a class="dropdown-item" href="#">All Movies</a></li>
@@ -42,19 +50,14 @@
 
                 
                 <div class="dropdown mt-2">
-                    <a class="btn btn-dark dropdown-toggle w-100" href="#" role="button" data-bs-toggle="dropdown">
-                         Games
+                    <a class="btn btn-dark dropdown-toggle w-100 media-tab" href="#" role="button" data-bs-toggle="dropdown">
+                        <img src="assets/images/icons/icon_games.svg" class="tab-icon me-2">
+                        Steam
                     </a>
                     <ul class="dropdown-menu">
                         <li><a class="dropdown-item" href="#">All Games</a></li>
                         <li><a class="dropdown-item" href="#">Last Played</a></li>
                     </ul>
-                </div>
-
-                <div class="mt-2">
-                    <a class="btn btn-dark w-100" href="index.html" role="button">
-                        Home
-                    </a>
                 </div>
                 
             </nav>
