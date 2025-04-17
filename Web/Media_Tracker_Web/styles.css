@@ -1,14 +1,31 @@
 
+.bg-dark-primary {
+    background-color: rgb(32,32,32);
+}
+
+.bg-dark-secondary {
+    background-color: rgb(16,16,16);
+}
+
 body {
-    background-color: #343030;
     color: white;
 }
 
+.tab-icon {
+    max-width: 40px;
+}
+
+.media-tab {
+    font-size: 1.2rem;
+}
+
+#btn-home {
+    font-size: 1.25rem;
+}
 
 .sidebar {
     height: 100vh;
-    background: #0c0c0c;
-    padding: 20px;
+    padding: 10px 20px 20px 20px;
 }
 
 .sidebar h3 {
@@ -18,7 +35,6 @@ body {
 }
 
 .sidebar a {
-    color: rgb(124, 109, 109);
     text-decoration: none;
     padding: 10px;
     display: block;
@@ -28,6 +44,10 @@ body {
 .sidebar a:hover {
     background: #e3c7c7;
     color: #0c0c0c;
+}
+
+.sidebar hr {
+    margin: .75rem 0;
 }
 
 .favorite {
@@ -44,7 +64,7 @@ body {
 }
 
 .table thead th {
-    background: #222;
+    background: rgb(16,16,16);
 }
 
 .card {
