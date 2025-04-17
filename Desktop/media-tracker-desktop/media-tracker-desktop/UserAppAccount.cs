@@ -37,7 +37,6 @@ namespace media_tracker_desktop
         private static string _userLastFmID = string.Empty;
         private static string _userSteamID = string.Empty;
         private static string _userTmdbID = string.Empty;
-
         // ----- Getter Methods -----
         // Method: Returns bool if a user is logged in.
         public static bool UserLoggedIn
