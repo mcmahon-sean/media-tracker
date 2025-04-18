@@ -1,31 +1,13 @@
 <?php
 
-// Require config file
-require_once('../configs/lastfm-config.php');
+    // Start session
+    session_start();
 
-// Username and API from config file
-$username = LASTFM_USERNAME;
-$apiKey = LASTFM_API_KEY;
+    // Required
+    require_once '../php/LastFm/get-top-artists.php';
 
-// URL for the API request
-$topArtistsUrl = "https://ws.audioscrobbler.com/2.0/?method=user.gettopartists&user=$username&api_key=$apiKey&format=json&limit=5";
-
-// Fetch the data from the API
-$response = file_get_contents($topArtistsUrl);
-
-// Decode the JSON response
-$topArtists = json_decode($response, true);
-
-// Check if the response is valid
-if ($topArtists && isset($topArtists['topartists']['artist'])) {
-    $artists = $topArtists['topartists']['artist'];
-} else {
-    $artists = [];
-    $error = "Error fetching data. Please check the username or API key.";
-}
 ?>
 
-<!-- Page Layout -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -33,30 +15,38 @@ if ($topArtists && isset($topArtists['topartists']['artist'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Top Artists</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="../../styles.css"> 
+    <link rel="stylesheet" href="../styles.css"> 
 </head>
-<body>
-
+<body  class="bg-dark-primary">
     <div class="container-fluid">
         <div class="row">
-            <nav class="col-md-2 d-none d-md-block sidebar">
+        <nav class="col-md-2 d-none d-md-block sidebar bg-dark-secondary">
+                <div>
+                    <a class="btn btn-dark w-100" id="btn-home" href="../index.html" role="button">
+                        Home
+                    </a>
+                </div>
+                <hr>
                 <div class="dropdown">
-                    <a class="btn btn-dark dropdown-toggle w-100" href="#" role="button" data-bs-toggle="dropdown">
-                        Music
+                    <a class="btn btn-dark dropdown-toggle w-100 media-tab" href="#" role="button" data-bs-toggle="dropdown">
+                        <img src="../assets/images/icons/icon_music.svg" class="tab-icon me-2">
+                        Last.fm
                     </a>
                     <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="get-all.php">All Music</a></li>
-                        <li><a class="dropdown-item" href="get-loved-tracks.php">Loved Tracks</a></li>
-                        <li><a class="dropdown-item" href="get-recent-tracks.php">Recent Tracks</a></li>
-                        <li><a class="dropdown-item" href="get-top-albums.php">Top Albums</a></li>
-                        <li><a class="dropdown-item" href="get-top-artists.php">Top Artists</a></li>
-                        <li><a class="dropdown-item" href="get-top-tracks.php">Top Tracks</a></li>
+                        <li><a class="dropdown-item" href="lastfm-all.php">All Music</a></li>
+                        <li><a class="dropdown-item" href="lastfm-loved-tracks.php">Loved Tracks</a></li>
+                        <li><a class="dropdown-item" href="lastfm-recent-tracks.php">Recent Tracks</a></li>
+                        <li><a class="dropdown-item" href="lastfm-top-albums.php">Top Albums</a></li>
+                        <li><a class="dropdown-item" href="lastfm-top-artists.php">Top Artists</a></li>
+                        <li><a class="dropdown-item" href="lastfm-top-tracks.php">Top Tracks</a></li>
                     </ul>
                 </div>
+
                 
                 <div class="dropdown mt-2">
-                    <a class="btn btn-dark dropdown-toggle w-100" href="#" role="button" data-bs-toggle="dropdown">
-                         Movies
+                    <a class="btn btn-dark dropdown-toggle w-100 media-tab" href="#" role="button" data-bs-toggle="dropdown">
+                        <img src="../assets/images/icons/icon_movies.svg" class="tab-icon me-2">
+                        TMDB
                     </a>
                     <ul class="dropdown-menu">
                         <li><a class="dropdown-item" href="#">All Movies</a></li>
@@ -64,22 +54,18 @@ if ($topArtists && isset($topArtists['topartists']['artist'])) {
                     </ul>
                 </div>
 
+                
                 <div class="dropdown mt-2">
-                    <a class="btn btn-dark dropdown-toggle w-100" href="#" role="button" data-bs-toggle="dropdown">
-                         Games
+                    <a class="btn btn-dark dropdown-toggle w-100 media-tab" href="#" role="button" data-bs-toggle="dropdown">
+                        <img src="../assets/images/icons/icon_games.svg" class="tab-icon me-2">
+                        Steam
                     </a>
                     <ul class="dropdown-menu">
                         <li><a class="dropdown-item" href="#">All Games</a></li>
                         <li><a class="dropdown-item" href="#">Last Played</a></li>
                     </ul>
                 </div>
-
-                <div class="mt-2">
-                    <a class="btn btn-dark w-100" href="../../index.html" role="button">
-                        Home
-                    </a>
-                </div>
-
+                
             </nav>
 
             <main class="col-md-10 ms-sm-auto px-4">
@@ -106,11 +92,13 @@ if ($topArtists && isset($topArtists['topartists']['artist'])) {
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php foreach ($artists as $artist): ?>
+                                <?php foreach ($topArtists as $artist): ?>
                                     <tr>
-                                        <td><?php echo htmlspecialchars($artist['playcount']); ?></td>
-                                        <td><?php echo htmlspecialchars($artist['name']); ?></td>
-                                        <td><a href="<?php echo htmlspecialchars($artist['url']); ?>" target="_blank">View</a></td>
+                                        <td><?php echo htmlspecialchars($artist->playCount); ?></td>
+                                        <td><?php echo htmlspecialchars($artist->name); ?></td>
+                                        <td>
+                                            <a href="<?php echo htmlspecialchars($artist->url); ?>" target="_blank">View</a>
+                                        </td>
                                     </tr>
                                 <?php endforeach; ?>
                             </tbody>
@@ -122,6 +110,8 @@ if ($topArtists && isset($topArtists['topartists']['artist'])) {
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="supabaseClient.js" type="module"></script>
+    <script src="script.js" type="module"></script>
 
 </body>
 </html>
