@@ -22,3 +22,22 @@ Future<List<SteamGame>> fetchSteamGames() async {
     throw Exception('Failed to load Steam games');
   }
 }
+
+Future<Map<String, dynamic>?> fetchSteamAppDetails(String appId) async {
+  try {
+    final response = await http.get(
+      Uri.parse('https://store.steampowered.com/api/appdetails?appids=$appId'),
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      final appData = data[appId];
+      if (appData['success'] == true) {
+        return appData['data'];
+      }
+    }
+  } catch (e) {
+    print('Failed to load Steam app details: $e');
+  }
+  return null;
+}

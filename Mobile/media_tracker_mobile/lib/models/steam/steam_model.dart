@@ -40,4 +40,6 @@ class SteamGame {
       playtimeDisconnected: json['playtime_disconnected'] ?? 0,
     );
   }
+
+  bool get isFavorite => false;
 }
