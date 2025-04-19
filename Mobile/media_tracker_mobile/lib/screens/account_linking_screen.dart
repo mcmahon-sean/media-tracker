@@ -130,58 +130,6 @@ class AccountLinkingScreen extends ConsumerWidget {
               },
               onEdit: () {},
             ),
-            // LinkAccountCard(
-            //   platformName: 'TMDB',
-            //   linkedValue: auth.tmdbSessionId,
-            //   onLink: (sessionId) async {
-            //     final success = await UserAccountServices()
-            //         .savePlatformCredentials(
-            //           username: auth.username!,
-            //           platformId: 3,
-            //           userPlatformId: sessionId,
-            //         );
-
-            //     if (success) {
-            //       // Re-fetch the saved value from the DB
-            //       final authService = ref.read(authServiceProvider);
-            //       final updatedTmdbSessionId = await authService.getPlatformID(
-            //         auth.username!,
-            //         3,
-            //       );
-
-            //       // Update state only after confirming the value from DB
-            //       if (updatedTmdbSessionId != null) {
-            //         notifier.updateTmdbSessionId(updatedTmdbSessionId);
-            //         Navigator.pop(context, true);
-            //       }
-            //     } else {
-            //       ScaffoldMessenger.of(context).showSnackBar(
-            //         const SnackBar(
-            //           content: Text('Failed to link TMDB account'),
-            //         ),
-            //       );
-            //     }
-            //   },
-            //   onUnlink: () async {
-            //     final success = await UserAccountServices()
-            //         .removePlatformCredentials(
-            //           username: auth.username!,
-            //           platformId: 3,
-            //           userPlatformId: auth.tmdbSessionId!,
-            //         );
-
-            //     if (success) {
-            //       notifier.updateTmdbSessionId(null);
-            //     } else {
-            //       ScaffoldMessenger.of(context).showSnackBar(
-            //         const SnackBar(
-            //           content: Text('Failed to unlink TMDB account.'),
-            //         ),
-            //       );
-            //     }
-            //   },
-            //   onEdit: () {},
-            // ),
             LinkAccountCard(
               platformName: 'TMDB',
               inputLabel: 'Enter TMDB Username',
