@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'media_details_screen.dart';
+
 import 'package:media_tracker_test/providers/auth_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -228,7 +230,7 @@ class _MediaScreenState extends ConsumerState<MediaScreen> {
     );
   }
 
-  Widget _buildSteamList() {
+ Widget _buildSteamList() {
     return ListView.builder(
       itemCount: _steamGames.length,
       itemBuilder: (context, index) {
@@ -236,12 +238,25 @@ class _MediaScreenState extends ConsumerState<MediaScreen> {
         return ListTile(
           title: Text(game.name),
           subtitle: Text('Played: ${game.playtimeForever} mins'),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => MediaDetailsScreen(mediaItem: game),
+              ),
+            );
+          },
         );
       },
     );
   }
+    
+      
 
-  Widget _buildLastFmSection() {
+        
+  
+
+Widget _buildLastFmSection() {
     return ListView(
       padding: const EdgeInsets.all(12),
       children: [
@@ -261,6 +276,14 @@ class _MediaScreenState extends ConsumerState<MediaScreen> {
           (artist) => ListTile(
             title: Text(artist.name),
             subtitle: Text("Plays: ${artist.playCount}"),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => MediaDetailsScreen(mediaItem: artist),
+                ),
+              );
+            },
           ),
         ),
         const SizedBox(height: 12),
@@ -273,6 +296,14 @@ class _MediaScreenState extends ConsumerState<MediaScreen> {
             title: Text(track.name),
             subtitle: Text("By: ${track.artist}"),
             trailing: Text(track.formattedDate ?? "Now Playing"),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => MediaDetailsScreen(mediaItem: track),
+                ),
+              );
+            },
           ),
         ),
       ],
@@ -298,6 +329,13 @@ class _MediaScreenState extends ConsumerState<MediaScreen> {
           (movie) => ListTile(
             title: Text(movie.title),
             subtitle: Text(movie.overview),
+            onTap: (){
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_)=>MediaDetailsScreen(mediaItem: movie),
+                ),
+              );
+            },
           ),
         ),
         const SizedBox(height: 12),
@@ -307,7 +345,18 @@ class _MediaScreenState extends ConsumerState<MediaScreen> {
         ),
         ..._favoriteTvShows.map(
           (show) =>
-              ListTile(title: Text(show.name), subtitle: Text(show.overview)),
+              ListTile(title: Text(show.name), 
+              subtitle: Text(show.overview),
+             onTap: (){
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_)=> MediaDetailsScreen(mediaItem: show),
+                ),
+              );
+             }, 
+             ),
+              
         ),
       ],
     );
