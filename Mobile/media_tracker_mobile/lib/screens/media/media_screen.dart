@@ -2,18 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:media_tracker_test/providers/auth_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../models/lastfm/lastfm_artist.dart';
-import '../models/lastfm/lastfm_track.dart';
-import '../models/lastfm/lastfm_user.dart';
-import '../models/steam/steam_model.dart';
-import '../models/tmdb/tmdb_account.dart';
-import '../models/tmdb/tmdb_movie.dart';
-import '../models/tmdb/tmdb_tv_show.dart';
-import '../services/media_api/steam_service.dart';
-import '../services/media_api/lastfm_service.dart';
-import '../services/media_api/tmdb_service.dart';
-import 'home_screen.dart';
-import 'widgets/drawer_menu.dart';
+import '../../models/lastfm/lastfm_artist.dart';
+import '../../models/lastfm/lastfm_track.dart';
+import '../../models/lastfm/lastfm_user.dart';
+import '../../models/steam/steam_model.dart';
+import '../../models/tmdb/tmdb_account.dart';
+import '../../models/tmdb/tmdb_movie.dart';
+import '../../models/tmdb/tmdb_tv_show.dart';
+import '../../services/media_api/steam_service.dart';
+import '../../services/media_api/lastfm_service.dart';
+import '../../services/media_api/tmdb_service.dart';
+import 'steam_section.dart';
+import 'lastfm_section.dart';
+import 'tmdb_section.dart';
+import '../home_screen.dart';
+import '../widgets/drawer_menu.dart';
 
 class MediaScreen extends ConsumerStatefulWidget {
   const MediaScreen({super.key});
@@ -186,15 +189,15 @@ class _MediaScreenState extends ConsumerState<MediaScreen> {
       case 0:
         if (_isLoadingSteam) return _loading();
         if (auth.steamId == null) return _noMediaLinkedPrompt("Steam");
-        return _buildSteamList();
+        return buildSteamSection(_steamGames);
       case 1:
         if (_isLoadingLastFm) return _loading();
         if (auth.lastFmUsername == null) return _noMediaLinkedPrompt("Last.fm");
-        return _buildLastFmSection();
+        return buildLastFmSection(_lastFmUser, _topArtists, _recentTracks);
       case 2:
         if (_isLoadingTmdb) return _loading();
         if (auth.tmdbSessionId == null) return _noMediaLinkedPrompt("TMDB");
-        return _buildTmdbSection();
+        return buildTmdbSection(_tmdbAccount, _ratedMovies, _favoriteTvShows);
       default:
         return Center(child: Text("Coming soon..."));
     }
@@ -220,7 +223,10 @@ class _MediaScreenState extends ConsumerState<MediaScreen> {
               icon: Icon(Icons.link),
               label: Text("Link $platform Account"),
               onPressed: () async {
-                final didLink = await Navigator.pushNamed(context, '/linkAccounts');
+                final didLink = await Navigator.pushNamed(
+                  context,
+                  '/linkAccounts',
+                );
                 if (didLink == true) {
                   _loadPlatformData(_selectedIndex);
                 }
@@ -229,91 +235,6 @@ class _MediaScreenState extends ConsumerState<MediaScreen> {
           ],
         ),
       ),
-    );
-  }
-
-  Widget _buildSteamList() {
-    return ListView.builder(
-      itemCount: _steamGames.length,
-      itemBuilder: (context, index) {
-        final game = _steamGames[index];
-        return ListTile(
-          title: Text(game.name),
-          subtitle: Text('Played: ${game.playtimeForever} mins'),
-        );
-      },
-    );
-  }
-
-  Widget _buildLastFmSection() {
-    return ListView(
-      padding: const EdgeInsets.all(12),
-      children: [
-        if (_lastFmUser != null) ...[
-          Text(
-            "User: ${_lastFmUser!.name}",
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-          Text("Plays: ${_lastFmUser!.playCount}"),
-          const SizedBox(height: 12),
-        ],
-        Text(
-          "Top Artists",
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-        ),
-        ..._topArtists.map(
-          (artist) => ListTile(
-            title: Text(artist.name),
-            subtitle: Text("Plays: ${artist.playCount}"),
-          ),
-        ),
-        const SizedBox(height: 12),
-        Text(
-          "Recent Tracks",
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-        ),
-        ..._recentTracks.map(
-          (track) => ListTile(
-            title: Text(track.name),
-            subtitle: Text("By: ${track.artist}"),
-            trailing: Text(track.formattedDate ?? "Now Playing"),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildTmdbSection() {
-    return ListView(
-      padding: const EdgeInsets.all(12),
-      children: [
-        if (_tmdbAccount != null) ...[
-          Text(
-            "User: ${_tmdbAccount!.username}",
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 12),
-        ],
-        Text(
-          "Rated Movies",
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-        ),
-        ..._ratedMovies.map(
-          (movie) => ListTile(
-            title: Text(movie.title),
-            subtitle: Text(movie.overview),
-          ),
-        ),
-        const SizedBox(height: 12),
-        Text(
-          "Favorite TV Shows",
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-        ),
-        ..._favoriteTvShows.map(
-          (show) =>
-              ListTile(title: Text(show.name), subtitle: Text(show.overview)),
-        ),
-      ],
     );
   }
 }
