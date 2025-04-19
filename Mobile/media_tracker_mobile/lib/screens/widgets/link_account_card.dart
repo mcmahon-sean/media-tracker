@@ -8,6 +8,7 @@ class LinkAccountCard extends ConsumerStatefulWidget {
   final void Function(String) onLink;
   final VoidCallback onUnlink;
   final VoidCallback onEdit;
+  final String? inputLabel;
 
   const LinkAccountCard({
     super.key,
@@ -16,6 +17,7 @@ class LinkAccountCard extends ConsumerStatefulWidget {
     required this.onLink,
     required this.onUnlink,
     required this.onEdit,
+    this.inputLabel,
   });
 
   @override
@@ -96,7 +98,7 @@ class _LinkAccountCardState extends ConsumerState<LinkAccountCard> {
                       controller: _controller,
                       style: const TextStyle(color: Colors.white),
                       decoration: InputDecoration(
-                        labelText: 'Enter ${widget.platformName} ID',
+                        labelText: widget.inputLabel ?? 'Enter ${widget.platformName} ID',
                         labelStyle: const TextStyle(color: Colors.white70),
                         border: const OutlineInputBorder(),
                       ),

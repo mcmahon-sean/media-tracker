@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:media_tracker_test/screens/account_linking_screen.dart';
 import 'package:media_tracker_test/screens/auth/login_screen.dart';
 import 'package:media_tracker_test/screens/auth/register_screen.dart';
-import 'package:media_tracker_test/screens/media_screen.dart';
+import 'package:media_tracker_test/screens/media/media_screen.dart';
 import 'screens/home_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'models/theme.dart' as theme;

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:media_tracker_test/screens/media_screen.dart';
+import 'package:media_tracker_test/screens/media/media_screen.dart';
 import '../../services/auth_service.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {

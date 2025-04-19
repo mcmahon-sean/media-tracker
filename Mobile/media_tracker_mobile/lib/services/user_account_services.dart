@@ -57,12 +57,20 @@ class UserAccountServices {
   // Function to fetch Steam ID from a Vanity username
   Future<String> fetchSteamIDFromVanity(String username) async {
     try {
+      // If input looks like a 64-bit numeric Steam ID, return it directly
+      final isSteamId = RegExp(r'^\d{17}$').hasMatch(username);
+      if (isSteamId) {
+        return username;
+      }
+
+      // Otherwise, treat it as a vanity URL and resolve it using Steam Web API
       final response = await http.get(
         Uri.parse(
           'http://api.steampowered.com/ISteamUser/ResolveVanityURL/v0001/?key=${ApiServices.steamApiKey}&vanityurl=$username',
         ),
       );
 
+      // If resolution was successful, return the resolved Steam ID
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         if (data['response']['success'] == 1) {
