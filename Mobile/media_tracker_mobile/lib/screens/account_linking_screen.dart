@@ -22,15 +22,19 @@ class AccountLinkingScreen extends ConsumerWidget {
           children: [
             LinkAccountCard(
               platformName: 'Steam',
+              inputLabel: 'Enter Vanity URL or Steam ID',
               linkedValue: auth.steamId,
-              onLink: (id) async {
-                final vanityUrl = await UserAccountServices()
-                    .fetchSteamIDFromVanity(id);
+              onLink: (input) async {
+                // Try to resolve Vanity URL to Steam ID
+                final steamId = await UserAccountServices()
+                    .fetchSteamIDFromVanity(input);
+
+                // Save the resolved Steam ID
                 final success = await UserAccountServices()
                     .savePlatformCredentials(
                       username: auth.username!,
                       platformId: 1,
-                      userPlatformId: vanityUrl,
+                      userPlatformId: steamId,
                     );
 
                 if (success) {
@@ -180,6 +184,7 @@ class AccountLinkingScreen extends ConsumerWidget {
             // ),
             LinkAccountCard(
               platformName: 'TMDB',
+              inputLabel: 'Enter TMDB Username',
               linkedValue: auth.tmdbSessionId,
               onLink: (_) async {
                 final requestToken = await TMDBService.getRequestToken();
