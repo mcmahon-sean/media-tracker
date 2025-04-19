@@ -80,6 +80,11 @@ class AuthNotifier extends StateNotifier<AuthState> {
     String? tmdbSessionId,
     String? lastFmUsername,
   }) {
+    // Sync third-party global API variables
+    ApiServices.steamId = steamID ?? "";
+    ApiServices.tmdbSessionId = tmdbSessionId ?? "";
+    ApiServices.lastFmUsername = lastFmUsername ?? "";
+    
     state = AuthState(
       username: username,
       firstName: firstName,
