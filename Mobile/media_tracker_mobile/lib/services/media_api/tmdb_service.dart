@@ -13,7 +13,7 @@ class TMDBService {
 
   static Future<TMDBAccount> fetchAccountDetails() async {
     final url = Uri.parse(
-      'https://api.themoviedb.org/3/account/${ApiServices.tmdbUser}',
+      'https://api.themoviedb.org/3/account/${ApiServices.tmdbSessionId}',
     );
 
     final response = await http.get(
@@ -30,7 +30,7 @@ class TMDBService {
 
   static Future<List<TMDBMovie>> fetchRatedMovies() async {
     final url = Uri.parse(
-      'https://api.themoviedb.org/3/account/${ApiServices.tmdbUser}/rated/movies?language=en-US&page=1&sort_by=created_at.desc',
+      'https://api.themoviedb.org/3/account/${ApiServices.tmdbSessionId}/rated/movies?language=en-US&page=1&sort_by=created_at.desc',
     );
 
     final response = await http.get(
@@ -48,7 +48,7 @@ class TMDBService {
 
   static Future<List<TMDBTvShow>> fetchFavoriteTvShows() async {
     final url = Uri.parse(
-      'https://api.themoviedb.org/3/account/${ApiServices.tmdbUser}/favorite/tv?language=en-US&page=1&sort_by=created_at.asc',
+      'https://api.themoviedb.org/3/account/${ApiServices.tmdbSessionId}/favorite/tv?language=en-US&page=1&sort_by=created_at.asc',
     );
 
     final response = await http.get(

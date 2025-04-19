@@ -55,17 +55,17 @@ class AuthService {
 
       // Fetch linked platform IDs (Steam, Last.fm, TMDB) from the useraccounts table
       // If the Steam ID, last.fm ID, or TMDB ID exists, assign them globally via ApiServices
-      final steamID = await getPlatformID(username, 1);
-      if (steamID != null && steamID.isNotEmpty) {
-        ApiServices.steamUserId = steamID;
+      final steamId = await getPlatformID(username, 1);
+      if (steamId != null && steamId.isNotEmpty) {
+        ApiServices.steamId = steamId;
       }
       final lastfmID = await getPlatformID(username, 2);
       if (lastfmID != null && lastfmID.isNotEmpty) {
-        ApiServices.lastFmUser = lastfmID;
+        ApiServices.lastFmUsername = lastfmID;
       }
       final tmdbID = await getPlatformID(username, 3);
       if (tmdbID != null && tmdbID.isNotEmpty) {
-        ApiServices.tmdbUser = tmdbID;
+        ApiServices.tmdbSessionId = tmdbID;
       }
 
       // If user profile data was found, update the global auth state using authProvider
@@ -78,7 +78,7 @@ class AuthService {
               lastName: userInfo[0]['last_name'] ?? '',
               email: userInfo[0]['email'] ?? '',
               token: result,
-              steamID: steamID,
+              steamID: steamId,
               lastFmUsername: lastfmID,
               tmdbSessionId: tmdbID
             );

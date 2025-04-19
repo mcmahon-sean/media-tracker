@@ -8,8 +8,16 @@ Future<List<SteamGame>> fetchSteamGames() async {
 
   if (response.statusCode == 200) {
     final data = json.decode(response.body);
-    final games = data['response']['games'] as List<dynamic>;
-    return games.map((game) => SteamGame.fromJson(game)).toList();
+    final gameList = data['response']['games'];
+
+    if (gameList == null) {
+      print('No games returned - check Steam ID.');
+      return [];
+    }
+
+    return (gameList as List<dynamic>)
+        .map((game) => SteamGame.fromJson(game))
+        .toList();
   } else {
     throw Exception('Failed to load Steam games');
   }

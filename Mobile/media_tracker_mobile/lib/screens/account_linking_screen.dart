@@ -23,11 +23,13 @@ class AccountLinkingScreen extends ConsumerWidget {
               platformName: 'Steam',
               linkedValue: auth.steamId,
               onLink: (id) async {
+                final vanityUrl = await UserAccountServices()
+                    .fetchSteamIDFromVanity(id);
                 final success = await UserAccountServices()
                     .savePlatformCredentials(
                       username: auth.username!,
                       platformId: 1,
-                      userPlatformId: id,
+                      userPlatformId: vanityUrl,
                     );
 
                 if (success) {
@@ -50,7 +52,24 @@ class AccountLinkingScreen extends ConsumerWidget {
                   );
                 }
               },
-              onUnlink: () => notifier.updateSteamId(null),
+              onUnlink: () async {
+                final success = await UserAccountServices()
+                    .removePlatformCredentials(
+                      username: auth.username!,
+                      platformId: 1,
+                      userPlatformId: auth.steamId!,
+                    );
+
+                if (success) {
+                  notifier.updateSteamId(null);
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Failed to unlink Steam account.'),
+                    ),
+                  );
+                }
+              },
               onEdit: () {},
             ),
             LinkAccountCard(
@@ -84,7 +103,24 @@ class AccountLinkingScreen extends ConsumerWidget {
                   );
                 }
               },
-              onUnlink: () => notifier.updateLastFmUsername(null),
+              onUnlink: () async {
+                final success = await UserAccountServices()
+                    .removePlatformCredentials(
+                      username: auth.username!,
+                      platformId: 2,
+                      userPlatformId: auth.lastFmUsername!,
+                    );
+
+                if (success) {
+                  notifier.updateLastFmUsername(null);
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Failed to unlink Last.FM account.'),
+                    ),
+                  );
+                }
+              },
               onEdit: () {},
             ),
             LinkAccountCard(
@@ -118,7 +154,24 @@ class AccountLinkingScreen extends ConsumerWidget {
                   );
                 }
               },
-              onUnlink: () => notifier.updateTmdbSessionId(null),
+              onUnlink: () async {
+                final success = await UserAccountServices()
+                    .removePlatformCredentials(
+                      username: auth.username!,
+                      platformId: 3,
+                      userPlatformId: auth.tmdbSessionId!,
+                    );
+
+                if (success) {
+                  notifier.updateTmdbSessionId(null);
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Failed to unlink TMDB account.'),
+                    ),
+                  );
+                }
+              },
               onEdit: () {},
             ),
           ],
