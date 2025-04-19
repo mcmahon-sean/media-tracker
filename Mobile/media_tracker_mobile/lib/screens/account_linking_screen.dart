@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:media_tracker_test/services/auth_service.dart';
+import 'package:media_tracker_test/services/media_api/tmdb_service.dart';
 import 'package:media_tracker_test/services/user_account_services.dart';
 import '../providers/auth_provider.dart';
 import 'widgets/link_account_card.dart';
@@ -125,10 +126,110 @@ class AccountLinkingScreen extends ConsumerWidget {
               },
               onEdit: () {},
             ),
+            // LinkAccountCard(
+            //   platformName: 'TMDB',
+            //   linkedValue: auth.tmdbSessionId,
+            //   onLink: (sessionId) async {
+            //     final success = await UserAccountServices()
+            //         .savePlatformCredentials(
+            //           username: auth.username!,
+            //           platformId: 3,
+            //           userPlatformId: sessionId,
+            //         );
+
+            //     if (success) {
+            //       // Re-fetch the saved value from the DB
+            //       final authService = ref.read(authServiceProvider);
+            //       final updatedTmdbSessionId = await authService.getPlatformID(
+            //         auth.username!,
+            //         3,
+            //       );
+
+            //       // Update state only after confirming the value from DB
+            //       if (updatedTmdbSessionId != null) {
+            //         notifier.updateTmdbSessionId(updatedTmdbSessionId);
+            //         Navigator.pop(context, true);
+            //       }
+            //     } else {
+            //       ScaffoldMessenger.of(context).showSnackBar(
+            //         const SnackBar(
+            //           content: Text('Failed to link TMDB account'),
+            //         ),
+            //       );
+            //     }
+            //   },
+            //   onUnlink: () async {
+            //     final success = await UserAccountServices()
+            //         .removePlatformCredentials(
+            //           username: auth.username!,
+            //           platformId: 3,
+            //           userPlatformId: auth.tmdbSessionId!,
+            //         );
+
+            //     if (success) {
+            //       notifier.updateTmdbSessionId(null);
+            //     } else {
+            //       ScaffoldMessenger.of(context).showSnackBar(
+            //         const SnackBar(
+            //           content: Text('Failed to unlink TMDB account.'),
+            //         ),
+            //       );
+            //     }
+            //   },
+            //   onEdit: () {},
+            // ),
             LinkAccountCard(
               platformName: 'TMDB',
               linkedValue: auth.tmdbSessionId,
-              onLink: (sessionId) async {
+              onLink: (_) async {
+                final requestToken = await TMDBService.getRequestToken();
+                if (requestToken == null) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Failed to generate TMDB request token.'),
+                    ),
+                  );
+                  return;
+                }
+
+                // Launch TMDB authorization in browser
+                await TMDBService.launchAuthUrl(requestToken);
+
+                // Wait for user to approve and come back
+                final approved = await showDialog(
+                  context: context,
+                  builder:
+                      (context) => AlertDialog(
+                        title: const Text('Continue?'),
+                        content: const Text(
+                          'Once you approve access on TMDB, press continue to finish linking.',
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.of(context).pop(true),
+                            child: const Text('Continue'),
+                          ),
+                          TextButton(
+                            onPressed: () => Navigator.of(context).pop(false),
+                            child: const Text('Cancel'),
+                          ),
+                        ],
+                      ),
+                );
+
+                if (approved != true) return;
+
+                // Create session after user authorizes
+                final sessionId = await TMDBService.createSession(requestToken);
+                if (sessionId == null) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Failed to create TMDB session'),
+                    ),
+                  );
+                  return;
+                }
+                // Save sessionId to DB via your service
                 final success = await UserAccountServices()
                     .savePlatformCredentials(
                       username: auth.username!,
@@ -137,14 +238,12 @@ class AccountLinkingScreen extends ConsumerWidget {
                     );
 
                 if (success) {
-                  // Re-fetch the saved value from the DB
                   final authService = ref.read(authServiceProvider);
                   final updatedTmdbSessionId = await authService.getPlatformID(
                     auth.username!,
                     3,
                   );
 
-                  // Update state only after confirming the value from DB
                   if (updatedTmdbSessionId != null) {
                     notifier.updateTmdbSessionId(updatedTmdbSessionId);
                     Navigator.pop(context, true);
