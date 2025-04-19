@@ -55,12 +55,13 @@ class _MediaScreenState extends ConsumerState<MediaScreen> {
         if (auth.steamId != null && _steamGames.isEmpty) _loadSteamGames();
         break;
       case 1:
-        if (auth.tmdbSessionId != null && _tmdbAccount == null) _loadTmdbData();
+        if (auth.lastFmUsername != null &&
+            (_topArtists.isEmpty || _recentTracks.isEmpty)) {
+          _loadLastFmData();
+        }
         break;
       case 2:
-        if (auth.lastFmUsername != null &&
-            (_topArtists.isEmpty || _recentTracks.isEmpty))
-          _loadLastFmData();
+        if (auth.tmdbSessionId != null && _tmdbAccount == null) _loadTmdbData();
         break;
     }
   }
@@ -168,11 +169,11 @@ class _MediaScreenState extends ConsumerState<MediaScreen> {
             icon: Icon(Icons.videogame_asset),
             label: 'Steam',
           ),
-          BottomNavigationBarItem(icon: Icon(Icons.movie), label: 'TMDB'),
           BottomNavigationBarItem(
             icon: Icon(Icons.music_note),
             label: 'Last.fm',
           ),
+          BottomNavigationBarItem(icon: Icon(Icons.movie), label: 'TMDB'),
         ],
       ),
     );
@@ -187,13 +188,13 @@ class _MediaScreenState extends ConsumerState<MediaScreen> {
         if (auth.steamId == null) return _noMediaLinkedPrompt("Steam");
         return _buildSteamList();
       case 1:
-        if (_isLoadingTmdb) return _loading();
-        if (auth.tmdbSessionId == null) return _noMediaLinkedPrompt("TMDB");
-        return _buildTmdbSection();
-      case 2:
         if (_isLoadingLastFm) return _loading();
         if (auth.lastFmUsername == null) return _noMediaLinkedPrompt("Last.fm");
         return _buildLastFmSection();
+      case 2:
+        if (_isLoadingTmdb) return _loading();
+        if (auth.tmdbSessionId == null) return _noMediaLinkedPrompt("TMDB");
+        return _buildTmdbSection();
       default:
         return Center(child: Text("Coming soon..."));
     }
