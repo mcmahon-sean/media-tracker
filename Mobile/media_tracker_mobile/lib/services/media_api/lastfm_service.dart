@@ -8,7 +8,7 @@ import '/config/api_connections.dart';
 Future<LastFmUser> fetchLastFmUser() async {
   final url =
       '${ApiServices.lastFmBaseUrl}?method=user.getinfo'
-      '&user=${ApiServices.lastFmUser}'
+      '&user=${ApiServices.lastFmUsername}'
       '&api_key=${ApiServices.lastFmApiKey}'
       '&format=json';
 
@@ -24,7 +24,7 @@ Future<LastFmUser> fetchLastFmUser() async {
 Future<List<LastFmArtist>> fetchLastFmTopArtists() async {
   final url =
       '${ApiServices.lastFmBaseUrl}?method=user.gettopartists'
-      '&user=${ApiServices.lastFmUser}'
+      '&user=${ApiServices.lastFmUsername}'
       '&api_key=${ApiServices.lastFmApiKey}'
       '&limit=5'
       '&format=json';
@@ -42,7 +42,7 @@ Future<List<LastFmArtist>> fetchLastFmTopArtists() async {
 Future<List<LastFmTrack>> fetchLastFmRecentTracks() async {
   final url =
       '${ApiServices.lastFmBaseUrl}?method=user.getrecenttracks'
-      '&user=${ApiServices.lastFmUser}'
+      '&user=${ApiServices.lastFmUsername}'
       '&api_key=${ApiServices.lastFmApiKey}'
       '&limit=5'
       '&format=json';
