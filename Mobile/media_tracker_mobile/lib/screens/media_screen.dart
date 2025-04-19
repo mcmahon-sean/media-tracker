@@ -219,8 +219,11 @@ class _MediaScreenState extends ConsumerState<MediaScreen> {
             ElevatedButton.icon(
               icon: Icon(Icons.link),
               label: Text("Link $platform Account"),
-              onPressed: () {
-                Navigator.pushNamed(context, '/linkAccounts');
+              onPressed: () async {
+                final didLink = await Navigator.pushNamed(context, '/linkAccounts');
+                if (didLink == true) {
+                  _loadPlatformData(_selectedIndex);
+                }
               },
             ),
           ],

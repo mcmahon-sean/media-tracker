@@ -43,6 +43,7 @@ class AccountLinkingScreen extends ConsumerWidget {
                   // Update state only after confirming the value from DB
                   if (updatedSteamId != null) {
                     notifier.updateSteamId(updatedSteamId);
+                    Navigator.pop(context, true);
                   }
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -94,6 +95,7 @@ class AccountLinkingScreen extends ConsumerWidget {
                   // Update state only after confirming the value from DB
                   if (updatedLastfmUsername != null) {
                     notifier.updateLastFmUsername(updatedLastfmUsername);
+                    Navigator.pop(context, true);
                   }
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -145,6 +147,7 @@ class AccountLinkingScreen extends ConsumerWidget {
                   // Update state only after confirming the value from DB
                   if (updatedTmdbSessionId != null) {
                     notifier.updateTmdbSessionId(updatedTmdbSessionId);
+                    Navigator.pop(context, true);
                   }
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
