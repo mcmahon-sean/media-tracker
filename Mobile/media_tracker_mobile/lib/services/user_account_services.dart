@@ -43,7 +43,7 @@ class UserAccountServices {
         params: {
           'username_input': username,
           'platform_id_input': platformId,
-          'user_platform_id_input': userPlatformId,
+          'user_plat_id_input': userPlatformId,
         },
       );
       print('Successfully removed 3rd party credentials');
