@@ -449,10 +449,8 @@ namespace media_tracker_desktop
         {
             string tmdbBaseUrl = ConfigurationManager.AppSettings["TMDBApiBaseUrl"];
             string tmdbAuthToken = ConfigurationManager.AppSettings["TMDBNathanAuthToken"];
-            string tmdbUser = ConfigurationManager.AppSettings["TMDBApiUser"];
 
-            string tmdbUrl = $"{tmdbBaseUrl}account_id?session_id={ConfigurationManager.AppSettings["TMDBTestSession"]}";
-
+            string tmdbUrl = $"{tmdbBaseUrl}account_id?session_id={UserAppAccount.UserTmdbSessionID}";
 
             // initialize client
             var client = new RestClient();
@@ -482,10 +480,11 @@ namespace media_tracker_desktop
         private async void btnTestTMDBMovie_Click(object sender, EventArgs e)
         {
             string tmdbBaseUrl = ConfigurationManager.AppSettings["TMDBApiBaseUrl"];
-            string tmdbAuthToken = ConfigurationManager.AppSettings["TMDBApiAuthToken"];
-            string tmdbUser = ConfigurationManager.AppSettings["TMDBApiUser"];
+            string tmdbAuthToken = ConfigurationManager.AppSettings["TMDBNathanAuthToken"];
+            string tmdbAccountId = UserAppAccount.UserTmdbAccountID;
+            string tmdbSessionId = UserAppAccount.UserTmdbSessionID;
 
-            string tmdbUrl = $"{tmdbBaseUrl}{tmdbUser}/rated/movies";
+            string tmdbUrl = $"{tmdbBaseUrl}{tmdbAccountId}/rated/movies";
 
             // initialize client
             var client = new RestClient();
@@ -496,6 +495,7 @@ namespace media_tracker_desktop
             request.AddParameter("language", "en-US");
             request.AddParameter("page", 1);
             request.AddParameter("sort_by", "created_at.desc");
+            request.AddParameter("session_id", tmdbSessionId);
 
             request.AddHeader("Authorization", $"Bearer {tmdbAuthToken}");
 
@@ -527,10 +527,11 @@ namespace media_tracker_desktop
         private async void btnTestTMDBTVShow_Click(object sender, EventArgs e)
         {
             string tmdbBaseUrl = ConfigurationManager.AppSettings["TMDBApiBaseUrl"];
-            string tmdbAuthToken = ConfigurationManager.AppSettings["TMDBApiAuthToken"];
-            string tmdbUser = ConfigurationManager.AppSettings["TMDBApiUser"];
+            string tmdbAuthToken = ConfigurationManager.AppSettings["TMDBNathanAuthToken"];
+            string tmdbAccountId = UserAppAccount.UserTmdbAccountID;
+            string tmdbSessionId = UserAppAccount.UserTmdbSessionID;
 
-            string tmdbUrl = $"{tmdbBaseUrl}{tmdbUser}/favorite/tv";
+            string tmdbUrl = $"{tmdbBaseUrl}{tmdbAccountId}/favorite/tv";
 
             // initialize client
             var client = new RestClient();
@@ -541,6 +542,7 @@ namespace media_tracker_desktop
             request.AddParameter("language", "en-US");
             request.AddParameter("page", 1);
             request.AddParameter("sort_by", "created_at.asc");
+            request.AddParameter("session_id", tmdbSessionId);
 
             request.AddHeader("Authorization", $"Bearer {tmdbAuthToken}");
 
@@ -566,6 +568,10 @@ namespace media_tracker_desktop
                 }
 
                 MessageBox.Show(message);
+            }
+            else
+            {
+                MessageBox.Show(response.Content);
             }
         }
 
@@ -683,56 +689,75 @@ namespace media_tracker_desktop
 
         private async void btnLinkTmdb_Click(object sender, EventArgs e)
         {
-            string tmdbBaseUrl = ConfigurationManager.AppSettings["TMDBApiBaseUrl"];
-            string tmdbAuthToken = ConfigurationManager.AppSettings["TMDBApiAuthToken"];
-            string tmdbUser = ConfigurationManager.AppSettings["TMDBApiUser"];
+            var authHeader = $"Bearer {ConfigurationManager.AppSettings["TMDBNathanAuthToken"]}";
+            var options = new RestClientOptions("https://api.themoviedb.org/3/authentication/token/new");
+            var client = new RestClient(options);
+            var request = new RestRequest("");
 
-            string tmdbUrl = $"{tmdbBaseUrl}21779127/rated/movies";
+            request.AddHeader("accept", "application/json");
+            request.AddHeader("Authorization", authHeader);
 
-            // initialize client
-            var client = new RestClient();
-
-            // pass the url to request
-            var request = new RestRequest(tmdbUrl);
-
-            request.AddParameter("language", "en-US");
-            request.AddParameter("page", 1);
-            request.AddParameter("sort_by", "created_at.desc");
-
-            request.AddHeader("Authorization", $"Bearer {tmdbAuthToken}");
-
-            // retrieve the response
-            var response = await client.ExecuteAsync(request);
+            var response = await client.GetAsync(request);
 
             if (response.IsSuccessful)
             {
-                // Convert content to json object.
-                var movieResultJson = JObject.Parse(response.Content);
+                var requestToken = JObject.Parse(response.Content)["request_token"].ToString();
 
-                // Retrieve the array of artist from the json object and convert it back to string.
-                var movieJson = movieResultJson.Root["results"];
+                Console.WriteLine("{0}", response.Content);
+                MessageBox.Show(requestToken);
 
-                // Deserialize
-                List<TMDB_Movie> movies = JsonConvert.DeserializeObject<List<TMDB_Movie>>(movieJson.ToString());
-
-                string message = "";
-
-                foreach (TMDB_Movie movie in movies)
+                var requestTokenUrl = $"https://www.themoviedb.org/authenticate/{requestToken}";
+                //System.Diagnostics.Process is used to open the authentication in a new window
+                System.Diagnostics.Process.Start(new ProcessStartInfo(requestTokenUrl)
                 {
-                    message += $"{movie.ID} - {movie.Title} - {movie.Overview} \n\n";
-                }
+                    UseShellExecute = true
+                });
 
-                MessageBox.Show(message);
+                DialogResult result = MessageBox.Show("One you have authorised the app press continue.", "Continue?", MessageBoxButtons.OK);
+                //Response if a guarenteed failure if user doesnt hit approve before hitting ok
+                if (result == DialogResult.OK)
+                {
+                    try
+                    {
+                        string jsonBodyToken = requestToken;
+
+                        options = new RestClientOptions("https://api.themoviedb.org/3/authentication/session/new");
+                        client = new RestClient(options);
+                        request = new RestRequest("");
+                        request.AddHeader("accept", "application/json");
+                        request.AddHeader("Authorization", authHeader);
+                        request.AddJsonBody(new { request_token = requestToken });
+
+                        response = await client.PostAsync(request);
+                        var success = JObject.Parse(response.Content)["success"].ToString();
+
+                        if (success == "True")
+                        {
+                            var sessionID = JObject.Parse(response.Content)["session_id"].ToString();
+                            MessageBox.Show(sessionID);
+                            AccountLinking(UserAppAccount.TMDBPlatformID, sessionID);
+
+                        }
+                        else
+                        {
+                            MessageBox.Show(response.Content);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        {
+                            MessageBox.Show(ex.ToString());
+                        }
+                    }
+                }
             }
-            //string tmdbUser = ConfigurationManager.AppSettings["TMDBApiUser"]; 
-            AccountLinking(UserAppAccount.TMDBPlatformID, tmdbUser);
         }
 
         private void btnCheckTMDB_Click(object sender, EventArgs e)
         {
             if (UserAppAccount.UserLoggedIn)
             {
-                MessageBox.Show($"TMDB Account Linked: {UserAppAccount.UserTmdbID}");
+                MessageBox.Show($"TMDB Account Linked: {UserAppAccount.UserTmdbAccountID} | {UserAppAccount.UserTmdbSessionID}");
             }
             else
             {
@@ -763,66 +788,6 @@ namespace media_tracker_desktop
                 MessageBox.Show("User Not Logged in");
             }
 
-        }
-
-        private async void TMDBCreateRequestToken()
-        {
-            var authHeader = $"Bearer {ConfigurationManager.AppSettings["TMDBApiAuthToken"]}";
-            var options = new RestClientOptions("https://api.themoviedb.org/3/authentication/token/new");
-            var client = new RestClient(options);
-            var request = new RestRequest("");
-            request.AddHeader("accept", "application/json");
-            request.AddHeader("Authorization", authHeader);
-            var response = await client.GetAsync(request);
-
-            if (response.IsSuccessful)
-            {
-                var requestToken = JObject.Parse(response.Content)["request_token"].ToString();
-                Console.WriteLine("{0}", response.Content);
-                MessageBox.Show(requestToken);
-                var requestTokenUrl = $"https://www.themoviedb.org/authenticate/{requestToken}";
-                //System.Diagnostics.Process is used to open the authentication in a new window
-                System.Diagnostics.Process.Start(new ProcessStartInfo(requestTokenUrl)
-                {
-                    UseShellExecute = true
-                });
-
-                DialogResult result = MessageBox.Show("One you have authorised the app press continue.", "Continue?", MessageBoxButtons.OK);
-                if (result == DialogResult.OK)
-                {
-                    try
-                    {
-                        string jsonBodyToken = requestToken;
-                        options = new RestClientOptions("https://api.themoviedb.org/3/authentication/session/new");
-                        client = new RestClient(options);
-                        request = new RestRequest("");
-                        request.AddHeader("accept", "application/json");
-                        request.AddHeader("Authorization", authHeader);
-                        request.AddJsonBody(new { request_token = requestToken });
-                        response = await client.PostAsync(request);
-                        var success = JObject.Parse(response.Content)["success"].ToString();
-                        if (success == "True")
-                        {
-                            var sessionID = JObject.Parse(response.Content)["session_id"].ToString();
-                            MessageBox.Show(sessionID);
-                        }
-                        else
-                        {
-                            MessageBox.Show(response.Content);
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        {
-                            MessageBox.Show(ex.ToString());
-                        }
-                    }
-                }
-            }
-        }
-        private async void button1_Click(object sender, EventArgs e)
-        {
-            TMDBCreateRequestToken();
         }
     }
 }

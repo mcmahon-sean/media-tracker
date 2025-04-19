@@ -1,6 +1,8 @@
 ﻿using media_tracker_desktop.Models;
 using media_tracker_desktop.Models.SupabaseTables;
+using media_tracker_desktop.Models.TMDB;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
 using RestSharp;
 using Supabase;
 using System;
@@ -9,9 +11,11 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
 using System.Net;
+using System.Printing;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media.Animation;
 
 namespace media_tracker_desktop
 {
@@ -36,7 +40,9 @@ namespace media_tracker_desktop
 
         private static string _userLastFmID = string.Empty;
         private static string _userSteamID = string.Empty;
-        private static string _userTmdbID = string.Empty;
+        private static string _userTmdbSessionID = string.Empty;
+        private static string _userTmdbAccountID = string.Empty;
+
         // ----- Getter Methods -----
         // Method: Returns bool if a user is logged in.
         public static bool UserLoggedIn
@@ -90,10 +96,14 @@ namespace media_tracker_desktop
             get { return _userSteamID; }
         }
 
-        // Method: Returns the user's TMDB id.
-        public static string UserTmdbID
+        // Method: Returns the user's TMDB Account id.
+        public static string UserTmdbAccountID
         {
-            get { return _userTmdbID; }
+            get { return _userTmdbAccountID; }
+        }
+        public static string UserTmdbSessionID
+        {
+            get { return _userTmdbSessionID; }
         }
         // ----- Getter Methods END -----
 
@@ -235,7 +245,7 @@ namespace media_tracker_desktop
         /// </summary>
         /// <param name="user">The user object of the logged in user.</param>
         /// <param name="userAccounts">The list of user account objects that is associated with the user.</param>
-        private static void UpdateUserSessionVariables(User user, List<UserAccount> userAccounts)
+        private static async void UpdateUserSessionVariables(User user, List<UserAccount> userAccounts)
         {
             _username = user.Username;
             _firstName = user.FirstName;
@@ -255,12 +265,23 @@ namespace media_tracker_desktop
                         _userLastFmID = userAccount.UserPlatID.ToString();
                         break;
                     case TMDB_PLATFORM_ID:
-                        _userTmdbID = userAccount.UserPlatID.ToString();
+                        _userTmdbSessionID = userAccount.UserPlatID.ToString();
+                        var (boolean, accountID) = await GetTmdbAccountID(userAccount.UserPlatID.ToString());
+                        if (boolean)
+                        {
+                           _userTmdbAccountID = accountID;
+                        }
+                        else
+                        {
+                            Console.WriteLine("Account Id Not Found");
+                        }
+                        
                         break;
                     default:
                         break;
                 }
             }
+
         }
 
         // Method: Resets the session variables.
@@ -275,7 +296,8 @@ namespace media_tracker_desktop
 
             _userLastFmID = string.Empty;
             _userSteamID= string.Empty;
-            _userTmdbID = string.Empty;
+            _userTmdbSessionID = string.Empty;
+            _userTmdbAccountID = string.Empty;
         }
 
         public static async Task<(bool, string)> AddThirdPartyId(int? PlatformId, string UserPlatformId)
@@ -306,6 +328,53 @@ namespace media_tracker_desktop
                 return (false, error.Message);
 
             }
+        }
+
+        private static async Task<(bool, string)> GetTmdbAccountID(string sessionID)
+        {
+            string tmdbBaseUrl = ConfigurationManager.AppSettings["TMDBApiBaseUrl"];
+            string tmdbAuthToken = ConfigurationManager.AppSettings["TMDBNathanAuthToken"];
+
+            string tmdbUrl = $"{tmdbBaseUrl}account_id?session_id={sessionID}";
+
+
+            // initialize client
+            var client = new RestClient();
+
+            // pass the url to request
+            var request = new RestRequest(tmdbUrl);
+
+            request.AddHeader("Authorization", $"Bearer {tmdbAuthToken}");
+
+            // retrieve the response
+            var response = await client.ExecuteAsync(request);
+
+            try
+            {
+                if (response.IsSuccessful)
+                {
+                    // Deserialize
+                    TMDB_Account accountInfo = JsonConvert.DeserializeObject<TMDB_Account>(response.Content);
+                    if (accountInfo != null)
+                    {
+                        return (true, accountInfo.ID.ToString());
+                    }
+                    else
+                    {
+                        return (false, response.Content);
+                    }
+                }
+                else
+                {
+                    return (false, response.Content);
+                }
+            }
+            catch(Exception error) 
+            {
+                return (false, error.Message);
+            }
+    
+            
         }
     }
 }
