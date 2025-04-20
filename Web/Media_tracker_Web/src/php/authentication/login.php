@@ -1,7 +1,9 @@
 <?php
-    require_once "../config.php";
 
     try{
+        
+        require_once "../db.php";
+
         if(isset($_POST['username']) && isset($_POST['password'])){
             $username = $_POST['username'];
             $password = $_POST['password'];
@@ -39,7 +41,8 @@
                     }
                 }
 
-                echo "Logged in successfully";
+                header("Location: ../../../index.php");
+                exit;
             } else {
                 echo "Invalid username or password";
             }

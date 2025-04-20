@@ -6,7 +6,7 @@ require_once '../models/Last.FM/LastFmTrack.php';
 
 // Username and API from config file
 $apiKey = LASTFM_API_KEY;
-$username = LASTFM_USERNAME;
+$username = $_SESSION['user_platform_ids']['lastfm'];
 
 // URL for the API request
 $url = "https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=$username&api_key=$apiKey&format=json&limit=5";

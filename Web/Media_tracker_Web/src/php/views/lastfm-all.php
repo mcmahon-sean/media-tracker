@@ -8,7 +8,7 @@
     require_once '../media/LastFm/get-recent-tracks.php';
     require_once '../media/LastFm/get-top-albums.php';
     require_once '../media/LastFm/get-top-artists.php';
-    require_once '../media/LastFm/get-top-tracks.php'
+    require_once '../media/LastFm/get-top-tracks.php';
 
 ?>
 
@@ -26,7 +26,7 @@
         <div class="row">
         <nav class="col-md-2 d-none d-md-block sidebar bg-dark-secondary">
                 <div>
-                    <a class="btn btn-dark w-100" id="btn-home" href="../index.html" role="button">
+                    <a class="btn btn-dark w-100" id="btn-home" href="../../../index.php" role="button">
                         Home
                     </a>
                 </div>
