@@ -6,6 +6,11 @@ import '../../models/steam/steam_model.dart';
 Future<List<SteamGame>> fetchSteamGames() async {
   final response = await http.get(Uri.parse(ApiServices.steamOwnedGamesUrl));
 
+  // ----- Debugging -----
+  print('Steam API Status: ${response.statusCode}');
+  print('Response Body: ${response.body}');
+  print('URL: ${ApiServices.steamOwnedGamesUrl}');
+
   if (response.statusCode == 200) {
     final data = json.decode(response.body);
     final gameList = data['response']['games'];

@@ -2,39 +2,87 @@ import 'package:flutter/material.dart';
 import '../../models/tmdb/tmdb_account.dart';
 import '../../models/tmdb/tmdb_movie.dart';
 import '../../models/tmdb/tmdb_tv_show.dart';
+import 'package:media_tracker_test/screens/media/media_details_screen.dart';
 
-Widget buildTmdbSection(
-  TMDBAccount? account,
-  List<TMDBMovie> ratedMovies,
-  List<TMDBTvShow> favoriteTvShows,
-) {
-  return ListView(
-    padding: const EdgeInsets.all(12),
-    children: [
-      if (account != null) ...[
-        Text(
-          "User: ${account.username}",
-          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+class TmdbSection extends StatelessWidget {
+  final TMDBAccount? account;
+  final List<TMDBMovie> ratedMovies;
+  final List<TMDBTvShow> favoriteTvShows;
+
+  const TmdbSection({
+    super.key,
+    required this.account,
+    required this.ratedMovies,
+    required this.favoriteTvShows,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return DefaultTabController(
+      length: 2,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const TabBar(
+            tabs: [Tab(text: 'Rated Movies'), Tab(text: 'Favorite TV Shows')],
+            indicatorColor: Colors.grey,
+            labelColor: Colors.white,
+            unselectedLabelColor: Colors.grey,
+          ),
+          Expanded(
+            child: TabBarView(
+              children: [
+                _buildMediaList(context, ratedMovies, isMovie: true),
+                _buildMediaList(context, favoriteTvShows, isMovie: false),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMediaList(
+    BuildContext context,
+    List items, {
+    required bool isMovie,
+  }) {
+    return ListView.builder(
+      itemCount: items.length,
+      itemBuilder: (context, index) {
+        final item = items[index];
+        final title = item.title;
+
+        return ListTile(
+          title: Text(title),
+          trailing: IconButton(
+          icon: Icon(
+            item.isFavorite ? Icons.star : Icons.star_border,
+            color: item.isFavorite ? Colors.yellow : Colors.grey,
+          ),
+          onPressed: () {
+            // toggle favorite logic
+          },
         ),
-        const SizedBox(height: 12),
-      ],
-      const Text(
-        "Rated Movies",
-        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-      ),
-      ...ratedMovies.map(
-        (movie) =>
-            ListTile(title: Text(movie.title), subtitle: Text(movie.overview)),
-      ),
-      const SizedBox(height: 12),
-      const Text(
-        "Favorite TV Shows",
-        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-      ),
-      ...favoriteTvShows.map(
-        (show) =>
-            ListTile(title: Text(show.name), subtitle: Text(show.overview)),
-      ),
-    ],
-  );
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder:
+                    (_) => MediaDetailsScreen(
+                      appId: item.id.toString(),
+                      title: item.title,
+                      subtitle: item.overview,
+                      genreIds: item.genreIds,
+                      releaseDate: item.releaseDate,
+                      posterPath: item.posterPath,
+                      mediaType: MediaType.tmdb,
+                    ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
 }

@@ -1,16 +1,27 @@
 import 'package:flutter/material.dart';
+import '../../models/tmdb/genre_helper.dart';
 import '../../services/media_api/steam_service.dart';
 
+enum MediaType { steam, tmdb, lastfm }
+
 class MediaDetailsScreen extends StatefulWidget {
-  final String appId; // required to fetch from Steam API
+  final String appId; // Required for Steam, optional for TMDB
   final String title;
   final String subtitle;
+  final MediaType mediaType;
+  final List<int>? genreIds;
+  final String? releaseDate;
+  final String? posterPath;
 
   const MediaDetailsScreen({
     super.key,
     required this.appId,
     required this.title,
     required this.subtitle,
+    required this.mediaType,
+    this.genreIds,
+    this.releaseDate,
+    this.posterPath,
   });
 
   @override
@@ -24,7 +35,11 @@ class _MediaDetailsScreenState extends State<MediaDetailsScreen> {
   @override
   void initState() {
     super.initState();
-    _loadSteamGameDetails();
+    if (widget.mediaType == MediaType.steam) {
+      _loadSteamGameDetails();
+    } else {
+      _loadTmdbDetails();
+    }
   }
 
   Future<void> _loadSteamGameDetails() async {
@@ -42,6 +57,39 @@ class _MediaDetailsScreenState extends State<MediaDetailsScreen> {
     }
   }
 
+  void _loadTmdbDetails() {
+    final genres =
+        widget.genreIds
+            ?.map((id) => tmdbGenreMap[id] ?? 'Unknown')
+            .join(', ') ??
+        'Unknown';
+
+    setState(() {
+      _extraDetails = [
+        'Genres: $genres',
+        'Release Date: ${widget.releaseDate ?? 'Unknown'}',
+        'Description: ${widget.subtitle}',
+      ];
+      _imageUrl = null;
+    });
+  }
+
+  String _resolveImageUrl() {
+    if (_imageUrl != null) return _imageUrl!;
+
+    if (widget.mediaType == MediaType.tmdb && widget.posterPath != null) {
+      return 'https://image.tmdb.org/t/p/w500${widget.posterPath}';
+    }
+
+    if (widget.mediaType == MediaType.lastfm && widget.posterPath != null) {
+      print(widget.posterPath!);
+      return widget.posterPath!;
+    }
+
+    // Fallback image if none are provided
+    return 'https://via.placeholder.com/300x400?text=No+Image';
+  }
+
   String _formatGenres(List<dynamic>? genres) {
     return genres?.map((g) => g['description']).join(', ') ?? 'Unknown';
   }
@@ -55,17 +103,21 @@ class _MediaDetailsScreenState extends State<MediaDetailsScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (_imageUrl != null)
+            if (_imageUrl != null || widget.posterPath != null)
               Center(
                 child: Image.network(
-                  _imageUrl!,
+                  _resolveImageUrl(),
                   fit: BoxFit.cover,
-                  height: 200,
+                  height:
+                      widget.mediaType == MediaType.steam
+                          ? 200
+                          : widget.mediaType == MediaType.tmdb
+                          ? 500
+                          : 300, // last.fm
                 ),
               ),
+
             const SizedBox(height: 16),
-            Text(widget.subtitle, style: const TextStyle(fontSize: 16)),
-            const SizedBox(height: 12),
             ..._extraDetails.map(
               (detail) => Padding(
                 padding: const EdgeInsets.only(bottom: 8.0),
