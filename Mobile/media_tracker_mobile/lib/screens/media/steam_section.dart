@@ -29,6 +29,7 @@ Widget buildSteamSection(List<SteamGame> steamGames) {
                     title: game.name,
                     subtitle:
                         'Total playtime: ${game.playtimeForever} minutes',
+                    mediaType: MediaType.steam,
                   ),
             ),
           );

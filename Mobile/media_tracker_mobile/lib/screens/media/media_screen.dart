@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:media_tracker_test/models/lastfm/lastfm_top_artist.dart';
 import 'package:media_tracker_test/providers/auth_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../models/lastfm/lastfm_artist.dart';
 import '../../models/lastfm/lastfm_track.dart';
 import '../../models/lastfm/lastfm_user.dart';
 import '../../models/steam/steam_model.dart';
@@ -34,7 +34,7 @@ class _MediaScreenState extends ConsumerState<MediaScreen> {
 
   // Last.fm
   LastFmUser? _lastFmUser;
-  List<LastFmArtist> _topArtists = [];
+  List<TopArtist> _topArtists = [];
   List<LastFmTrack> _recentTracks = [];
   bool _isLoadingLastFm = false;
 
@@ -47,7 +47,7 @@ class _MediaScreenState extends ConsumerState<MediaScreen> {
   @override
   void initState() {
     super.initState();
-    _loadPlatformData(_selectedIndex); // Load Steam by default
+    _loadPlatformData(_selectedIndex);
   }
 
   // Load the data for the selected platform based on index
@@ -55,30 +55,49 @@ class _MediaScreenState extends ConsumerState<MediaScreen> {
     final auth = ref.read(authProvider);
     switch (index) {
       case 0:
-        if (auth.steamId != null && _steamGames.isEmpty) _loadSteamGames();
+        if (auth.steamId != null) {
+          setState(() {
+            _steamGames = []; // Clear old data
+          });
+          _loadSteamGames();
+        }
         break;
       case 1:
-        if (auth.lastFmUsername != null &&
-            (_topArtists.isEmpty || _recentTracks.isEmpty)) {
+        if (auth.lastFmUsername != null) {
+          setState(() {
+            _topArtists = [];
+            _recentTracks = [];
+          });
           _loadLastFmData();
         }
         break;
       case 2:
-        if (auth.tmdbSessionId != null && _tmdbAccount == null) _loadTmdbData();
+        if (auth.tmdbSessionId != null) {
+          setState(() {
+            _tmdbAccount = null;
+          });
+          _loadTmdbData();
+        }
         break;
     }
   }
 
   // Fetches and sets Steam game data
   Future<void> _loadSteamGames() async {
+    if (_steamGames.isNotEmpty)
+      return; // Skip loading if games list is populated
     setState(() => _isLoadingSteam = true);
     try {
       final games = await fetchSteamGames();
       setState(() => _steamGames = games); // Set game list
-    } catch (e) {
+    } catch (e, stackTrace) {
       print('Steam load error: $e');
+      print('Stack trace: $stackTrace');
+      print('Steam ID: ${ref.read(authProvider).steamId}');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Failed to load Steam data. Try again later.")),
+        const SnackBar(
+          content: Text("Failed to load Steam data. Try again later."),
+        ),
       );
     } finally {
       setState(() => _isLoadingSteam = false);
@@ -111,7 +130,7 @@ class _MediaScreenState extends ConsumerState<MediaScreen> {
     try {
       final account = await TMDBService.fetchAccountDetails();
       final movies = await TMDBService.fetchRatedMovies();
-      final shows = await TMDBService.fetchFavoriteTvShows();
+      final shows = await TMDBService.fetchRatedTvShows();
 
       setState(() {
         _tmdbAccount = account; // Get user profile
@@ -128,6 +147,7 @@ class _MediaScreenState extends ConsumerState<MediaScreen> {
   @override
   Widget build(BuildContext context) {
     final auth = ref.watch(authProvider);
+
     final firstName = auth.firstName;
 
     return Scaffold(
@@ -162,6 +182,7 @@ class _MediaScreenState extends ConsumerState<MediaScreen> {
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: (index) {
+          if (index == _selectedIndex) return; // Ignore redundant tap
           setState(() {
             _selectedIndex = index;
           });
@@ -197,7 +218,11 @@ class _MediaScreenState extends ConsumerState<MediaScreen> {
       case 2:
         if (_isLoadingTmdb) return _loading();
         if (auth.tmdbSessionId == null) return _noMediaLinkedPrompt("TMDB");
-        return buildTmdbSection(_tmdbAccount, _ratedMovies, _favoriteTvShows);
+        return TmdbSection(
+          account: _tmdbAccount,
+          ratedMovies: _ratedMovies,
+          favoriteTvShows: _favoriteTvShows,
+        );
       default:
         return Center(child: Text("Coming soon..."));
     }
@@ -228,7 +253,10 @@ class _MediaScreenState extends ConsumerState<MediaScreen> {
                   '/linkAccounts',
                 );
                 if (didLink == true) {
-                  _loadPlatformData(_selectedIndex);
+                  setState(() {}); // just to rebuild
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    _loadPlatformData(_selectedIndex);
+                  });
                 }
               },
             ),
