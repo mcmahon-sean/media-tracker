@@ -1,4 +1,5 @@
 using media_tracker_desktop.Models;
+using media_tracker_desktop.Models.ApiModels;
 using media_tracker_desktop.Models.LastFM;
 using media_tracker_desktop.Models.Steam;
 using media_tracker_desktop.Models.SupabaseTables;
@@ -11,6 +12,7 @@ using System.Configuration;
 using System.Diagnostics;
 using System.Security.Policy;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using static System.Net.WebRequestMethods;
 
 namespace media_tracker_desktop
@@ -23,6 +25,9 @@ namespace media_tracker_desktop
         }
 
         private Client connection;
+
+        private string lastFMUrl;
+        private string lastFMApiKey;
 
         // Testing
         private async void btnDBConnectionTest_Click(object sender, EventArgs e)
@@ -59,6 +64,13 @@ namespace media_tracker_desktop
             // Initializing connection.
             UserAppAccount.ConnectToDB(connection);
 
+
+            // initializing last fm stuff
+            lastFMUrl = ConfigurationManager.AppSettings["LastFMApiBaseUrl"];
+            lastFMApiKey = ConfigurationManager.AppSettings["LastFMApiKey"];
+
+            LastFMApi.Initialize(lastFMUrl, lastFMApiKey);
+            
         }
 
         // Testing user create. Normally should be done in a separate form.
@@ -166,6 +178,9 @@ namespace media_tracker_desktop
                         MessageBox.Show($"{user.Username} logged in.");
 
                         validUser = true;
+
+                        // connect api's
+                        LastFMApi.User = UserAppAccount.UserLastFmID;
                     }
                     else
                     {
@@ -247,39 +262,13 @@ namespace media_tracker_desktop
 
         private async void btnTestLastFMArtist_Click(object sender, EventArgs e)
         {
-            string lastFMUrl = ConfigurationManager.AppSettings["LastFMApiBaseUrl"];
-            string lastFMApiKey = ConfigurationManager.AppSettings["LastFMApiKey"];
-            string lastFMUsername = UserAppAccount.UserLastFmID;
+            (bool isSuccess, List<LastFM_Artist>? artists) result = await LastFMApi.GetUserTopArtists();
 
-            // initialize client
-            var client = new RestClient();
-
-            // pass the url to request
-            var request = new RestRequest(lastFMUrl);
-
-            request.AddParameter("method", "user.getTopArtists");
-            request.AddParameter("user", lastFMUsername);
-            request.AddParameter("api_key", lastFMApiKey);
-            request.AddParameter("limit", 5);
-            request.AddParameter("format", "json");
-
-            // retrieve the response
-            var response = await client.ExecuteAsync(request);
-
-            if (response.IsSuccessful)
+            if (result.isSuccess && result.artists != null)
             {
-                // Convert content to json object.
-                var topArtistsJson = JObject.Parse(response.Content);
-
-                // Retrieve the array of artist from the json object and convert it back to string.
-                var artistsJson = topArtistsJson.Root["topartists"]["artist"];
-
-                // Deserialize
-                List<LastFM_Artist> artists = JsonConvert.DeserializeObject<List<LastFM_Artist>>(artistsJson.ToString());
-
                 string message = "";
-
-                foreach (LastFM_Artist artist in artists)
+                
+                foreach (LastFM_Artist artist in result.artists)
                 {
                     message += $"{artist.Name} - {artist.ImageUrl} \n";
                 }
@@ -290,39 +279,13 @@ namespace media_tracker_desktop
 
         private async void btnTestLastFMTrack_Click(object sender, EventArgs e)
         {
-            string lastFMUrl = ConfigurationManager.AppSettings["LastFMApiBaseUrl"];
-            string lastFMApiKey = ConfigurationManager.AppSettings["LastFMApiKey"];
-            string lastFMUsername = UserAppAccount.UserLastFmID;
+            (bool isSuccess, List<LastFM_Track>? tracks) result = await LastFMApi.GetUserRecentTracks();
 
-            // initialize client
-            var client = new RestClient();
-
-            // pass the url to request
-            var request = new RestRequest(lastFMUrl);
-
-            request.AddParameter("method", "user.getRecentTracks");
-            request.AddParameter("user", lastFMUsername);
-            request.AddParameter("api_key", lastFMApiKey);
-            request.AddParameter("limit", 5);
-            request.AddParameter("format", "json");
-
-            // retrieve the response
-            var response = await client.ExecuteAsync(request);
-
-            if (response.IsSuccessful)
+            if (result.isSuccess && result.tracks != null)
             {
-                // Convert content to json object.
-                var recentTracksJson = JObject.Parse(response.Content);
-
-                // Retrieve the array of artist from the json object and convert it back to string.
-                var tracksJson = recentTracksJson.Root["recenttracks"]["track"];
-
-                // Deserialize
-                List<LastFM_Track> tracks = JsonConvert.DeserializeObject<List<LastFM_Track>>(tracksJson.ToString());
-
                 string message = "";
 
-                foreach (LastFM_Track track in tracks)
+                foreach (LastFM_Track track in result.tracks)
                 {
                     message += $"{track.ArtistName} - {track.ImageUrl} - {track.Timestamp} \n";
                 }
@@ -333,37 +296,12 @@ namespace media_tracker_desktop
 
         private async void btnTestLastFMUser_Click(object sender, EventArgs e)
         {
-            string lastFMUrl = ConfigurationManager.AppSettings["LastFMApiBaseUrl"];
-            string lastFMApiKey = ConfigurationManager.AppSettings["LastFMApiKey"];
-            string lastFMUsername = UserAppAccount.UserLastFmID;
+            (bool isSuccess, LastFM_User? user) result = await LastFMApi.GetUserInfo();
 
-            // initialize client
-            var client = new RestClient();
-
-            // pass the url to request
-            var request = new RestRequest(lastFMUrl);
-
-            request.AddParameter("method", "user.getInfo");
-            request.AddParameter("user", lastFMUsername);
-            request.AddParameter("api_key", lastFMApiKey);
-            request.AddParameter("format", "json");
-
-            // retrieve the response
-            var response = await client.ExecuteAsync(request);
-
-            if (response.IsSuccessful)
+            if (result.isSuccess && result.user != null)
             {
-                // Convert content to json object.
-                var userInfoJson = JObject.Parse(response.Content);
 
-                // Retrieve the array of artist from the json object and convert it back to string.
-                var userJson = userInfoJson.Root["user"];
-
-                // Deserialize
-                LastFM_User userInfo = JsonConvert.DeserializeObject<LastFM_User>(userJson.ToString());
-
-
-                MessageBox.Show($"{userInfo.Name} - {userInfo.IsSubscriber} - {userInfo.RegisteredAt}");
+                MessageBox.Show($"{result.user.Name} - {result.user.IsSubscriber} - {result.user.RegisteredAt}");
             }
         }
 
