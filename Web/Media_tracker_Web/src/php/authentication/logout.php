@@ -4,7 +4,7 @@
 session_start();
 
 // Check if signed in
-if ($_SESSION['signed-in'] === true) {
+if ($_SESSION['signed_in'] === true) {
     // Clear all session variables
     $_SESSION = array();
 

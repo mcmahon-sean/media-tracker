@@ -10,7 +10,8 @@ define('LASTFM_API_KEY', '1456c592b2d19dabd13468f0eee62dc9');
 
 // TMDB credentials
 define('TMDB_USERNAME', '');
-define('TMDB_API_KEY', '');
+define('TMDB_API_KEY', '2572887e2d078ce0787e693bb0348f3c');
+define('TMDB_API_URL', 'https://api.themoviedb.org/3');
 
 // Supabase credentials
 define('SUPABASE_URL', 'https://hrqakudeaalvgstpupdu.supabase.co');

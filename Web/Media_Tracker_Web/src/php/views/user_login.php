@@ -30,12 +30,12 @@
                         Last.fm
                     </a>
                     <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="lastfm-all.php">All Music</a></li>
-                        <li><a class="dropdown-item" href="lastfm-loved-tracks.php">Loved Tracks</a></li>
-                        <li><a class="dropdown-item" href="lastfm-recent-tracks.php">Recent Tracks</a></li>
-                        <li><a class="dropdown-item" href="lastfm-top-albums.php">Top Albums</a></li>
-                        <li><a class="dropdown-item" href="lastfm-top-artists.php">Top Artists</a></li>
-                        <li><a class="dropdown-item" href="lastfm-top-tracks.php">Top Tracks</a></li>
+                        <li><a class="dropdown-item" href="lastfm_all.php">All Music</a></li>
+                        <li><a class="dropdown-item" href="lastfm_loved_tracks.php">Loved Tracks</a></li>
+                        <li><a class="dropdown-item" href="lastfm_recent_tracks.php">Recent Tracks</a></li>
+                        <li><a class="dropdown-item" href="lastfm_top_albums.php">Top Albums</a></li>
+                        <li><a class="dropdown-item" href="lastfm_top_artists.php">Top Artists</a></li>
+                        <li><a class="dropdown-item" href="lastfm_top_tracks.php">Top Tracks</a></li>
                     </ul>
                 </div>
 
@@ -81,18 +81,13 @@
                         <p><?php echo $error; ?></p>
                     <?php else: ?>
                         <div class="form-container">
-                            <form id="addEditForm" action="../database/add_3rd_party_id.php" method="post">
-                                <h3>Add/Edit Platforms</h3>
-                                <label for="platform_id">Choose a platform:</label>
-                                <select name="platform_id" id="platform_id">
-                                    <option value="1">Steam</option>
-                                    <option value="2">Last.fm</option>
-                                    <option value="3">TMDB</option>
-                                </select>
-                                <br><br>
-                                <label for="userplatid">Enter your username:</label>
-                                <input type="text" name="userplatid" id="userplatid" required><br><br>
-                                <input type="submit" value="Add/Edit">
+                            <form id="loginForm" action="../authentication/login.php" method="post">
+                                <h3>Login</h3>
+                                <label>Username:</label><br>
+                                <input type="text" name="username" required><br>
+                                <label>Password:</label><br>
+                                <input type="password" name="password" required><br><br>
+                                <input type="submit" value="Login">
                             </form>
                         </div>
                     <?php endif; ?>

@@ -12,7 +12,11 @@
             $stmt = $pdo->prepare("SELECT public.add_3rd_party_id(?, ?, ?)");
             $stmt->execute([$username, $platformID, $userplatID]);
 
-            echo "3rd party ID saved!";
+            session_start();         
+            $_SESSION['user_platform_ids']['steam'] = $userplatID;
+            
+            header("Location: ../../../index.php");
+            exit;
         } else {
             echo "Required fields are missing.";
         }

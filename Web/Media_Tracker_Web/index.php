@@ -50,32 +50,32 @@ session_start();
             </a>
             <ul class="dropdown-menu">
               <li>
-                <a class="dropdown-item" href="src/php/views/lastfm-all.php"
+                <a class="dropdown-item" href="src/php/views/lastfm_all.php"
                   >All Music</a
                 >
               </li>
               <li>
-                <a class="dropdown-item" href="src/php/views/lastfm-loved-tracks.php"
+                <a class="dropdown-item" href="src/php/views/lastfm_loved_tracks.php"
                   >Loved Tracks</a
                 >
               </li>
               <li>
-                <a class="dropdown-item" href="src/php/views/lastfm-recent-tracks.php"
+                <a class="dropdown-item" href="src/php/views/lastfm_recent_tracks.php"
                   >Recent Tracks</a
                 >
               </li>
               <li>
-                <a class="dropdown-item" href="src/php/views/lastfm-top-albums.php"
+                <a class="dropdown-item" href="src/php/views/lastfm_top_albums.php"
                   >Top Albums</a
                 >
               </li>
               <li>
-                <a class="dropdown-item" href="src/php/views/lastfm-top-artists.php"
+                <a class="dropdown-item" href="src/php/views/lastfm_top_artists.php"
                   >Top Artists</a
                 >
               </li>
               <li>
-                <a class="dropdown-item" href="src/php/views/lastfm-top-tracks.php"
+                <a class="dropdown-item" href="src/php/views/lastfm_top_tracks.php"
                   >Top Tracks</a
                 >
               </li>
@@ -137,16 +137,16 @@ session_start();
               />
             </div>
           </div>
-          <?php if (isset($_SESSION['username'])): ?>
+          <?php if (isset($_SESSION['signed_in'])): ?>
             <p>Hello, <strong><?= htmlspecialchars($_SESSION['username']) ?></strong>!</p>
             <p>Steam ID: <strong><?= htmlspecialchars($_SESSION['user_platform_ids']['steam']) ?></strong></p>
             <p>Last.fm ID: <strong><?= htmlspecialchars($_SESSION['user_platform_ids']['lastfm']) ?></strong></p>
             <p>TMDB: <strong><?= htmlspecialchars($_SESSION['user_platform_ids']['tmdb']) ?></strong></p>
-            <!--<button onclick="window.location.href='src/php/views/platforms-addedit.php'">Add/Edit Platforms</button>-->
+            <button onclick="window.location.href='src/php/views/add_edit_3rd_party.php'">Add/Edit Platforms</button>
             <button onclick="window.location.href='src/php/authentication/logout.php'">Logout</button>
           <?php else: ?>
-            <button onclick="window.location.href='src/php/views/user-login.php'">Login</button>
-            <button onclick="window.location.href='src/php/views/user-signup.php'">Sign Up</button>
+            <button onclick="window.location.href='src/php/views/user_login.php'">Login</button>
+            <button onclick="window.location.href='src/php/views/user_signup.php'">Sign Up</button>
           <?php endif; ?>
         </main>
       </div>

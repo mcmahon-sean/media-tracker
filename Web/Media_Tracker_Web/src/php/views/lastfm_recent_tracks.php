@@ -3,6 +3,9 @@
     // Start session
     session_start();
 
+    // Required
+    require_once '../media/LastFm/get_recent_tracks.php';
+
 ?>
 
 <!DOCTYPE html>
@@ -30,12 +33,12 @@
                         Last.fm
                     </a>
                     <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="lastfm-all.php">All Music</a></li>
-                        <li><a class="dropdown-item" href="lastfm-loved-tracks.php">Loved Tracks</a></li>
-                        <li><a class="dropdown-item" href="lastfm-recent-tracks.php">Recent Tracks</a></li>
-                        <li><a class="dropdown-item" href="lastfm-top-albums.php">Top Albums</a></li>
-                        <li><a class="dropdown-item" href="lastfm-top-artists.php">Top Artists</a></li>
-                        <li><a class="dropdown-item" href="lastfm-top-tracks.php">Top Tracks</a></li>
+                        <li><a class="dropdown-item" href="lastfm_all.php">All Music</a></li>
+                        <li><a class="dropdown-item" href="lastfm_loved_tracks.php">Loved Tracks</a></li>
+                        <li><a class="dropdown-item" href="lastfm_recent_tracks.php">Recent Tracks</a></li>
+                        <li><a class="dropdown-item" href="lastfm_top_albums.php">Top Albums</a></li>
+                        <li><a class="dropdown-item" href="lastfm_top_artists.php">Top Artists</a></li>
+                        <li><a class="dropdown-item" href="lastfm_top_tracks.php">Top Tracks</a></li>
                     </ul>
                 </div>
 
@@ -67,7 +70,7 @@
 
             <main class="col-md-10 ms-sm-auto px-4">
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                    <h2>Welcome Back</h2>
+                    <h2>Recent Tracks</h2>
                 </div>
 
                 <div class="card bg-dark text-light mb-4">
@@ -80,22 +83,26 @@
                     <?php if (isset($error)): ?>
                         <p><?php echo $error; ?></p>
                     <?php else: ?>
-                        <div class="form-container">
-                            <form id="loginForm" action="../authentication/create_user.php" method="post">
-                                <h3>Login</h3>
-                                <label>Username:</label><br>
-                                <input type="text" name="username" required><br>
-                                <label>First Name:</label><br>
-                                <input type="text" name="first_name" required><br>
-                                <label>Last Name:</label><br>
-                                <input type="text" name="last_name" required><br>
-                                <label>Email:</label><br>
-                                <input type="email" name="email" required><br>
-                                <label>Password:</label><br>
-                                <input type="password" name="password" required><br><br>
-                                <input type="submit" value="Login">
-                            </form>
-                        </div>
+                        <table class="table table-dark table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Track Name</th>
+                                    <th>Artist Name</th>
+                                    <th>Last Played</th>
+                                    <th>URL</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($recentTracks as $track): ?>
+                                    <tr>
+                                        <td><?php echo htmlspecialchars($track->name); ?></td>
+                                        <td><?php echo htmlspecialchars($track->artist); ?></td>
+                                        <td><?php echo htmlspecialchars($track->getFormattedDate()); ?></td>
+                                        <td><a href="<?php echo htmlspecialchars($track->url); ?>" target="_blank">View</a></td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
                     <?php endif; ?>
                 </div>
             </main>
