@@ -56,7 +56,7 @@ namespace media_tracker_desktop
 
             foreach (var record in records)
             {
-                displayString += record.UserPlatID + " " + record.Username + "\n\n";
+                displayString += record.UserPlatID + " " + record.Username + " " + record.PlatformID + "\n\n";
             }
 
             MessageBox.Show(displayString);
@@ -176,6 +176,10 @@ namespace media_tracker_desktop
                     if (result.userAuthenticated)
                     {
                         MessageBox.Show($"{user.Username} logged in.");
+                        if (UserAppAccount.UserSteamID != null)
+                        {
+                            txtLinkingBox.Text = UserAppAccount.UserSteamID;
+                        }
 
                         validUser = true;
 
@@ -226,7 +230,7 @@ namespace media_tracker_desktop
             string steamFormat = ConfigurationManager.AppSettings["SteamAPIFormat"];
             string steamUserID = UserAppAccount.UserSteamID;
             string steamIncludes = "&include_appinfo=1&include_played_free_games=1&format=json";
-            string steamUrl = $"{steamBaseUrl}?key={steamApiKey}&steamid={steamUserID}&include_appinfo=1&format={steamFormat}";
+            string steamUrl = $"{steamBaseUrl}key={steamApiKey}&steamid={steamUserID}&include_appinfo=1&format={steamFormat}";
 
             // initialize client
             var client = new RestClient();
@@ -246,18 +250,27 @@ namespace media_tracker_desktop
                 // retrieve the games property of the json object and convert it back to a json string
                 var steamUserGamesJson = steamJson.Root["response"]["games"];
 
-                // pass the json string to deserialize each game into steam_model objects
-                List<Steam_Model> steamUserGames = JsonConvert.DeserializeObject<List<Steam_Model>>(steamUserGamesJson.ToString());
-
-                string message = "";
-
-                foreach (Steam_Model game in steamUserGames)
+                if (steamUserGamesJson != null)
                 {
-                    message += $"{game.Name} - {game.RTimeLastPlayed} - {game.AppID} \n";
+                    // pass the json string to deserialize each game into steam_model objects
+                    List<Steam_Model> steamUserGames = JsonConvert.DeserializeObject<List<Steam_Model>>(steamUserGamesJson.ToString());
+
+                    string message = "";
+
+                    foreach (Steam_Model game in steamUserGames)
+                    {
+                        message += $"{game.Name} - {game.RTimeLastPlayed} - {game.AppID} \n";
+                    }
+
+                    MessageBox.Show(message);
+                }
+                else
+                {
+                    MessageBox.Show("steamUserGamesJson is null.");
                 }
 
-                MessageBox.Show(message);
             }
+            
         }
 
         private async void btnTestLastFMArtist_Click(object sender, EventArgs e)
@@ -480,8 +493,10 @@ namespace media_tracker_desktop
         }
 
         private async void btnLinkSteam_Click(object sender, EventArgs e)
-        {
-            string steamID = "76561199378709292";
+        { 
+            string steamID = txtLinkingBox.Text;
+            AccountLinking(UserAppAccount.SteamPlatformID, steamID);
+
 
             string steamBaseUrl = ConfigurationManager.AppSettings["SteamApiBaseUrl"];
             string steamApiKey = ConfigurationManager.AppSettings["steamApiKey"];
@@ -505,7 +520,6 @@ namespace media_tracker_desktop
                 if (steamUserGamesJson != null)
                 {
                     List<Steam_Model> steamUserGames = JsonConvert.DeserializeObject<List<Steam_Model>>(steamUserGamesJson.ToString());
-                    AccountLinking(UserAppAccount.SteamPlatformID, steamID);
                 }
                 else
                 {
