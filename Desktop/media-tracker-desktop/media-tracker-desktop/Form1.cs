@@ -35,14 +35,26 @@ namespace media_tracker_desktop
             //string userEmailDB = "";
             //string userPasswordDB = "";
 
-            connection = new SupabaseConnection().GetClient();
+            string? initializationResult = SupabaseConnection.InitializeDB().ToString();
+
+            connection = SupabaseConnection.GetClient();
 
             // test connection ----------
             TestSupabaseConnection(connection);
 
             // test viewing tables -----------
             // to test different table, go to method.
-            TestSupabaseViewUserAccountTable(connection);
+            //TestSupabaseViewUserAccountTable(connection);
+            var records = await SupabaseConnection.GetTableRecord<UserAccount>(connection);
+
+            string displayString = "";
+
+            foreach (var record in records)
+            {
+                displayString += record.UserPlatID + " " + record.Username + "\n\n";
+            }
+
+            MessageBox.Show(displayString);
 
             // Initializing connection.
             UserAppAccount.ConnectToDB(connection);
@@ -185,96 +197,6 @@ namespace media_tracker_desktop
             var data = await connection.Rpc("testconnectionwitharguments", param);
 
             testDisplay = data.Content.ToString();
-
-            MessageBox.Show(testDisplay);
-        }
-
-        private async void TestSupabaseViewUserTable(Client connection)
-        {
-            // Change the object type of the .From method to a different table model for testing.
-            var records = await connection.From<User>().Get();
-
-            string testDisplay = "";
-
-            foreach (var record in records.Models)
-            {
-                testDisplay += $"{record.Username} | {record.FirstName} | {record.LastName} | {record.Email} | {record.Password}\n\n";
-            }
-
-            MessageBox.Show(testDisplay);
-        }
-
-        private async void TestSupabaseViewUserAccountTable(Client connection)
-        {
-            // Change the object type of the .From method to a different table model for testing.
-            var records = await connection.From<UserAccount>().Get();
-
-            string testDisplay = "";
-
-            foreach (var record in records.Models)
-            {
-                testDisplay += $"{record.Username} | {record.PlatformID} | {record.UserPlatID}\n\n";
-            }
-
-            MessageBox.Show(testDisplay);
-        }
-
-        private async void TestSupabaseViewPlatformTable(Client connection)
-        {
-            // Change the object type of the .From method to a different table model for testing.
-            var records = await connection.From<Platform>().Get();
-
-            string testDisplay = "";
-
-            foreach (var record in records.Models)
-            {
-                testDisplay += $"{record.PlatformID} | {record.PlatformName} | {record.APIKey}\n\n";
-            }
-
-            MessageBox.Show(testDisplay);
-        }
-
-        private async void TestSupabaseViewMediaTable(Client connection)
-        {
-            // Change the object type of the .From method to a different table model for testing.
-            var records = await connection.From<Media>().Get();
-
-            string testDisplay = "";
-
-            foreach (var record in records.Models)
-            {
-                testDisplay += $"{record.MediaID} | {record.PlatformID} | {record.MediaTypeID} | {record.MediaPlatID} | {record.Title} | {record.Album} | {record.Artist}\n\n";
-            }
-
-            MessageBox.Show(testDisplay);
-        }
-
-        private async void TestSupabaseViewMediaTypeTable(Client connection)
-        {
-            // Change the object type of the .From method to a different table model for testing.
-            var records = await connection.From<MediaType>().Get();
-
-            string testDisplay = "";
-
-            foreach (var record in records.Models)
-            {
-                testDisplay += $"{record.MediaTypeID} | {record.MediaTypeName}\n\n";
-            }
-
-            MessageBox.Show(testDisplay);
-        }
-
-        private async void TestSupabaseViewUserFavoriteTable(Client connection)
-        {
-            // Change the object type of the .From method to a different table model for testing.
-            var records = await connection.From<UserFavorite>().Get();
-
-            string testDisplay = "";
-
-            foreach (var record in records.Models)
-            {
-                testDisplay += $"{record.Username} | {record.MediaID} | {record.Favorite}\n\n";
-            }
 
             MessageBox.Show(testDisplay);
         }
