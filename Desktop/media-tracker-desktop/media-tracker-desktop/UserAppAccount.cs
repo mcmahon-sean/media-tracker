@@ -335,7 +335,7 @@ namespace media_tracker_desktop
             string tmdbBaseUrl = ConfigurationManager.AppSettings["TMDBApiBaseUrl"];
             string tmdbAuthToken = ConfigurationManager.AppSettings["TMDBNathanAuthToken"];
 
-            string tmdbUrl = $"{tmdbBaseUrl}account_id?session_id={sessionID}";
+            string tmdbUrl = $"{tmdbBaseUrl}/account/account_id?session_id={sessionID}";
 
 
             // initialize client

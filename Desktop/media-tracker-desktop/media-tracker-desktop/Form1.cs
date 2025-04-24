@@ -64,13 +64,9 @@ namespace media_tracker_desktop
             // Initializing connection.
             UserAppAccount.ConnectToDB(connection);
 
-
-            // initializing last fm stuff
-            lastFMUrl = ConfigurationManager.AppSettings["LastFMApiBaseUrl"];
-            lastFMApiKey = ConfigurationManager.AppSettings["LastFMApiKey"];
-
-            LastFMApi.Initialize(lastFMUrl, lastFMApiKey);
-            
+            LastFMApi.Initialize();
+            SteamApi.Initialize();
+            TmdbApi.Initialize();
         }
 
         // Testing user create. Normally should be done in a separate form.
@@ -185,6 +181,7 @@ namespace media_tracker_desktop
 
                         // connect api's
                         LastFMApi.User = UserAppAccount.UserLastFmID;
+                        SteamApi.SteamID = UserAppAccount.UserSteamID;
                     }
                     else
                     {
@@ -222,55 +219,23 @@ namespace media_tracker_desktop
 
         private async void btnTestSteam_Click(object sender, EventArgs e)
         {
-            //string steamUrl = ConfigurationManager.AppSettings["SteamApiOwnedGamesUrl"];
+            (bool isSuccess, List<Steam_Game>? games) result = await SteamApi.GetOwnedGames();
 
-            // it doesn't seem to work if I put this in App.config, hence why it's here, otherwise, ideally, the above commented out code would be used.
-            string steamBaseUrl = ConfigurationManager.AppSettings["SteamApiBaseUrl"];
-            string steamApiKey = ConfigurationManager.AppSettings["steamApiKey"];
-            string steamFormat = ConfigurationManager.AppSettings["SteamAPIFormat"];
-            string steamUserID = UserAppAccount.UserSteamID;
-            string steamIncludes = "&include_appinfo=1&include_played_free_games=1&format=json";
-            string steamUrl = $"{steamBaseUrl}key={steamApiKey}&steamid={steamUserID}&include_appinfo=1&format={steamFormat}";
-
-            // initialize client
-            var client = new RestClient();
-
-            // pass the url to request
-            var request = new RestRequest(steamUrl);
-
-            // retrieve the response
-            var response = await client.ExecuteAsync(request);
-
-            // if successful,
-            if (response.IsSuccessful)
+            if (result.isSuccess && result.games != null)
             {
-                // convert the content to a json object
-                var steamJson = JObject.Parse(response.Content);
+                string message = "";
 
-                // retrieve the games property of the json object and convert it back to a json string
-                var steamUserGamesJson = steamJson.Root["response"]["games"];
-
-                if (steamUserGamesJson != null)
+                foreach (Steam_Game game in result.games)
                 {
-                    // pass the json string to deserialize each game into steam_model objects
-                    List<Steam_Model> steamUserGames = JsonConvert.DeserializeObject<List<Steam_Model>>(steamUserGamesJson.ToString());
-
-                    string message = "";
-
-                    foreach (Steam_Model game in steamUserGames)
-                    {
-                        message += $"{game.Name} - {game.RTimeLastPlayed} - {game.AppID} \n";
-                    }
-
-                    MessageBox.Show(message);
-                }
-                else
-                {
-                    MessageBox.Show("steamUserGamesJson is null.");
+                    message += $"{game.Name} - {game.AppID} \n";
                 }
 
+                MessageBox.Show(message);
             }
-            
+
+            //string steamGetOwnedGamesEndpoint = "IPlayerService/GetOwnedGames/v0001/";
+
+            //string steamUrl = $"{steamBaseUrl}{steamGetOwnedGamesEndpoint}?key={steamApiKey}&steamid={steamUserID}&include_appinfo=1&format={steamFormat}";
         }
 
         private async void btnTestLastFMArtist_Click(object sender, EventArgs e)
@@ -323,7 +288,9 @@ namespace media_tracker_desktop
             string tmdbBaseUrl = ConfigurationManager.AppSettings["TMDBApiBaseUrl"];
             string tmdbAuthToken = ConfigurationManager.AppSettings["TMDBNathanAuthToken"];
 
-            string tmdbUrl = $"{tmdbBaseUrl}account_id?session_id={UserAppAccount.UserTmdbSessionID}";
+            string accountEndpoint = "account/";
+
+            string tmdbUrl = $"{tmdbBaseUrl}{accountEndpoint}account_id?session_id={UserAppAccount.UserTmdbSessionID}";
 
             // initialize client
             var client = new RestClient();
@@ -357,7 +324,9 @@ namespace media_tracker_desktop
             string tmdbAccountId = UserAppAccount.UserTmdbAccountID;
             string tmdbSessionId = UserAppAccount.UserTmdbSessionID;
 
-            string tmdbUrl = $"{tmdbBaseUrl}{tmdbAccountId}/rated/movies";
+            string endpoint = $"account/{tmdbAccountId}/rated/movies";
+
+            string tmdbUrl = $"{tmdbBaseUrl}{endpoint}";
 
             // initialize client
             var client = new RestClient();
@@ -404,7 +373,7 @@ namespace media_tracker_desktop
             string tmdbAccountId = UserAppAccount.UserTmdbAccountID;
             string tmdbSessionId = UserAppAccount.UserTmdbSessionID;
 
-            string tmdbUrl = $"{tmdbBaseUrl}{tmdbAccountId}/favorite/tv";
+            string tmdbUrl = $"{tmdbBaseUrl}/account/{tmdbAccountId}/favorite/tv";
 
             // initialize client
             var client = new RestClient();
@@ -503,7 +472,10 @@ namespace media_tracker_desktop
             string steamFormat = ConfigurationManager.AppSettings["SteamAPIFormat"];
             string steamUserID = UserAppAccount.UserSteamID;
             string steamIncludes = "&include_appinfo=1&include_played_free_games=1&format=json";
-            string steamUrl = $"{steamBaseUrl}?key={steamApiKey}&steamid={steamUserID}&include_appinfo=1&format={steamFormat}";
+
+            string steamGetOwnedGamesEndpoint = "IPlayerService/GetOwnedGames/v0001/";
+
+            string steamUrl = $"{steamBaseUrl}{steamGetOwnedGamesEndpoint}?key={steamApiKey}&steamid={steamUserID}&include_appinfo=1&format={steamFormat}";
 
 
             var client = new RestClient();
@@ -519,7 +491,7 @@ namespace media_tracker_desktop
 
                 if (steamUserGamesJson != null)
                 {
-                    List<Steam_Model> steamUserGames = JsonConvert.DeserializeObject<List<Steam_Model>>(steamUserGamesJson.ToString());
+                    List<Steam_Game> steamUserGames = JsonConvert.DeserializeObject<List<Steam_Game>>(steamUserGamesJson.ToString());
                 }
                 else
                 {
@@ -563,68 +535,76 @@ namespace media_tracker_desktop
 
         private async void btnLinkTmdb_Click(object sender, EventArgs e)
         {
-            var authHeader = $"Bearer {ConfigurationManager.AppSettings["TMDBNathanAuthToken"]}";
-            var options = new RestClientOptions("https://api.themoviedb.org/3/authentication/token/new");
-            var client = new RestClient(options);
-            var request = new RestRequest("");
 
-            request.AddHeader("accept", "application/json");
-            request.AddHeader("Authorization", authHeader);
+            string sessionID = await TmdbApi.RetrieveSessionID();
 
-            var response = await client.GetAsync(request);
+            MessageBox.Show(sessionID);
+            //AccountLinking(UserAppAccount.TMDBPlatformID, sessionID);
 
-            if (response.IsSuccessful)
-            {
-                var requestToken = JObject.Parse(response.Content)["request_token"].ToString();
 
-                Console.WriteLine("{0}", response.Content);
-                MessageBox.Show(requestToken);
 
-                var requestTokenUrl = $"https://www.themoviedb.org/authenticate/{requestToken}";
-                //System.Diagnostics.Process is used to open the authentication in a new window
-                System.Diagnostics.Process.Start(new ProcessStartInfo(requestTokenUrl)
-                {
-                    UseShellExecute = true
-                });
+            //var authHeader = $"Bearer {ConfigurationManager.AppSettings["TMDBNathanAuthToken"]}";
+            //var options = new RestClientOptions("https://api.themoviedb.org/3/authentication/token/new");
+            //var client = new RestClient(options);
+            //var request = new RestRequest("");
 
-                DialogResult result = MessageBox.Show("One you have authorised the app press continue.", "Continue?", MessageBoxButtons.OK);
-                //Response if a guarenteed failure if user doesnt hit approve before hitting ok
-                if (result == DialogResult.OK)
-                {
-                    try
-                    {
-                        string jsonBodyToken = requestToken;
+            //request.AddHeader("accept", "application/json");
+            //request.AddHeader("Authorization", authHeader);
 
-                        options = new RestClientOptions("https://api.themoviedb.org/3/authentication/session/new");
-                        client = new RestClient(options);
-                        request = new RestRequest("");
-                        request.AddHeader("accept", "application/json");
-                        request.AddHeader("Authorization", authHeader);
-                        request.AddJsonBody(new { request_token = requestToken });
+            //var response = await client.GetAsync(request);
 
-                        response = await client.PostAsync(request);
-                        var success = JObject.Parse(response.Content)["success"].ToString();
+            //if (response.IsSuccessful)
+            //{
+            //    var requestToken = JObject.Parse(response.Content)["request_token"].ToString();
 
-                        if (success == "True")
-                        {
-                            var sessionID = JObject.Parse(response.Content)["session_id"].ToString();
-                            MessageBox.Show(sessionID);
-                            AccountLinking(UserAppAccount.TMDBPlatformID, sessionID);
+            //    Console.WriteLine("{0}", response.Content);
+            //    MessageBox.Show(requestToken);
 
-                        }
-                        else
-                        {
-                            MessageBox.Show(response.Content);
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        {
-                            MessageBox.Show(ex.ToString());
-                        }
-                    }
-                }
-            }
+            //    var requestTokenUrl = $"https://www.themoviedb.org/authenticate/{requestToken}";
+            //    //System.Diagnostics.Process is used to open the authentication in a new window
+            //    System.Diagnostics.Process.Start(new ProcessStartInfo(requestTokenUrl)
+            //    {
+            //        UseShellExecute = true
+            //    });
+
+            //    DialogResult result = MessageBox.Show("One you have authorised the app press continue.", "Continue?", MessageBoxButtons.OK);
+            //    //Response if a guarenteed failure if user doesnt hit approve before hitting ok
+            //    if (result == DialogResult.OK)
+            //    {
+            //        try
+            //        {
+            //            string jsonBodyToken = requestToken;
+
+            //            options = new RestClientOptions("https://api.themoviedb.org/3/authentication/session/new");
+            //            client = new RestClient(options);
+            //            request = new RestRequest("");
+            //            request.AddHeader("accept", "application/json");
+            //            request.AddHeader("Authorization", authHeader);
+            //            request.AddJsonBody(new { request_token = requestToken });
+
+            //            response = await client.PostAsync(request);
+            //            var success = JObject.Parse(response.Content)["success"].ToString();
+
+            //            if (success == "True")
+            //            {
+            //                var sessionID = JObject.Parse(response.Content)["session_id"].ToString();
+            //                MessageBox.Show(sessionID);
+            //                AccountLinking(UserAppAccount.TMDBPlatformID, sessionID);
+
+            //            }
+            //            else
+            //            {
+            //                MessageBox.Show(response.Content);
+            //            }
+            //        }
+            //        catch (Exception ex)
+            //        {
+            //            {
+            //                MessageBox.Show(ex.ToString());
+            //            }
+            //        }
+            //    }
+            //}
         }
 
         private void btnCheckTMDB_Click(object sender, EventArgs e)

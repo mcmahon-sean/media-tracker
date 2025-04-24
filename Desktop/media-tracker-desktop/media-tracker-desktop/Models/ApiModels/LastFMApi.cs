@@ -8,11 +8,15 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Configuration;
 
 namespace media_tracker_desktop.Models.ApiModels
 {
     public static class LastFMApi
     {
+        private const string CONFIG_KEY_FOR_LASTFM_BASE_URL = "LastFMApiBaseUrl";
+        private const string CONFIG_KEY_FOR_LASTFM_API_KEY = "LastFMApiKey";
+
         private static string _baseUrl = string.Empty;
         private static string _apiKey = string.Empty;
         private static string _user = string.Empty;
@@ -42,21 +46,33 @@ namespace media_tracker_desktop.Models.ApiModels
         /// <summary>
         /// Initializes the LastFMApi class so that it is ready to work with the LastFM api. 
         /// </summary>
-        /// <param name="baseUrl">The LastFM base url.</param>
-        /// <param name="apiKey">The LastFM api key.</param>
-        /// <exception cref="Exception">Throws exception when base url and/or api key is null.</exception>
-        public static void Initialize(string baseUrl, string apiKey)
+        /// <exception cref="Exception">Throws exception when base url and/or api key is null. Rethrows any exception that is thrown when retrieving information from configuration.</exception>
+        public static void Initialize()
         {
-            // Ensure base url and api key are not null.
-            // Otherwise, throws exception.
-            if (!string.IsNullOrEmpty(baseUrl) && !string.IsNullOrEmpty(apiKey))
+            string? baseUrl;
+            string? apiKey;
+
+            // Ensure no exception occurs when retrieving the properties from ConfigurationManager.
+            try
             {
-                _baseUrl = baseUrl;
-                _apiKey = apiKey;
+                baseUrl = ConfigurationManager.AppSettings[CONFIG_KEY_FOR_LASTFM_BASE_URL];
+                apiKey = ConfigurationManager.AppSettings[CONFIG_KEY_FOR_LASTFM_API_KEY];
+
+                // Ensure base url and api key are not null.
+                // Otherwise, throws exception.
+                if (!string.IsNullOrEmpty(baseUrl) && !string.IsNullOrEmpty(apiKey))
+                {
+                    _baseUrl = baseUrl;
+                    _apiKey = apiKey;
+                }
+                else
+                {
+                    throw new Exception("Base url and/or api key is null or empty.");
+                }
             }
-            else
+            catch (Exception)
             {
-                throw new Exception("Base url and/or api key is null or empty.");
+                throw;
             }
         }
 
@@ -134,7 +150,7 @@ namespace media_tracker_desktop.Models.ApiModels
                 var artistsJson = topArtistsJson.Root["topartists"]["artist"];
 
                 // Deserialize
-                List<LastFM_Artist> artists = JsonConvert.DeserializeObject<List<LastFM_Artist>>(artistsJson.ToString());
+                List<LastFM_Artist>? artists = JsonConvert.DeserializeObject<List<LastFM_Artist>>(artistsJson.ToString());
 
                 return (true, artists);
             }

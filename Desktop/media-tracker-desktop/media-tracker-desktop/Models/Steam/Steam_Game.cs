@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace media_tracker_desktop.Models.Steam
 {
     // This model represents each game object in the games array in the response json object returned by the GetOwnedGames endpoint of the SteamAPI.
-    public class Steam_Model
+    public class Steam_Game
     {
         [JsonProperty("appid")]
         public int AppID { get; }
@@ -55,7 +55,7 @@ namespace media_tracker_desktop.Models.Steam
 
 
         [JsonConstructor]
-        public Steam_Model(int appId, string name, int playtimeForever, string imgIconUrl, bool hasCommunityStats, int playtimeWindows, int playtimeMac, int playtimeLinux, int playtimeDeck, int rtimeLastPlayed, int playtimeDisconnected)
+        public Steam_Game(int appId, string name, int playtimeForever, string imgIconUrl, bool hasCommunityStats, int playtimeWindows, int playtimeMac, int playtimeLinux, int playtimeDeck, int rtimeLastPlayed, int playtimeDisconnected)
         {
             this.AppID = appId;
             this.Name = name;
