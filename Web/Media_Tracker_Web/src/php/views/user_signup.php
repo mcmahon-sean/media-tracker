@@ -46,8 +46,10 @@
                         TMDB
                     </a>
                     <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="#">All Movies</a></li>
-                        <li><a class="dropdown-item" href="#">Last Played</a></li>
+                        <li><a class="dropdown-item" href="tmdb_favorite_movies.php">Favorite Movies</a></li>
+                        <li><a class="dropdown-item" href="tmdb_rated_movies.php">Rated Movies</a></li>
+                        <li><a class="dropdown-item" href="tmdb_favorite_tv_shows.php">Favorite TV Shows</a></li>
+                        <li><a class="dropdown-item" href="tmdb_rated_tv_shows.php">Rated TV Shows</a></li>
                     </ul>
                 </div>
 
@@ -58,8 +60,7 @@
                         Steam
                     </a>
                     <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="#">All Games</a></li>
-                        <li><a class="dropdown-item" href="#">Last Played</a></li>
+                        <li><a class="dropdown-item" href="steam_owned_games.php">Owned Games</a></li>
                     </ul>
                 </div>
                 
@@ -67,7 +68,7 @@
 
             <main class="col-md-10 ms-sm-auto px-4">
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                    <h2>Welcome Back</h2>
+                    <h2>Media Tracker</h2>
                 </div>
 
                 <div class="card bg-dark text-light mb-4">
@@ -75,14 +76,13 @@
                         <input type="text" class="form-control" placeholder="Search Titles...">
                     </div>
                 </div>
-
+                <h3>Sign Up</h3>
                 <div class="table-responsive">
                     <?php if (isset($error)): ?>
                         <p><?php echo $error; ?></p>
                     <?php else: ?>
                         <div class="form-container">
                             <form id="signUpForm" action="../authentication/create_user.php" method="post">
-                                <h3>Sign Up</h3>
                                 <label>Username:</label><br>
                                 <input type="text" name="username" required><br>
                                 <label>First Name:</label><br>

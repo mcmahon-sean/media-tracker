@@ -3,6 +3,9 @@
     // Start session
     session_start();
 
+    // Required
+    require_once '../media/TMDB/get_rated_movies.php';
+
 ?>
 
 <!DOCTYPE html>
@@ -76,20 +79,35 @@
                         <input type="text" class="form-control" placeholder="Search Titles...">
                     </div>
                 </div>
-                <h3>Login</h3>
+                <h3>Rated Movies</h3>
                 <div class="table-responsive">
                     <?php if (isset($error)): ?>
                         <p><?php echo $error; ?></p>
                     <?php else: ?>
-                        <div class="form-container">
-                            <form id="loginForm" action="../authentication/login.php" method="post">
-                                <label>Username:</label><br>
-                                <input type="text" name="username" required><br>
-                                <label>Password:</label><br>
-                                <input type="password" name="password" required><br><br>
-                                <input type="submit" value="Login">
-                            </form>
-                        </div>
+                        <table class="table table-dark table-hover">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Title</th>
+                                    <th>Your Rating</th>
+                                    <th>Average Rating</th>
+                                    <th>Vote Count</th>
+                                    <th>Overview</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($ratedMovies as $movie): ?>
+                                    <tr>
+                                        <td><?php echo htmlspecialchars($movie->id); ?></td>
+                                        <td><?php echo htmlspecialchars($movie->title); ?></td>
+                                        <td><?php echo htmlspecialchars($movie->user_rating); ?></td>
+                                        <td><?php echo htmlspecialchars($movie->average_rating); ?></td>
+                                        <td><?php echo htmlspecialchars($movie->vote_count); ?></td>
+                                        <td><?php echo htmlspecialchars($movie->overview); ?></td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
                     <?php endif; ?>
                 </div>
             </main>

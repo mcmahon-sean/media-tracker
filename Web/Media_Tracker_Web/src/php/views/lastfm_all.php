@@ -53,8 +53,10 @@
                         TMDB
                     </a>
                     <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="#">All Movies</a></li>
-                        <li><a class="dropdown-item" href="#">Last Played</a></li>
+                        <li><a class="dropdown-item" href="tmdb_favorite_movies.php">Favorite Movies</a></li>
+                        <li><a class="dropdown-item" href="tmdb_rated_movies.php">Rated Movies</a></li>
+                        <li><a class="dropdown-item" href="tmdb_favorite_tv_shows.php">Favorite TV Shows</a></li>
+                        <li><a class="dropdown-item" href="tmdb_rated_tv_shows.php">Rated TV Shows</a></li>
                     </ul>
                 </div>
 
@@ -65,8 +67,7 @@
                         Steam
                     </a>
                     <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="#">All Games</a></li>
-                        <li><a class="dropdown-item" href="#">Last Played</a></li>
+                        <li><a class="dropdown-item" href="steam_owned_games.php">Owned Games</a></li>
                     </ul>
                 </div>
                 
@@ -74,7 +75,7 @@
 
             <main class="col-md-10 ms-sm-auto px-4">
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                    <h2>Loved Tracks</h2>
+                    <h2>Media Tracker</h2>
                 </div>
 
                 <div class="card bg-dark text-light mb-4">

@@ -2,6 +2,11 @@
 
 session_start();
 
+// TEMP CODE START
+require_once 'src/php/config.php';
+//$_SESSION['session_id'] = TMDB_SESSION_ID;
+// TEMP CODE END
+
 ?>
 
 <!DOCTYPE html>
@@ -96,8 +101,10 @@ session_start();
               TMDB
             </a>
             <ul class="dropdown-menu">
-              <li><a class="dropdown-item" href="#">All Movies</a></li>
-              <li><a class="dropdown-item" href="#">Last Played</a></li>
+              <li><a class="dropdown-item" href="src/php/views/tmdb_favorite_movies.php">Favorite Movies</a></li>
+              <li><a class="dropdown-item" href="src/php/views/tmdb_rated_movies.php">Rated Movies</a></li>
+              <li><a class="dropdown-item" href="src/php/views/tmdb_favorite_tv_shows.php">Favorite TV Shows</a></li>
+              <li><a class="dropdown-item" href="src/php/views/tmdb_rated_tv_shows.php">Rated TV Shows</a></li>
             </ul>
           </div>
 
@@ -115,8 +122,7 @@ session_start();
               Steam
             </a>
             <ul class="dropdown-menu">
-              <li><a class="dropdown-item" href="#">All Games</a></li>
-              <li><a class="dropdown-item" href="#">Last Played</a></li>
+              <li><a class="dropdown-item" href="src/php/views/steam_owned_games.php">Owned Games</a></li>
             </ul>
           </div>
         </nav>
@@ -137,11 +143,14 @@ session_start();
               />
             </div>
           </div>
+          <?php if (isset($_SESSION['session_id']) && !empty($_SESSION['session_id'])): ?>
+              <p>SESSION ID: <strong><?= htmlspecialchars($_SESSION['session_id']) ?></strong></p>
+          <?php endif; ?>
           <?php if (isset($_SESSION['signed_in'])): ?>
             <p>Hello, <strong><?= htmlspecialchars($_SESSION['username']) ?></strong>!</p>
             <p>Steam ID: <strong><?= htmlspecialchars($_SESSION['user_platform_ids']['steam']) ?></strong></p>
             <p>Last.fm ID: <strong><?= htmlspecialchars($_SESSION['user_platform_ids']['lastfm']) ?></strong></p>
-            <p>TMDB: <strong><?= htmlspecialchars($_SESSION['user_platform_ids']['tmdb']) ?></strong></p>
+            <p>TMDB ID: <strong><?= htmlspecialchars($_SESSION['user_platform_ids']['tmdb']) ?></strong></p>
             <button onclick="window.location.href='src/php/views/add_edit_3rd_party.php'">Add/Edit Platforms</button>
             <button onclick="window.location.href='src/php/authentication/logout.php'">Logout</button>
           <?php else: ?>

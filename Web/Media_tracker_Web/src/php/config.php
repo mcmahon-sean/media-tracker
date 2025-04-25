@@ -2,16 +2,18 @@
 
 // Steam credentials
 define('STEAM_USERNAME', '');
-define('STEAM_API_KEY', '');
+define('STEAM_API_KEY', '5553B2F6E49998D47EB298C086A05084');
 
 // Last.fm credentials
 define('LASTFM_USERNAME', '');
 define('LASTFM_API_KEY', '1456c592b2d19dabd13468f0eee62dc9');
 
 // TMDB credentials
-define('TMDB_USERNAME', '');
-define('TMDB_API_KEY', '2572887e2d078ce0787e693bb0348f3c');
+define('TMDB_READ_ACCESS_TOKEN', '');
+define('TMDB_API_KEY', 'c42aedff935d3382bc95b0f7e8f5f7e3');
 define('TMDB_API_URL', 'https://api.themoviedb.org/3');
+define('TMDB_SESSION_ID', '');
+define('TMDB_ACCOUNT_ID', '');
 
 // Supabase credentials
 define('SUPABASE_URL', 'https://hrqakudeaalvgstpupdu.supabase.co');

@@ -3,6 +3,9 @@
     // Start session
     session_start();
 
+    // Required
+    require_once '../media/TMDB/get_favorite_tv_shows.php';
+
 ?>
 
 <!DOCTYPE html>
@@ -76,20 +79,29 @@
                         <input type="text" class="form-control" placeholder="Search Titles...">
                     </div>
                 </div>
-                <h3>Login</h3>
+                <h3>Favorite TV Shows</h3>
                 <div class="table-responsive">
                     <?php if (isset($error)): ?>
                         <p><?php echo $error; ?></p>
                     <?php else: ?>
-                        <div class="form-container">
-                            <form id="loginForm" action="../authentication/login.php" method="post">
-                                <label>Username:</label><br>
-                                <input type="text" name="username" required><br>
-                                <label>Password:</label><br>
-                                <input type="password" name="password" required><br><br>
-                                <input type="submit" value="Login">
-                            </form>
-                        </div>
+                        <table class="table table-dark table-hover">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Overview</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($favoriteTvShows as $show): ?>
+                                    <tr>
+                                        <td><?php echo htmlspecialchars($show->id); ?></td>
+                                        <td><?php echo htmlspecialchars($show->name); ?></td>
+                                        <td><?php echo htmlspecialchars($show->overview); ?></td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
                     <?php endif; ?>
                 </div>
             </main>

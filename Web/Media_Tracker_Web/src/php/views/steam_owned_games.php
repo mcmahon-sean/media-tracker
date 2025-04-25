@@ -3,6 +3,9 @@
     // Start session
     session_start();
 
+    // Required
+    require_once '../media/Steam/get_owned_games.php';
+
 ?>
 
 <!DOCTYPE html>
@@ -65,7 +68,7 @@
                 </div>
                 
             </nav>
-
+            
             <main class="col-md-10 ms-sm-auto px-4">
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
                     <h2>Media Tracker</h2>
@@ -76,20 +79,38 @@
                         <input type="text" class="form-control" placeholder="Search Titles...">
                     </div>
                 </div>
-                <h3>Login</h3>
+                <h3>Owned Games</h3>
                 <div class="table-responsive">
                     <?php if (isset($error)): ?>
                         <p><?php echo $error; ?></p>
                     <?php else: ?>
-                        <div class="form-container">
-                            <form id="loginForm" action="../authentication/login.php" method="post">
-                                <label>Username:</label><br>
-                                <input type="text" name="username" required><br>
-                                <label>Password:</label><br>
-                                <input type="password" name="password" required><br><br>
-                                <input type="submit" value="Login">
-                            </form>
-                        </div>
+                        <table class="table table-dark table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Game Title</th>
+                                    <th>Minutes Played</th>
+                                    <th>URL</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            <?php foreach ($ownedGames as $game): ?>
+                                <tr>
+                                    <td>
+                                        <strong><?php echo htmlspecialchars($game->name); ?></strong><br>
+                                        <img 
+                                            src="https://media.steampowered.com/steamcommunity/public/images/apps/<?php echo $game->appId; ?>/<?php echo $game->imgIconUrl; ?>.jpg" 
+                                            alt="Icon for <?php echo htmlspecialchars($game->name); ?>" 
+                                            style="height:32px;">
+                                    </td>
+                                    <td><?php echo $game->playtimeForever; ?> mins</td>
+                                    <td>
+                                        <a href="https://store.steampowered.com/app/<?php echo $game->appId; ?>" target="_blank">View In Store</a>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+
+                            </tbody>
+                        </table>
                     <?php endif; ?>
                 </div>
             </main>
