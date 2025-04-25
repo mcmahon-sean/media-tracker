@@ -37,21 +37,46 @@ namespace media_tracker_desktop
             connection = SupabaseConnection.GetClient();
 
             // test connection ----------
-            TestSupabaseConnection(connection);
+            //TestSupabaseConnection(connection);
 
             // test viewing tables -----------
             // to test different table, go to method.
             //TestSupabaseViewUserAccountTable(connection);
-            var records = await SupabaseConnection.GetTableRecord<UserAccount>(connection);
+
+            //var users = await SupabaseConnection.GetTableRecord<User>(connection);
 
             string displayString = "";
 
-            foreach (var record in records)
+            //foreach (var user in users)
+            //{
+            //    displayString += $"{user.FirstName} - {user.LastName} - {user.Username}\n\n";
+            //}
+
+            //MessageBox.Show(displayString);
+
+
+            var records = await SupabaseConnection.GetTableRecord<UserAccount>(connection);
+
+            //displayString = "";
+
+            //foreach (var record in records)
+            //{
+            //    displayString += record.UserPlatID + " " + record.Username + " " + record.PlatformID + "\n\n";
+            //}
+
+            //MessageBox.Show(displayString);
+
+            displayString = "";
+
+            var tmdbAccounts = records.Where(a => a.PlatformID == 3).ToList();
+
+            foreach (var account in tmdbAccounts)
             {
-                displayString += record.UserPlatID + " " + record.Username + " " + record.PlatformID + "\n\n";
+                displayString += $"{account.UserPlatID} - {account.Username} - {account.PlatformID}\n\n";
             }
 
             MessageBox.Show(displayString);
+
 
             // Initializing connection.
             UserAppAccount.ConnectToDB(connection);
@@ -433,11 +458,17 @@ namespace media_tracker_desktop
 
         private async void btnLinkTmdb_Click(object sender, EventArgs e)
         {
+            try
+            {
+                string sessionID = await TmdbApi.RetrieveSessionID();
 
-            string sessionID = await TmdbApi.RetrieveSessionID();
-
-            MessageBox.Show(sessionID);
-            //AccountLinking(UserAppAccount.TMDBPlatformID, sessionID);
+                MessageBox.Show(sessionID);
+                AccountLinking(UserAppAccount.TMDBPlatformID, sessionID);
+            }
+            catch (Exception error)
+            {
+                MessageBox.Show(error.Message);
+            }
 
 
 
