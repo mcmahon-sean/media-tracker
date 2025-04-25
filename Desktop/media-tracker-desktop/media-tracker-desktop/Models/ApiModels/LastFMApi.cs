@@ -28,19 +28,7 @@ namespace media_tracker_desktop.Models.ApiModels
             // Retrieve the lastFM username.
             get { return _user; }
             // Set the lastFM username.
-            set
-            {
-                // Make sure it is not null or empty,
-                // otherwise, throws exception.
-                if (string.IsNullOrEmpty(value))
-                {
-                    throw new Exception("User is null or empty.");
-                }
-                else
-                {
-                    _user = value;
-                }
-            }
+            set { _user = value; }
         }
 
         /// <summary>
@@ -93,7 +81,7 @@ namespace media_tracker_desktop.Models.ApiModels
             
             if (string.IsNullOrEmpty(_apiKey))
             {
-                isValid = true;
+                isValid = false;
                 message += "Api key is null or empty.\n";
             }
             
@@ -253,6 +241,11 @@ namespace media_tracker_desktop.Models.ApiModels
 
                 return (true, userInfo);
             }
+        }
+
+        public static void Logout()
+        {
+            _user = string.Empty;
         }
     }
 }

@@ -28,19 +28,7 @@ namespace media_tracker_desktop.Models.ApiModels
             // Retrieve the user's steam ID.
             get { return _steamID; }
             // Set the user's steam ID.
-            set
-            {
-                // Make sure it is not null or empty,
-                // otherwise, throws exception.
-                if (string.IsNullOrEmpty(value))
-                {
-                    throw new Exception("SteamID is null or empty.");
-                }
-                else
-                {
-                    _steamID = value;
-                }
-            }
+            set { _steamID = value; }
         }
 
         /// <summary>
@@ -93,7 +81,7 @@ namespace media_tracker_desktop.Models.ApiModels
 
             if (string.IsNullOrEmpty(_apiKey))
             {
-                isValid = true;
+                isValid = false;
                 message += "Api key is null or empty.\n";
             }
 
@@ -156,6 +144,11 @@ namespace media_tracker_desktop.Models.ApiModels
 
                 return (true, games);
             }
+        }
+
+        public static void Logout()
+        {
+            _steamID = string.Empty;
         }
     }
 }

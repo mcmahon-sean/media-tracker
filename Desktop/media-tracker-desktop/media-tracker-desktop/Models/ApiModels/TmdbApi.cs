@@ -1,4 +1,7 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using media_tracker_desktop.Models.Steam;
+using media_tracker_desktop.Models.TMDB;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using RestSharp;
 using System;
 using System.Collections.Generic;
@@ -25,6 +28,24 @@ namespace media_tracker_desktop.Models.ApiModels
         private static string _sessionID = string.Empty;
         private static string _accountID = string.Empty;
         private static RestClient _client = new RestClient();
+
+        // Property: SessionID
+        public static string SessionID
+        {
+            // Retrieve the sessionID.
+            get { return _sessionID; }
+            // Set the sessionID.
+            set { _sessionID = value; }
+        }
+
+        // Property: AccountID
+        public static string AccountID
+        {
+            // Retrieve the accountID.
+            get { return _accountID; }
+            // Set the accountID.
+            set { _accountID = value; }
+        }
 
         /// <summary>
         /// Initializes the TmdbApi class so that it is ready to work with the TMDB api. 
@@ -70,7 +91,7 @@ namespace media_tracker_desktop.Models.ApiModels
         /// Check if the properties are valid.
         /// </summary>
         /// <returns>A boolean indicating if the properties are valid and a message for any errors.</returns>
-        private static (bool, string) CheckRequiredProperties()
+        private static (bool, string) CheckRequiredProperties(bool checkRequestTokenUrl = true, bool checkAccountID = true)
         {
             bool isValid = true;
             string message = "";
@@ -83,15 +104,33 @@ namespace media_tracker_desktop.Models.ApiModels
 
             if (string.IsNullOrEmpty(_apiKey))
             {
-                isValid = true;
+                isValid = false;
                 message += "Api key is null or empty.\n";
             }
 
-            //if (string.IsNullOrEmpty(_))
-            //{
-            //    isValid = false;
-            //    message += "User is null or empty.\n";
-            //}
+            if (string.IsNullOrEmpty(_authToken))
+            {
+                isValid = false;
+                message += "Auth token is null or empty.\n";
+            }
+
+            if (string.IsNullOrEmpty(_requestTokenUrl) && checkRequestTokenUrl)
+            {
+                isValid = false;
+                message += "Request token url is null or empty.\n";
+            }
+
+            if (string.IsNullOrEmpty(_sessionID))
+            {
+                isValid = false;
+                message += "SessionID is null or empty.\n";
+            }
+
+            if (string.IsNullOrEmpty(_accountID) && checkAccountID)
+            {
+                isValid = false;
+                message += "AccountID is null or empty.\n";
+            }
 
             return (isValid, message);
         }
@@ -173,6 +212,162 @@ namespace media_tracker_desktop.Models.ApiModels
             {
                 throw new Exception(response.ErrorMessage);
             }
+        }
+
+        /// <summary>
+        /// Retrieve the user's account details returned by the TMDB api. Execute Initialize() and set SessionID property before using this method.
+        /// </summary>
+        /// <returns>A boolean indicating if the process is successful and the tmbd account object.</returns>
+        /// <exception cref="Exception"></exception>
+        public static async Task<(bool, TMDB_Account?)> GetAccountDetails()
+        {
+            // Check necessary properties.
+            (bool isValid, string message) propertyCheck = CheckRequiredProperties(checkRequestTokenUrl: false, checkAccountID: false);
+
+            if (!propertyCheck.isValid)
+            {
+                throw new Exception(propertyCheck.message);
+            }
+
+            // Add the endpoint to the base url.
+            string urlWithEndpoint = $"{_baseUrl}/account/account_id";
+
+            RestRequest request = new RestRequest(urlWithEndpoint);
+
+            request.AddParameter("session_id", _sessionID);
+            request.AddHeader("Authorization", $"Bearer {_authToken}");
+
+            var response = await _client.ExecuteAsync(request);
+
+            // If response is not successful, throw exception.
+            if (!response.IsSuccessful)
+            {
+                throw new Exception(response.ErrorMessage);
+            }
+            // If the response has no content, return empty list.
+            else if (string.IsNullOrEmpty(response.Content))
+            {
+                return (false, null);
+            }
+            else
+            {
+                // Deserialize
+                TMDB_Account account = JsonConvert.DeserializeObject<TMDB_Account>(response.Content)!;
+
+                return (true, account);
+            }
+        }
+
+        /// <summary>
+        /// Retrieve the user's account details returned by the rated/movies TMDB api endpoint. Execute Initialize() and set AccountID and SessionID property before using this method.
+        /// </summary>
+        /// <returns>A boolean indicating if the process is successful and the list of movies.</returns>
+        /// <exception cref="Exception"></exception>
+        public static async Task<(bool, List<TMDB_Movie>?)> GetUserRatedMovies()
+        {
+            // Check necessary properties.
+            (bool isValid, string message) propertyCheck = CheckRequiredProperties(checkRequestTokenUrl: false);
+
+            if (!propertyCheck.isValid)
+            {
+                throw new Exception(propertyCheck.message);
+            }
+
+            // Add the endpoint to the base url.
+            string urlWithEndpoint = $"{_baseUrl}/account/{_accountID}/rated/movies";
+
+            RestRequest request = new RestRequest(urlWithEndpoint);
+
+            request.AddParameter("language", "en-US");
+            request.AddParameter("page", 1);
+            request.AddParameter("sort_by", "created_at.desc");
+            request.AddParameter("session_id", _sessionID);
+            request.AddHeader("Authorization", $"Bearer {_authToken}");
+
+            var response = await _client.ExecuteAsync(request);
+
+            // If response is not successful, throw exception.
+            if (!response.IsSuccessful)
+            {
+                throw new Exception(response.ErrorMessage);
+            }
+            // If the response has no content, return empty list.
+            else if (string.IsNullOrEmpty(response.Content))
+            {
+                return (false, null);
+            }
+            else
+            {
+                // Convert content to json object.
+                var movieResultJson = JObject.Parse(response.Content);
+
+                // Retrieve the array of artist from the json object and convert it back to string.
+                var movieJson = movieResultJson.Root["results"];
+
+                // Deserialize
+                List<TMDB_Movie> movies = JsonConvert.DeserializeObject<List<TMDB_Movie>>(movieJson.ToString());
+
+                return (true, movies);
+            }
+        }
+
+        /// <summary>
+        /// Retrieve the user's account details returned by the favorite/tv TMDB api endpoint. Execute Initialize() and set AccountID and SessionID property before using this method.
+        /// </summary>
+        /// <returns>A boolean indicating if the process is successful and the list of tv shows.</returns>
+        /// <exception cref="Exception"></exception>
+        public static async Task<(bool, List<TMDB_TV_Show>?)> GetUserFavoriteTV()
+        {
+            // Check necessary properties.
+            (bool isValid, string message) propertyCheck = CheckRequiredProperties(checkRequestTokenUrl: false);
+
+            if (!propertyCheck.isValid)
+            {
+                throw new Exception(propertyCheck.message);
+            }
+
+            // Add the endpoint to the base url.
+            string urlWithEndpoint = $"{_baseUrl}/account/{_accountID}/favorite/tv";
+
+            RestRequest request = new RestRequest(urlWithEndpoint);
+
+            request.AddParameter("language", "en-US");
+            request.AddParameter("page", 1);
+            request.AddParameter("sort_by", "created_at.asc");
+            request.AddParameter("session_id", _sessionID);
+            request.AddHeader("Authorization", $"Bearer {_authToken}");
+
+            var response = await _client.ExecuteAsync(request);
+
+            // If response is not successful, throw exception.
+            if (!response.IsSuccessful)
+            {
+                throw new Exception(response.ErrorMessage);
+            }
+            // If the response has no content, return empty list.
+            else if (string.IsNullOrEmpty(response.Content))
+            {
+                return (false, null);
+            }
+            else
+            {
+                // Convert content to json object.
+                var tvShowResultJson = JObject.Parse(response.Content);
+
+                // Retrieve the array of artist from the json object and convert it back to string.
+                var tvShowJson = tvShowResultJson.Root["results"];
+
+                // Deserialize
+                List<TMDB_TV_Show> tvShows = JsonConvert.DeserializeObject<List<TMDB_TV_Show>>(tvShowJson.ToString());
+
+                return (true, tvShows);
+            }
+        }
+
+        public static void Logout()
+        {
+            _accountID = string.Empty;
+            _sessionID = string.Empty;
         }
     }
 }

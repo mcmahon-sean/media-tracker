@@ -3,10 +3,6 @@
   "WorkspaceRootPath": "C:\\Users\\bondh\\OneDrive - MNSCU\\MTRepo\\media-tracker\\Desktop\\media-tracker-desktop\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{E1D13E99-C696-41F3-9B58-A1C5D7155072}|media-tracker-desktop\\media-tracker-desktop.csproj|C:\\Users\\bondh\\OneDrive - MNSCU\\MTRepo\\media-tracker\\Desktop\\media-tracker-desktop\\media-tracker-desktop\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
-      "RelativeMoniker": "D:0:0:{E1D13E99-C696-41F3-9B58-A1C5D7155072}|media-tracker-desktop\\media-tracker-desktop.csproj|solutionrelative:media-tracker-desktop\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{E1D13E99-C696-41F3-9B58-A1C5D7155072}|media-tracker-desktop\\media-tracker-desktop.csproj|c:\\users\\bondh\\onedrive - mnscu\\mtrepo\\media-tracker\\desktop\\media-tracker-desktop\\media-tracker-desktop\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{E1D13E99-C696-41F3-9B58-A1C5D7155072}|media-tracker-desktop\\media-tracker-desktop.csproj|solutionrelative:media-tracker-desktop\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
@@ -15,8 +11,8 @@
       "RelativeMoniker": "D:0:0:{E1D13E99-C696-41F3-9B58-A1C5D7155072}|media-tracker-desktop\\media-tracker-desktop.csproj|solutionrelative:media-tracker-desktop\\app.config||{FA3CD31E-987B-443A-9B81-186104E8DAC1}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{E1D13E99-C696-41F3-9B58-A1C5D7155072}|media-tracker-desktop\\media-tracker-desktop.csproj|c:\\users\\bondh\\onedrive - mnscu\\mtrepo\\media-tracker\\desktop\\media-tracker-desktop\\media-tracker-desktop\\models\\apimodels\\lastfmapi.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{E1D13E99-C696-41F3-9B58-A1C5D7155072}|media-tracker-desktop\\media-tracker-desktop.csproj|solutionrelative:media-tracker-desktop\\models\\apimodels\\lastfmapi.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{E1D13E99-C696-41F3-9B58-A1C5D7155072}|media-tracker-desktop\\media-tracker-desktop.csproj|c:\\users\\bondh\\onedrive - mnscu\\mtrepo\\media-tracker\\desktop\\media-tracker-desktop\\media-tracker-desktop\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
+      "RelativeMoniker": "D:0:0:{E1D13E99-C696-41F3-9B58-A1C5D7155072}|media-tracker-desktop\\media-tracker-desktop.csproj|solutionrelative:media-tracker-desktop\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
     }
   ],
   "DocumentGroupContainers": [
@@ -26,37 +22,37 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 3,
+          "SelectedChildIndex": 1,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "App.config",
-              "DocumentMoniker": "C:\\Users\\bondh\\OneDrive - MNSCU\\MTRepo\\media-tracker\\Desktop\\media-tracker-desktop\\media-tracker-desktop\\App.config",
-              "RelativeDocumentMoniker": "media-tracker-desktop\\App.config",
-              "ToolTip": "C:\\Users\\bondh\\OneDrive - MNSCU\\MTRepo\\media-tracker\\Desktop\\media-tracker-desktop\\media-tracker-desktop\\App.config",
-              "RelativeToolTip": "media-tracker-desktop\\App.config",
-              "ViewState": "AgIAAAMAAAAAAAAAAAAAAA4AAAAZAQAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000601|",
-              "WhenOpened": "2025-04-24T00:08:54.744Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 0,
               "Title": "Form1.cs",
               "DocumentMoniker": "C:\\Users\\bondh\\OneDrive - MNSCU\\MTRepo\\media-tracker\\Desktop\\media-tracker-desktop\\media-tracker-desktop\\Form1.cs",
               "RelativeDocumentMoniker": "media-tracker-desktop\\Form1.cs",
               "ToolTip": "C:\\Users\\bondh\\OneDrive - MNSCU\\MTRepo\\media-tracker\\Desktop\\media-tracker-desktop\\media-tracker-desktop\\Form1.cs",
               "RelativeToolTip": "media-tracker-desktop\\Form1.cs",
-              "ViewState": "AgIAAH8BAAAAAAAAAAAcwIkBAAAmAAAAAAAAAA==",
+              "ViewState": "AgIAAOMAAAAAAAAAAAAYwBgBAAANAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-03-29T03:21:17.94Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 1,
+              "Title": "App.config",
+              "DocumentMoniker": "C:\\Users\\bondh\\OneDrive - MNSCU\\MTRepo\\media-tracker\\Desktop\\media-tracker-desktop\\media-tracker-desktop\\App.config",
+              "RelativeDocumentMoniker": "media-tracker-desktop\\App.config",
+              "ToolTip": "C:\\Users\\bondh\\OneDrive - MNSCU\\MTRepo\\media-tracker\\Desktop\\media-tracker-desktop\\media-tracker-desktop\\App.config",
+              "RelativeToolTip": "media-tracker-desktop\\App.config",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAQAAAAhAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000601|",
+              "WhenOpened": "2025-04-03T02:43:43.884Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
               "Title": "Form1.cs [Design]",
               "DocumentMoniker": "C:\\Users\\bondh\\OneDrive - MNSCU\\MTRepo\\media-tracker\\Desktop\\media-tracker-desktop\\media-tracker-desktop\\Form1.cs",
               "RelativeDocumentMoniker": "media-tracker-desktop\\Form1.cs",
@@ -65,40 +61,6 @@
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-04-03T02:58:20.882Z",
               "EditorCaption": " [Design]"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "Orientation": 0,
-      "VerticalTabListWidth": 256,
-      "FloatingWindowState": {
-        "Id": "d1c7b733-1b06-4c94-9a01-8ab92ade6aaa",
-        "Display": 0,
-        "X": 181,
-        "Y": 817,
-        "Width": 814,
-        "Height": 709,
-        "WindowState": 0
-      },
-      "DocumentGroups": [
-        {
-          "DockedWidth": 200,
-          "SelectedChildIndex": 0,
-          "Children": [
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "LastFMApi.cs",
-              "DocumentMoniker": "C:\\Users\\bondh\\OneDrive - MNSCU\\MTRepo\\media-tracker\\Desktop\\media-tracker-desktop\\media-tracker-desktop\\Models\\ApiModels\\LastFMApi.cs",
-              "RelativeDocumentMoniker": "media-tracker-desktop\\Models\\ApiModels\\LastFMApi.cs",
-              "ToolTip": "C:\\Users\\bondh\\OneDrive - MNSCU\\MTRepo\\media-tracker\\Desktop\\media-tracker-desktop\\media-tracker-desktop\\Models\\ApiModels\\LastFMApi.cs",
-              "RelativeToolTip": "media-tracker-desktop\\Models\\ApiModels\\LastFMApi.cs",
-              "ViewState": "AgIAAH8AAAAAAAAAAAAkwIkAAAANAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-04-23T23:53:21.526Z",
-              "EditorCaption": ""
             }
           ]
         }

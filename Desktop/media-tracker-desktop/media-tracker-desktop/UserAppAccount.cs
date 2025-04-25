@@ -1,4 +1,5 @@
 ﻿using media_tracker_desktop.Models;
+using media_tracker_desktop.Models.ApiModels;
 using media_tracker_desktop.Models.SupabaseTables;
 using media_tracker_desktop.Models.TMDB;
 using Microsoft.IdentityModel.Tokens;
@@ -256,20 +257,29 @@ namespace media_tracker_desktop
             foreach (UserAccount userAccount in userAccounts)
             {
                 // Determine the platform and store that user's id for that platform.
+                // Also, input those ID into the api models.
                 switch (userAccount.PlatformID)
                 {
                     case STEAM_PLATFORM_ID:
                         _userSteamID = userAccount.UserPlatID.ToString();
+                        SteamApi.SteamID = _userSteamID;
+
                         break;
                     case LASTFM_PLATFORM_ID:
                         _userLastFmID = userAccount.UserPlatID.ToString();
+                        LastFMApi.User = _userLastFmID;
+
                         break;
                     case TMDB_PLATFORM_ID:
                         _userTmdbSessionID = userAccount.UserPlatID.ToString();
-                        var (boolean, accountID) = await GetTmdbAccountID(userAccount.UserPlatID.ToString());
-                        if (boolean)
+                        TmdbApi.SessionID = _userTmdbSessionID;
+
+                        var (accountIDFound, accountID) = await GetTmdbAccountID(userAccount.UserPlatID.ToString());
+
+                        if (accountIDFound)
                         {
                            _userTmdbAccountID = accountID;
+                           TmdbApi.AccountID = _userTmdbAccountID;
                         }
                         else
                         {
@@ -281,7 +291,6 @@ namespace media_tracker_desktop
                         break;
                 }
             }
-
         }
 
         // Method: Resets the session variables.
@@ -298,6 +307,10 @@ namespace media_tracker_desktop
             _userSteamID= string.Empty;
             _userTmdbSessionID = string.Empty;
             _userTmdbAccountID = string.Empty;
+
+            LastFMApi.Logout();
+            SteamApi.Logout();
+            TmdbApi.Logout();
         }
 
         public static async Task<(bool, string)> AddThirdPartyId(int? PlatformId, string UserPlatformId)

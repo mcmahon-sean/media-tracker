@@ -32,14 +32,6 @@ namespace media_tracker_desktop
         // Testing
         private async void btnDBConnectionTest_Click(object sender, EventArgs e)
         {
-            // make sure that, in the App.config file, the supabase api base url and key are entered.
-
-            // enter the user and password here for testing.
-            // If the Supabase [Enable read access for all users] policy is enabled, 
-            // signing in shouldn't be necessary.
-            //string userEmailDB = "";
-            //string userPasswordDB = "";
-
             string? initializationResult = SupabaseConnection.InitializeDB().ToString();
 
             connection = SupabaseConnection.GetClient();
@@ -178,10 +170,6 @@ namespace media_tracker_desktop
                         }
 
                         validUser = true;
-
-                        // connect api's
-                        LastFMApi.User = UserAppAccount.UserLastFmID;
-                        SteamApi.SteamID = UserAppAccount.UserSteamID;
                     }
                     else
                     {
@@ -245,7 +233,7 @@ namespace media_tracker_desktop
             if (result.isSuccess && result.artists != null)
             {
                 string message = "";
-                
+
                 foreach (LastFM_Artist artist in result.artists)
                 {
                     message += $"{artist.Name} - {artist.ImageUrl} \n";
@@ -285,81 +273,25 @@ namespace media_tracker_desktop
 
         private async void btnTestTMDBAccount_Click(object sender, EventArgs e)
         {
-            string tmdbBaseUrl = ConfigurationManager.AppSettings["TMDBApiBaseUrl"];
-            string tmdbAuthToken = ConfigurationManager.AppSettings["TMDBNathanAuthToken"];
+            (bool isSuccess, TMDB_Account? account) result = await TmdbApi.GetAccountDetails();
 
-            string accountEndpoint = "account/";
-
-            string tmdbUrl = $"{tmdbBaseUrl}{accountEndpoint}account_id?session_id={UserAppAccount.UserTmdbSessionID}";
-
-            // initialize client
-            var client = new RestClient();
-
-            // pass the url to request
-            var request = new RestRequest(tmdbUrl);
-
-            request.AddHeader("Authorization", $"Bearer {tmdbAuthToken}");
-
-            // retrieve the response
-            var response = await client.ExecuteAsync(request);
-
-            if (response.IsSuccessful)
+            if (result.isSuccess && result.account != null)
             {
-                // Deserialize
-                TMDB_Account accountInfo = JsonConvert.DeserializeObject<TMDB_Account>(response.Content);
-
-
-                MessageBox.Show($"{accountInfo.ID} - {accountInfo.Username}");
-            }
-            else
-            {
-                MessageBox.Show(response.Content);
+                MessageBox.Show($"{result.account.ID} - {result.account.Username}");
             }
         }
 
         private async void btnTestTMDBMovie_Click(object sender, EventArgs e)
         {
-            string tmdbBaseUrl = ConfigurationManager.AppSettings["TMDBApiBaseUrl"];
-            string tmdbAuthToken = ConfigurationManager.AppSettings["TMDBNathanAuthToken"];
-            string tmdbAccountId = UserAppAccount.UserTmdbAccountID;
-            string tmdbSessionId = UserAppAccount.UserTmdbSessionID;
+            (bool isSuccess, List<TMDB_Movie>? movies) result = await TmdbApi.GetUserRatedMovies();
 
-            string endpoint = $"account/{tmdbAccountId}/rated/movies";
-
-            string tmdbUrl = $"{tmdbBaseUrl}{endpoint}";
-
-            // initialize client
-            var client = new RestClient();
-
-            // pass the url to request
-            var request = new RestRequest(tmdbUrl);
-
-            request.AddParameter("language", "en-US");
-            request.AddParameter("page", 1);
-            request.AddParameter("sort_by", "created_at.desc");
-            request.AddParameter("session_id", tmdbSessionId);
-
-            request.AddHeader("Authorization", $"Bearer {tmdbAuthToken}");
-
-            // retrieve the response
-            var response = await client.ExecuteAsync(request);
-
-            if (response.IsSuccessful)
+            if (result.isSuccess && result.movies != null)
             {
-                // Convert content to json object.
-                var movieResultJson = JObject.Parse(response.Content);
-
-                // Retrieve the array of artist from the json object and convert it back to string.
-                var movieJson = movieResultJson.Root["results"];
-
-                // Deserialize
-                List<TMDB_Movie> movies = JsonConvert.DeserializeObject<List<TMDB_Movie>>(movieJson.ToString());
-
                 string message = "";
 
-                foreach (TMDB_Movie movie in movies)
+                foreach (TMDB_Movie movie in result.movies)
                 {
-                    message += $"{movie.ID} - {movie.Title} - {movie.Overview} \n\n";
+                    message += $"{movie.ID} - {movie.Title}\n";
                 }
 
                 MessageBox.Show(message);
@@ -368,52 +300,18 @@ namespace media_tracker_desktop
 
         private async void btnTestTMDBTVShow_Click(object sender, EventArgs e)
         {
-            string tmdbBaseUrl = ConfigurationManager.AppSettings["TMDBApiBaseUrl"];
-            string tmdbAuthToken = ConfigurationManager.AppSettings["TMDBNathanAuthToken"];
-            string tmdbAccountId = UserAppAccount.UserTmdbAccountID;
-            string tmdbSessionId = UserAppAccount.UserTmdbSessionID;
+            (bool isSuccess, List<TMDB_TV_Show>? tvShows) result = await TmdbApi.GetUserFavoriteTV();
 
-            string tmdbUrl = $"{tmdbBaseUrl}/account/{tmdbAccountId}/favorite/tv";
-
-            // initialize client
-            var client = new RestClient();
-
-            // pass the url to request
-            var request = new RestRequest(tmdbUrl);
-
-            request.AddParameter("language", "en-US");
-            request.AddParameter("page", 1);
-            request.AddParameter("sort_by", "created_at.asc");
-            request.AddParameter("session_id", tmdbSessionId);
-
-            request.AddHeader("Authorization", $"Bearer {tmdbAuthToken}");
-
-            // retrieve the response
-            var response = await client.ExecuteAsync(request);
-
-            if (response.IsSuccessful)
+            if (result.isSuccess && result.tvShows != null)
             {
-                // Convert content to json object.
-                var tvShowResultJson = JObject.Parse(response.Content);
-
-                // Retrieve the array of artist from the json object and convert it back to string.
-                var tvShowJson = tvShowResultJson.Root["results"];
-
-                // Deserialize
-                List<TMDB_TV_Show> tvShows = JsonConvert.DeserializeObject<List<TMDB_TV_Show>>(tvShowJson.ToString());
-
                 string message = "";
 
-                foreach (TMDB_TV_Show tvShow in tvShows)
+                foreach (TMDB_TV_Show tvShow in result.tvShows)
                 {
                     message += $"{tvShow.ID} - {tvShow.Name} - {tvShow.Overview} \n\n";
                 }
 
                 MessageBox.Show(message);
-            }
-            else
-            {
-                MessageBox.Show(response.Content);
             }
         }
 
@@ -462,7 +360,7 @@ namespace media_tracker_desktop
         }
 
         private async void btnLinkSteam_Click(object sender, EventArgs e)
-        { 
+        {
             string steamID = txtLinkingBox.Text;
             AccountLinking(UserAppAccount.SteamPlatformID, steamID);
 
@@ -642,6 +540,11 @@ namespace media_tracker_desktop
                 MessageBox.Show("User Not Logged in");
             }
 
+        }
+
+        private void btnLogOut_Click(object sender, EventArgs e)
+        {
+            UserAppAccount.LogOut();
         }
     }
 }
