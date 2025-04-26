@@ -85,23 +85,24 @@ namespace media_tracker_desktop
             get { return TMDB_PLATFORM_ID;}
         }
 
-        // Method: Returns the user's LastFM id.
-        public static string UserLastFmID
-        {
-            get { return _userLastFmID; }
-        }
-
-        // Method: Returns the user's Steam id.
         public static string UserSteamID
         {
             get { return _userSteamID; }
+            set { _userSteamID = value; } // Add setter
         }
 
-        // Method: Returns the user's TMDB Account id.
+        public static string UserLastFmID
+        {
+            get { return _userLastFmID; }
+            set { _userLastFmID = value; } // Add setter
+        }
+
         public static string UserTmdbAccountID
         {
             get { return _userTmdbAccountID; }
+            set { _userTmdbAccountID = value; } // Add setter
         }
+
         public static string UserTmdbSessionID
         {
             get { return _userTmdbSessionID; }
@@ -330,7 +331,7 @@ namespace media_tracker_desktop
             }
             try{
                 var response = await _connection.Rpc(ADD_THIRD_PARTY_ID, parameters);
-                string returnedString = response.Content.ToString();
+                string returnedString = response.Content != null ? response.Content.ToString() : string.Empty;
                 if (returnedString.IsNullOrEmpty()){
                     return (false, "Database did not return a string value.");
                 }
