@@ -214,7 +214,11 @@ class _MediaScreenState extends ConsumerState<MediaScreen> {
       case 1:
         if (_isLoadingLastFm) return _loading();
         if (auth.lastFmUsername == null) return _noMediaLinkedPrompt("Last.fm");
-        return buildLastFmSection(_lastFmUser, _topArtists, _recentTracks);
+        return LastFmSection(
+          user: _lastFmUser,
+          topArtists: _topArtists,
+          recentTracks: _recentTracks,
+        );
       case 2:
         if (_isLoadingTmdb) return _loading();
         if (auth.tmdbSessionId == null) return _noMediaLinkedPrompt("TMDB");
