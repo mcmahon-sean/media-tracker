@@ -8,13 +8,13 @@ enum MediaType { steam, tmdb, lastfm, lastfmAlbum }
 
 class MediaDetailsScreen extends StatefulWidget {
   final String appId; // Required for Steam, optional for TMDB
-  final String title;
-  final String subtitle;
-  final MediaType mediaType;
-  final List<int>? genreIds;
-  final String? releaseDate;
-  final String? posterPath;
-  final String? artistName;
+  final String title; // Title of the media (game name, movie title, artist name, etc.)
+  final String subtitle; // Subtitle text (overview, artist info, etc.)
+  final MediaType mediaType; // Determines what kind of data to show
+  final List<int>? genreIds; // For TMDB movies/shows
+  final String? releaseDate; // Optional release date (for TMDB)
+  final String? posterPath; // Optional poster or album cover path
+  final String? artistName; // Used for Last.fm album drilldown
 
   const MediaDetailsScreen({
     super.key,
@@ -33,8 +33,8 @@ class MediaDetailsScreen extends StatefulWidget {
 }
 
 class _MediaDetailsScreenState extends State<MediaDetailsScreen> {
-  String? _imageUrl;
-  List<String> _extraDetails = [];
+  String? _imageUrl; // URL for media image to display
+  List<String> _extraDetails = []; // List of extra string details
 
   // For Last.fm artist detail
   List<Map<String, dynamic>> _topTracks = [];
@@ -49,6 +49,8 @@ class _MediaDetailsScreenState extends State<MediaDetailsScreen> {
   @override
   void initState() {
     super.initState();
+
+    // Determine what to load based on media type
     if (widget.mediaType == MediaType.steam) {
       _loadSteamGameDetails();
     } else if (widget.mediaType == MediaType.tmdb) {
@@ -60,6 +62,7 @@ class _MediaDetailsScreenState extends State<MediaDetailsScreen> {
     }
   }
 
+  // Load Steam-specific app details
   Future<void> _loadSteamGameDetails() async {
     final details = await fetchSteamAppDetails(widget.appId);
     if (details != null) {
@@ -75,6 +78,7 @@ class _MediaDetailsScreenState extends State<MediaDetailsScreen> {
     }
   }
 
+  // Load TMDB movie/TV show details
   void _loadTmdbDetails() {
     final genres =
         widget.genreIds
@@ -88,12 +92,12 @@ class _MediaDetailsScreenState extends State<MediaDetailsScreen> {
         'Release Date: ${widget.releaseDate ?? 'Unknown'}',
         'Description: ${widget.subtitle}',
       ];
-      _imageUrl = null;
+      _imageUrl = null;  // TMDB uses posterPath instead
     });
   }
 
+  // Load Last.fm artist information (top tracks, albums, similar artists)
   Future<void> _loadLastFmDetails() async {
-    // Details already passed in subtitle/title from the listtile, just load extra sections
     try {
       final topTracks = await fetchArtistTopTracks(widget.title);
       final topAlbums = await fetchArtistTopAlbums(widget.title);
@@ -109,6 +113,7 @@ class _MediaDetailsScreenState extends State<MediaDetailsScreen> {
     }
   }
 
+  // Load Last.fm album details (tracklist, album image, durations)
   Future<void> _loadLastFmAlbumDetails() async {
     try {
       final albumDetails = await fetchFullAlbumDetails(
@@ -137,6 +142,7 @@ class _MediaDetailsScreenState extends State<MediaDetailsScreen> {
     }
   }
 
+  // Resolve the correct image URL based on media type
   String _resolveImageUrl() {
     if (widget.mediaType == MediaType.lastfm) {
       return ''; // No image for Last.fm artists
@@ -151,10 +157,12 @@ class _MediaDetailsScreenState extends State<MediaDetailsScreen> {
     return 'https://via.placeholder.com/300x400?text=No+Image';
   }
 
+  // Format genres for TMDB movies and tv shows
   String _formatGenres(List<dynamic>? genres) {
     return genres?.map((g) => g['description']).join(', ') ?? 'Unknown';
   }
 
+  // Format number with thousands separator
   String formatNumber(int number) {
     final formatter = NumberFormat.decimalPattern();
     return formatter.format(number);
@@ -187,6 +195,8 @@ class _MediaDetailsScreenState extends State<MediaDetailsScreen> {
               ),
 
             const SizedBox(height: 16),
+
+            // Show extra details
             ..._extraDetails.map(
               (detail) => Padding(
                 padding: const EdgeInsets.only(bottom: 8.0),
@@ -197,6 +207,7 @@ class _MediaDetailsScreenState extends State<MediaDetailsScreen> {
               ),
             ),
 
+            // Last.fm Artist Detail Screen
             if (widget.mediaType == MediaType.lastfm) ...[
               if (_topTracks.isNotEmpty) _buildSectionTitle('Top Tracks'),
               ...(_showAllTracks ? _topTracks.take(10) : _topTracks.take(5)).map(
@@ -265,6 +276,7 @@ class _MediaDetailsScreenState extends State<MediaDetailsScreen> {
                 ),
             ],
             
+            // Last.fm Album Detail Screen
             if (widget.mediaType == MediaType.lastfmAlbum) ...[
                 if (_topTracks.isNotEmpty) _buildSectionTitle('Tracklist'),
                 ListView.separated(
@@ -298,6 +310,7 @@ class _MediaDetailsScreenState extends State<MediaDetailsScreen> {
     );
   }
 
+  // Helper to build section titles
   Widget _buildSectionTitle(String title) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -308,6 +321,7 @@ class _MediaDetailsScreenState extends State<MediaDetailsScreen> {
     );
   }
 
+  // Format seconds into mm:ss
   String _formatDuration(int seconds) {
     final minutes = seconds ~/ 60;
     final remainingSeconds = seconds % 60;
