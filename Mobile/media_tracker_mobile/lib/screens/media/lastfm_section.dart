@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:media_tracker_test/providers/auth_provider.dart';
+import 'package:media_tracker_test/providers/favorites_provider.dart';
 import 'package:media_tracker_test/services/user_account_services.dart';
 import '../../models/lastfm/lastfm_top_artist.dart';
 import '../../models/lastfm/lastfm_track.dart';
@@ -20,7 +21,7 @@ class LastFmSection extends ConsumerStatefulWidget {
     required this.recentTracks,
   });
 
-   @override
+  @override
   ConsumerState<LastFmSection> createState() => _LastFmSectionState();
 }
 
@@ -61,10 +62,22 @@ class _LastFmSectionState extends ConsumerState<LastFmSection> {
 
   Widget _buildTopArtistsList(BuildContext context) {
     final auth = ref.watch(authProvider);
+    final favorites = ref.watch(favoritesProvider);
+    for (var artist in _topArtists) {
+      artist.isFavorite = favorites.any(
+        (fav) =>
+            fav['media']['platform_id'] == 2 &&
+            fav['media']['media_plat_id'].toString().toLowerCase().trim() ==
+                artist.name.toLowerCase().trim() &&
+            fav['favorites'] == true,
+      );
+    }
+
     return ListView.builder(
       itemCount: _topArtists.length,
       itemBuilder: (context, index) {
         final artist = _topArtists[index];
+
         return ListTile(
           title: Text(artist.name),
           subtitle: Text("Plays: ${artist.playCount}"),
@@ -74,18 +87,20 @@ class _LastFmSectionState extends ConsumerState<LastFmSection> {
               color: artist.isFavorite ? Colors.yellow : Colors.grey,
             ),
             onPressed: () async {
+                print('Favorite icon clicked for index $index: ${artist.name}');
               final success = await UserAccountServices().toggleFavoriteMedia(
                 platformId: 2, // Steam, TMDB. last.fm
-                mediaTypeId: 6, // Media type name ("Game", "TV Show", "Film", "Song", "Album", or "Artist")
+                mediaTypeId:
+                    6, // Media type name ("Game", "TV Show", "Film", "Song", "Album", or "Artist")
                 mediaPlatId: artist.name,
                 title: artist.name,
                 username: auth.username!,
               );
 
               if (success) {
-                setState(() {
-                  artist.isFavorite = !artist.isFavorite; // Toggle local UI
-                });
+                final updatedFavorites = await UserAccountServices()
+                    .fetchUserFavorites(auth.username!);
+                ref.read(favoritesProvider.notifier).state = updatedFavorites;
               } else {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Failed to favorite')),

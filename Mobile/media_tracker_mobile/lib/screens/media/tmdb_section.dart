@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:media_tracker_test/providers/auth_provider.dart';
+import 'package:media_tracker_test/providers/favorites_provider.dart';
 import 'package:media_tracker_test/services/user_account_services.dart';
 import '../../models/tmdb/tmdb_account.dart';
 import '../../models/tmdb/tmdb_movie.dart';
@@ -24,7 +25,6 @@ class TmdbSection extends ConsumerStatefulWidget {
 }
 
 class _TmdbSectionState extends ConsumerState<TmdbSection> {
-
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -42,7 +42,11 @@ class _TmdbSectionState extends ConsumerState<TmdbSection> {
             child: TabBarView(
               children: [
                 _buildMediaList(context, widget.ratedMovies, isMovie: true),
-                _buildMediaList(context, widget.favoriteTvShows, isMovie: false),
+                _buildMediaList(
+                  context,
+                  widget.favoriteTvShows,
+                  isMovie: false,
+                ),
               ],
             ),
           ),
@@ -57,11 +61,20 @@ class _TmdbSectionState extends ConsumerState<TmdbSection> {
     required bool isMovie,
   }) {
     final auth = ref.watch(authProvider);
+    final favorites = ref.watch(favoritesProvider);
     return ListView.builder(
       itemCount: items.length,
       itemBuilder: (context, index) {
         final item = items[index];
         final title = item.title;
+
+        // Check if this item is favorited
+        item.isFavorite = favorites.any(
+          (fav) =>
+              fav['media']['platform_id'] == 3 &&
+              fav['media']['media_plat_id'] == item.id.toString() &&
+              fav['favorites'] == true,
+        );
 
         return ListTile(
           title: Text(title),
@@ -73,18 +86,19 @@ class _TmdbSectionState extends ConsumerState<TmdbSection> {
             onPressed: () async {
               final success = await UserAccountServices().toggleFavoriteMedia(
                 platformId: 3, // Steam, TMDB. last.fm
-                mediaTypeId: isMovie ? 3 : 2, // Media type name ("Game", "TV Show", "Film", "Song", "Album", or "Artist")
+                mediaTypeId:
+                    isMovie
+                        ? 3
+                        : 2, // Media type name ("Game", "TV Show", "Film", "Song", "Album", or "Artist")
                 mediaPlatId: item.id.toString(),
                 title: title,
                 username: auth.username!,
               );
 
               if (success) {
-                setState(() {
-                  if (isMovie || !isMovie) {
-                    item.isFavorite = !item.isFavorite;
-                  }
-                });
+                final updatedFavorites = await UserAccountServices()
+                    .fetchUserFavorites(auth.username!);
+                ref.read(favoritesProvider.notifier).state = updatedFavorites;
               } else {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Failed to favorite')),

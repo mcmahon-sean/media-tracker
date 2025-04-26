@@ -117,4 +117,25 @@ class UserAccountServices {
       return false;
     }
   }
+
+  // Fetch all favorited media IDs for a given user
+  Future<List<Map<String, dynamic>>> fetchUserFavorites(String username) async {
+    try {
+      final response = await supabase
+          .from('userfavorites')
+          .select(
+            'media_id, favorites, media (platform_id, media_type_id, media_plat_id, title, album, artist)',
+          )
+          .eq('username', username);
+
+      if (response.isEmpty) {
+        return [];
+      } else {
+        return List<Map<String, dynamic>>.from(response);
+      }
+    } catch (e) {
+      print('Error fetching user favorites: $e');
+      return [];
+    }
+  }
 }

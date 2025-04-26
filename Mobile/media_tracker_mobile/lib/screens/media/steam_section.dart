@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:media_tracker_test/providers/auth_provider.dart';
+import 'package:media_tracker_test/providers/favorites_provider.dart';
 import 'package:media_tracker_test/screens/media/media_details_screen.dart';
 import 'package:media_tracker_test/services/user_account_services.dart';
 import '../../models/steam/steam_model.dart';
@@ -8,10 +9,7 @@ import '../../models/steam/steam_model.dart';
 class SteamSection extends ConsumerStatefulWidget {
   final List<SteamGame> steamGames;
 
-  const SteamSection({
-    super.key,
-    required this.steamGames,
-  });
+  const SteamSection({super.key, required this.steamGames});
 
   @override
   ConsumerState<SteamSection> createState() => _SteamSectionState();
@@ -29,6 +27,17 @@ class _SteamSectionState extends ConsumerState<SteamSection> {
   @override
   Widget build(BuildContext context) {
     final auth = ref.watch(authProvider);
+    final favorites = ref.watch(favoritesProvider);
+    print('Favorites: $favorites');
+    
+    for (var game in _steamGames) {
+      game.isFavorite = favorites.any(
+        (fav) =>
+            fav['media']['platform_id'] == 1 &&
+            fav['media']['media_plat_id'] == game.name.toString() &&
+            fav['favorites'] == true,
+      );
+    }
 
     return ListView.builder(
       itemCount: _steamGames.length,
@@ -52,9 +61,10 @@ class _SteamSectionState extends ConsumerState<SteamSection> {
               );
 
               if (success) {
-                setState(() {
-                  game.isFavorite = !game.isFavorite;
-                });
+                // Re-fetch favorites and update the provider
+                final updatedFavorites = await UserAccountServices()
+                    .fetchUserFavorites(auth.username!);
+                ref.read(favoritesProvider.notifier).state = updatedFavorites;
               } else {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Failed to favorite')),
@@ -66,12 +76,14 @@ class _SteamSectionState extends ConsumerState<SteamSection> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (_) => MediaDetailsScreen(
-                  appId: game.appId.toString(),
-                  title: game.name,
-                  subtitle: 'Total playtime: ${game.playtimeForever} minutes',
-                  mediaType: MediaType.steam,
-                ),
+                builder:
+                    (_) => MediaDetailsScreen(
+                      appId: game.appId.toString(),
+                      title: game.name,
+                      subtitle:
+                          'Total playtime: ${game.playtimeForever} minutes',
+                      mediaType: MediaType.steam,
+                    ),
               ),
             );
           },
