@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:media_tracker_test/providers/auth_provider.dart';
+import 'package:media_tracker_test/services/user_account_services.dart';
 import '../../models/lastfm/lastfm_top_artist.dart';
 import '../../models/lastfm/lastfm_track.dart';
 import '../../models/lastfm/lastfm_user.dart';
 import '../../services/media_api/lastfm_service.dart';
 import '../../screens/media/media_details_screen.dart';
 
-class LastFmSection extends StatelessWidget {
+class LastFmSection extends ConsumerStatefulWidget {
   final LastFmUser? user;
   final List<TopArtist> topArtists;
   final List<LastFmTrack> recentTracks;
@@ -16,6 +19,19 @@ class LastFmSection extends StatelessWidget {
     required this.topArtists,
     required this.recentTracks,
   });
+
+   @override
+  ConsumerState<LastFmSection> createState() => _LastFmSectionState();
+}
+
+class _LastFmSectionState extends ConsumerState<LastFmSection> {
+  late List<TopArtist> _topArtists;
+
+  @override
+  void initState() {
+    super.initState();
+    _topArtists = List.from(widget.topArtists); // Make a mutable local copy
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,10 +60,11 @@ class LastFmSection extends StatelessWidget {
   }
 
   Widget _buildTopArtistsList(BuildContext context) {
+    final auth = ref.watch(authProvider);
     return ListView.builder(
-      itemCount: topArtists.length,
+      itemCount: _topArtists.length,
       itemBuilder: (context, index) {
-        final artist = topArtists[index];
+        final artist = _topArtists[index];
         return ListTile(
           title: Text(artist.name),
           subtitle: Text("Plays: ${artist.playCount}"),
@@ -56,8 +73,24 @@ class LastFmSection extends StatelessWidget {
               artist.isFavorite ? Icons.star : Icons.star_border,
               color: artist.isFavorite ? Colors.yellow : Colors.grey,
             ),
-            onPressed: () {
-              // toggle favorite logic
+            onPressed: () async {
+              final success = await UserAccountServices().toggleFavoriteMedia(
+                platformId: 2, // Steam, TMDB. last.fm
+                mediaTypeId: 6, // Media type name ("Game", "TV Show", "Film", "Song", "Album", or "Artist")
+                mediaPlatId: artist.name,
+                title: artist.name,
+                username: auth.username!,
+              );
+
+              if (success) {
+                setState(() {
+                  artist.isFavorite = !artist.isFavorite; // Toggle local UI
+                });
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Failed to favorite')),
+                );
+              }
             },
           ),
           onTap: () async {
@@ -93,9 +126,9 @@ class LastFmSection extends StatelessWidget {
 
   Widget _buildRecentTracksList() {
     return ListView.builder(
-      itemCount: recentTracks.length,
+      itemCount: widget.recentTracks.length,
       itemBuilder: (context, index) {
-        final track = recentTracks[index];
+        final track = widget.recentTracks[index];
         return ListTile(
           title: Text(track.name),
           subtitle: Text("By: ${track.artist}"),

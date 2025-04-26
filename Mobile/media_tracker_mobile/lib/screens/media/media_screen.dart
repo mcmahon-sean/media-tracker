@@ -210,7 +210,7 @@ class _MediaScreenState extends ConsumerState<MediaScreen> {
       case 0:
         if (_isLoadingSteam) return _loading();
         if (auth.steamId == null) return _noMediaLinkedPrompt("Steam");
-        return buildSteamSection(_steamGames);
+        return SteamSection(steamGames: _steamGames);
       case 1:
         if (_isLoadingLastFm) return _loading();
         if (auth.lastFmUsername == null) return _noMediaLinkedPrompt("Last.fm");

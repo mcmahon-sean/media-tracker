@@ -86,4 +86,35 @@ class UserAccountServices {
     }
     return '';
   }
+
+  // Call stored procedure to favorite a media item
+  Future<bool> toggleFavoriteMedia({
+    required int platformId,
+    required int mediaTypeId,
+    required String mediaPlatId,
+    required String title,
+    String? album,
+    String? artist,
+    required String username,
+  }) async {
+    try {
+      await supabase.rpc(
+        'initial_media_fav',
+        params: {
+          'platform_id_input': platformId,
+          'media_type_id_input': mediaTypeId,
+          'media_plat_id_input': mediaPlatId,
+          'title_input': title,
+          'album_input': album ?? '',
+          'artist_input': artist ?? '',
+          'username_input': username,
+        },
+      );
+      print('Success favoriting media');
+      return true; // Success
+    } catch (e) {
+      print('Failed to favorite media: $e');
+      return false;
+    }
+  }
 }
