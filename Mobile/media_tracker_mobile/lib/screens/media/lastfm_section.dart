@@ -87,7 +87,7 @@ class _LastFmSectionState extends ConsumerState<LastFmSection> {
               color: artist.isFavorite ? Colors.yellow : Colors.grey,
             ),
             onPressed: () async {
-                print('Favorite icon clicked for index $index: ${artist.name}');
+              print('Favorite icon clicked for index $index: ${artist.name}');
               final success = await UserAccountServices().toggleFavoriteMedia(
                 platformId: 2, // Steam, TMDB. last.fm
                 mediaTypeId:
@@ -101,6 +101,24 @@ class _LastFmSectionState extends ConsumerState<LastFmSection> {
                 final updatedFavorites = await UserAccountServices()
                     .fetchUserFavorites(auth.username!);
                 ref.read(favoritesProvider.notifier).state = updatedFavorites;
+                // 🔥 Print out after updating
+                print('Successfully favorited: $success');
+                print('Updated favorites list: $updatedFavorites');
+                print('After favoriting, is ${artist.name} favorited?');
+                print(
+                  updatedFavorites.any(
+                        (fav) =>
+                            fav['media']['platform_id'] == 2 &&
+                            fav['media']['media_plat_id']
+                                    .toString()
+                                    .toLowerCase()
+                                    .trim() ==
+                                artist.name.toLowerCase().trim() &&
+                            fav['favorites'] == true,
+                      )
+                      ? 'YES'
+                      : 'NO',
+                );
               } else {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Failed to favorite')),
