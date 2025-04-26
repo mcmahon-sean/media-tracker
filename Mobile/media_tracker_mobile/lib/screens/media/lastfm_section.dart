@@ -101,7 +101,7 @@ class _LastFmSectionState extends ConsumerState<LastFmSection> {
                 final updatedFavorites = await UserAccountServices()
                     .fetchUserFavorites(auth.username!);
                 ref.read(favoritesProvider.notifier).state = updatedFavorites;
-                // 🔥 Print out after updating
+                // Print out after updating
                 print('Successfully favorited: $success');
                 print('Updated favorites list: $updatedFavorites');
                 print('After favoriting, is ${artist.name} favorited?');
