@@ -51,6 +51,15 @@ class LastFmSection extends StatelessWidget {
         return ListTile(
           title: Text(artist.name),
           subtitle: Text("Plays: ${artist.playCount}"),
+          trailing: IconButton(
+            icon: Icon(
+              artist.isFavorite ? Icons.star : Icons.star_border,
+              color: artist.isFavorite ? Colors.yellow : Colors.grey,
+            ),
+            onPressed: () {
+              // toggle favorite logic
+            },
+          ),
           onTap: () async {
             try {
               final details = await fetchArtistDetail(artist.name);

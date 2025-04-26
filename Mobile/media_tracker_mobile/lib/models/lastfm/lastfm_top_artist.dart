@@ -28,4 +28,6 @@ class TopArtist {
       imageUrl: image['#text'],
     );
   }
+
+  bool get isFavorite => false;
 }

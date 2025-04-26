@@ -56,14 +56,14 @@ class TmdbSection extends StatelessWidget {
         return ListTile(
           title: Text(title),
           trailing: IconButton(
-          icon: Icon(
-            item.isFavorite ? Icons.star : Icons.star_border,
-            color: item.isFavorite ? Colors.yellow : Colors.grey,
+            icon: Icon(
+              item.isFavorite ? Icons.star : Icons.star_border,
+              color: item.isFavorite ? Colors.yellow : Colors.grey,
+            ),
+            onPressed: () {
+              // toggle favorite logic
+            },
           ),
-          onPressed: () {
-            // toggle favorite logic
-          },
-        ),
           onTap: () {
             Navigator.push(
               context,
