@@ -1,1 +1,16 @@
 This is the desktop section.
+
+----------------NOTES FROM FRONT-END---------------
+-working on improving the overall layout of the data that gets displayed.
+-Currently the SteamID is the username, but to get the proper data to show up put "76561199378709292" in the SteamID section. Can do this by hitting the edit button on the home page.
+-Added the Forms folder and files.
+
+
+------------- BEEN USING THIS ACCOUNT INFORMATION----------------
+username: testDesktopUser
+password: testDesktopPassword
+SteamID: 76561199378709292
+Last.FmID: beecrimes
+TmdbID: 21954046
+
+if you are having trouble launching it through launch.json, dotnet run has been working. Suddenly ran into that trouble and haven't gotten to fixing it.
