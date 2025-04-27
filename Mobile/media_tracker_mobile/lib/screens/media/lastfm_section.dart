@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:media_tracker_test/providers/auth_provider.dart';
+import 'package:media_tracker_test/providers/favorites_provider.dart';
+import 'package:media_tracker_test/services/user_account_services.dart';
 import '../../models/lastfm/lastfm_top_artist.dart';
 import '../../models/lastfm/lastfm_track.dart';
 import '../../models/lastfm/lastfm_user.dart';
 import '../../services/media_api/lastfm_service.dart';
 import '../../screens/media/media_details_screen.dart';
 
-class LastFmSection extends StatelessWidget {
+class LastFmSection extends ConsumerStatefulWidget {
   final LastFmUser? user;
   final List<TopArtist> topArtists;
   final List<LastFmTrack> recentTracks;
@@ -18,6 +22,16 @@ class LastFmSection extends StatelessWidget {
   });
 
   @override
+  ConsumerState<LastFmSection> createState() => _LastFmSectionState();
+}
+
+class _LastFmSectionState extends ConsumerState<LastFmSection> {
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return DefaultTabController(
       length: 2,
@@ -25,7 +39,7 @@ class LastFmSection extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const TabBar(
-            tabs: [Tab(text: 'Recent Tracks'), Tab(text: 'Top Artists')],
+            tabs: [Tab(text: 'Top Artists'), Tab(text: 'Recent Tracks')],
             indicatorColor: Colors.grey,
             labelColor: Colors.white,
             unselectedLabelColor: Colors.grey,
@@ -33,8 +47,8 @@ class LastFmSection extends StatelessWidget {
           Expanded(
             child: TabBarView(
               children: [
-                _buildRecentTracksList(),
                 _buildTopArtistsList(context),
+                _buildRecentTracksList(),
               ],
             ),
           ),
@@ -44,13 +58,71 @@ class LastFmSection extends StatelessWidget {
   }
 
   Widget _buildTopArtistsList(BuildContext context) {
+    final auth = ref.watch(authProvider);
+    final favorites = ref.watch(favoritesProvider);
+
     return ListView.builder(
-      itemCount: topArtists.length,
+      itemCount: widget.topArtists.length,
       itemBuilder: (context, index) {
-        final artist = topArtists[index];
+        final artist = widget.topArtists[index];
+
+        final isFavorite = favorites.any(
+          (fav) =>
+              fav['media']['platform_id'] == 2 &&
+              fav['media']['media_plat_id'].toString().toLowerCase().trim() ==
+                  artist.name.toLowerCase().trim() &&
+              fav['favorites'] == true,
+        );
+
         return ListTile(
           title: Text(artist.name),
           subtitle: Text("Plays: ${artist.playCount}"),
+          trailing: IconButton(
+            icon: Icon(
+              isFavorite ? Icons.star : Icons.star_border,
+              color: isFavorite ? Colors.yellow : Colors.grey,
+            ),
+            onPressed: () async {
+              //print('Favorite icon clicked for index $index: ${artist.name}'); // DEBUGGING
+              final success = await UserAccountServices().toggleFavoriteMedia(
+                platformId: 2, // Steam, TMDB. last.fm
+                mediaTypeId:
+                    6, // Media type name ("Game", "TV Show", "Film", "Song", "Album", or "Artist")
+                mediaPlatId: artist.name.toLowerCase().trim(),
+                title: artist.name,
+                artist: artist.name,
+                username: auth.username!,
+              );
+
+              if (success) {
+                final updatedFavorites = await UserAccountServices()
+                    .fetchUserFavorites(auth.username!);
+                ref.read(favoritesProvider.notifier).state = updatedFavorites;
+                // // Print out after updating || DEBUGGING
+                // print('Successfully favorited: $success');
+                // printFull('Updated favorites list: $updatedFavorites');
+                // print('After favoriting, is ${artist.name} favorited?');
+                // print(
+                //   updatedFavorites.any(
+                //         (fav) =>
+                //             fav['media']['platform_id'] == 2 &&
+                //             fav['media']['media_plat_id']
+                //                     .toString()
+                //                     .toLowerCase()
+                //                     .trim() ==
+                //                 artist.name.toLowerCase().trim() &&
+                //             fav['favorites'] == true,
+                //       )
+                //       ? 'YES'
+                //       : 'NO',
+                // );
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Failed to favorite')),
+                );
+              }
+            },
+          ),
           onTap: () async {
             try {
               final details = await fetchArtistDetail(artist.name);
@@ -84,9 +156,9 @@ class LastFmSection extends StatelessWidget {
 
   Widget _buildRecentTracksList() {
     return ListView.builder(
-      itemCount: recentTracks.length,
+      itemCount: widget.recentTracks.length,
       itemBuilder: (context, index) {
-        final track = recentTracks[index];
+        final track = widget.recentTracks[index];
         return ListTile(
           title: Text(track.name),
           subtitle: Text("By: ${track.artist}"),

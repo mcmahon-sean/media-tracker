@@ -4,6 +4,7 @@ class TopArtist {
   final String url;
   final int rank;
   final String? imageUrl;
+  bool isFavorite;
 
   TopArtist({
     required this.name,
@@ -11,6 +12,7 @@ class TopArtist {
     required this.url,
     required this.rank,
     this.imageUrl,
+    this.isFavorite = false,
   });
 
   factory TopArtist.fromJson(Map<String, dynamic> json) {
@@ -26,6 +28,7 @@ class TopArtist {
       url: json['url'],
       rank: int.tryParse(json['@attr']?['rank'] ?? '') ?? 0,
       imageUrl: image['#text'],
+      isFavorite: false,
     );
   }
 }

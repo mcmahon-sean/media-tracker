@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:media_tracker_test/models/lastfm/lastfm_top_artist.dart';
 import 'package:media_tracker_test/providers/auth_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:media_tracker_test/providers/favorites_provider.dart';
 
 import '../../models/lastfm/lastfm_track.dart';
 import '../../models/lastfm/lastfm_user.dart';
@@ -84,11 +85,26 @@ class _MediaScreenState extends ConsumerState<MediaScreen> {
 
   // Fetches and sets Steam game data
   Future<void> _loadSteamGames() async {
-    if (_steamGames.isNotEmpty)
+    if (_steamGames.isNotEmpty) {
       return; // Skip loading if games list is populated
+    }
     setState(() => _isLoadingSteam = true);
     try {
       final games = await fetchSteamGames();
+      final favorites = ref.read(favoritesProvider);
+
+      // First make sure both are strings for a clean compare
+      for (var game in games) {
+        if (favorites.any(
+          (fav) =>
+              fav['media']['platform_id'] == 1 &&
+              fav['media']['media_plat_id'] == game.name.toString() &&
+              fav['favorites'] == true,
+        )) {
+          game.isFavorite = true;
+        }
+      }
+
       setState(() => _steamGames = games); // Set game list
     } catch (e, stackTrace) {
       print('Steam load error: $e');
@@ -210,7 +226,7 @@ class _MediaScreenState extends ConsumerState<MediaScreen> {
       case 0:
         if (_isLoadingSteam) return _loading();
         if (auth.steamId == null) return _noMediaLinkedPrompt("Steam");
-        return buildSteamSection(_steamGames);
+        return SteamSection(steamGames: _steamGames);
       case 1:
         if (_isLoadingLastFm) return _loading();
         if (auth.lastFmUsername == null) return _noMediaLinkedPrompt("Last.fm");
