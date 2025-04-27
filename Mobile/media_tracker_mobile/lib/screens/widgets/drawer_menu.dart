@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:media_tracker_test/screens/profile_screen.dart';
 
 class DrawerMenu extends ConsumerWidget {
   final String firstName;
@@ -45,7 +46,18 @@ class DrawerMenu extends ConsumerWidget {
               onSectionSelected(0);
               Navigator.pop(context);
             },
+
           ),
+          ListTile(
+  title: const Text('Profile'),
+  onTap: () {
+    Navigator.pop(context);
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => ProfileScreen()),
+    );
+  },
+),
         ],
       ),
     );
