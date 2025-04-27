@@ -1,6 +1,9 @@
 ﻿using media_tracker_desktop.Models;
+using media_tracker_desktop.Models.ApiModels;
 using media_tracker_desktop.Models.SupabaseTables;
+using media_tracker_desktop.Models.TMDB;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
 using RestSharp;
 using Supabase;
 using System;
@@ -9,9 +12,11 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
 using System.Net;
+using System.Printing;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media.Animation;
 
 namespace media_tracker_desktop
 {
@@ -36,9 +41,16 @@ namespace media_tracker_desktop
 
         private static string _userLastFmID = string.Empty;
         private static string _userSteamID = string.Empty;
-        private static string _userTmdbID = string.Empty;
+        private static string _userTmdbSessionID = string.Empty;
+        private static string _userTmdbAccountID = string.Empty;
+
         // ----- Getter Methods -----
         // Method: Returns bool if a user is logged in.
+        // Only getters.
+        // Reason:
+        // These are values from the database.
+        // If these values were to be updated outside of this class, we won't know if it is also updated in the database.
+        // These values should only contain values that are in the database.
         public static bool UserLoggedIn
         {
             get { return _userLoggedIn; }
@@ -78,22 +90,30 @@ namespace media_tracker_desktop
             get { return TMDB_PLATFORM_ID;}
         }
 
-        // Method: Returns the user's LastFM id.
-        public static string UserLastFmID
-        {
-            get { return _userLastFmID; }
-        }
-
-        // Method: Returns the user's Steam id.
         public static string UserSteamID
         {
             get { return _userSteamID; }
+            // No setter, reason outlined in the beginning of this section.
+            //set { _userSteamID = value; } 
         }
 
-        // Method: Returns the user's TMDB id.
-        public static string UserTmdbID
+        public static string UserLastFmID
         {
-            get { return _userTmdbID; }
+            get { return _userLastFmID; }
+            // No setter, reason outlined in the beginning of this section.
+            //set { _userLastFmID = value; }
+        }
+
+        public static string UserTmdbAccountID
+        {
+            get { return _userTmdbAccountID; }
+            // No setter, reason outlined in the beginning of this section.
+            //set { _userTmdbAccountID = value; }
+        }
+
+        public static string UserTmdbSessionID
+        {
+            get { return _userTmdbSessionID; }
         }
         // ----- Getter Methods END -----
 
@@ -211,7 +231,7 @@ namespace media_tracker_desktop
                     var userAccountQueryResult = await _connection.From<UserAccount>().Filter(u => u.Username, Supabase.Postgrest.Constants.Operator.Equals, user.Username).Get();
 
                     // User record shouldn't be null since the user is logged in at this stage. Hence, (!).
-                    UpdateUserSessionVariables(userQueryResult.Model!, userAccountQueryResult.Models);
+                    await UpdateUserSessionVariables(userQueryResult.Model!, userAccountQueryResult.Models);
 
                     message = "Successfully logged in.";
                     _userLoggedIn = true;
@@ -232,10 +252,11 @@ namespace media_tracker_desktop
 
         /// <summary>
         /// Updates the session variables.
+        /// When a user is logged in, the session user api id variables are also updated, as well as the user's id in each api model.
         /// </summary>
         /// <param name="user">The user object of the logged in user.</param>
         /// <param name="userAccounts">The list of user account objects that is associated with the user.</param>
-        private static void UpdateUserSessionVariables(User user, List<UserAccount> userAccounts)
+        private static async Task UpdateUserSessionVariables(User user, List<UserAccount> userAccounts)
         {
             _username = user.Username;
             _firstName = user.FirstName;
@@ -246,16 +267,35 @@ namespace media_tracker_desktop
             foreach (UserAccount userAccount in userAccounts)
             {
                 // Determine the platform and store that user's id for that platform.
+                // Also, input those ID into the api models.
                 switch (userAccount.PlatformID)
                 {
                     case STEAM_PLATFORM_ID:
                         _userSteamID = userAccount.UserPlatID.ToString();
+                        SteamApi.SteamID = _userSteamID;
+
                         break;
                     case LASTFM_PLATFORM_ID:
                         _userLastFmID = userAccount.UserPlatID.ToString();
+                        LastFMApi.User = _userLastFmID;
+
                         break;
                     case TMDB_PLATFORM_ID:
-                        _userTmdbID = userAccount.UserPlatID.ToString();
+                        _userTmdbSessionID = userAccount.UserPlatID.ToString();
+                        TmdbApi.SessionID = _userTmdbSessionID;
+
+                        var (accountIDFound, accountID) = await GetTmdbAccountID(userAccount.UserPlatID.ToString());
+
+                        if (accountIDFound)
+                        {
+                           _userTmdbAccountID = accountID;
+                           TmdbApi.AccountID = _userTmdbAccountID;
+                        }
+                        else
+                        {
+                            Console.WriteLine("Account Id Not Found");
+                        }
+                        
                         break;
                     default:
                         break;
@@ -275,9 +315,21 @@ namespace media_tracker_desktop
 
             _userLastFmID = string.Empty;
             _userSteamID= string.Empty;
-            _userTmdbID = string.Empty;
+            _userTmdbSessionID = string.Empty;
+            _userTmdbAccountID = string.Empty;
+
+            LastFMApi.Logout();
+            SteamApi.Logout();
+            TmdbApi.Logout();
         }
 
+        /// <summary>
+        /// When adding an api id, the session variables for user's api ids are also updated.
+        /// In addition, the user's id in each api models are also updated.
+        /// </summary>
+        /// <param name="PlatformId"></param>
+        /// <param name="UserPlatformId"></param>
+        /// <returns></returns>
         public static async Task<(bool, string)> AddThirdPartyId(int? PlatformId, string UserPlatformId)
         {
             var parameters = new{
@@ -285,20 +337,75 @@ namespace media_tracker_desktop
                 platform_id_input = PlatformId,
                 user_plat_id_input = UserPlatformId
             };
+
+            if (!_userLoggedIn)
+            {
+                return (false, "User is not logged in.");
+            }
+
             if (!PlatformId.HasValue)
             {
                 return (false, "Platform ID is null.");
             }
+
+            if (string.IsNullOrEmpty(UserPlatformId))
+            {
+                return (false, "User Platform ID is null.");
+            }
+
+            if (string.IsNullOrEmpty(_username))
+            {
+                return (false, "Username is null.");
+            }
+
             if (_connection == null)
             {
                 return (false, "Connection is null.");
             }
+
             try{
                 var response = await _connection.Rpc(ADD_THIRD_PARTY_ID, parameters);
-                string returnedString = response.Content.ToString();
+
+                string returnedString = response.Content != null ? response.Content.ToString() : string.Empty;
+
                 if (returnedString.IsNullOrEmpty()){
                     return (false, "Database did not return a string value.");
                 }
+
+                // Update the corresponding user api id session variables and for each api model.
+                switch (PlatformId)
+                {
+                    case STEAM_PLATFORM_ID:
+                        _userSteamID = UserPlatformId;
+                        SteamApi.SteamID = _userSteamID;
+
+                        break;
+                    case LASTFM_PLATFORM_ID:
+                        _userLastFmID = UserPlatformId;
+                        LastFMApi.User = _userLastFmID;
+
+                        break;
+                    case TMDB_PLATFORM_ID:
+                        _userTmdbSessionID = UserPlatformId;
+                        TmdbApi.SessionID = _userTmdbSessionID;
+
+                        //var (accountIDFound, accountID) = await GetTmdbAccountID(userAccount.UserPlatID.ToString());
+
+                        //if (accountIDFound)
+                        //{
+                        //    _userTmdbAccountID = accountID;
+                        //    TmdbApi.AccountID = _userTmdbAccountID;
+                        //}
+                        //else
+                        //{
+                        //    Console.WriteLine("Account Id Not Found");
+                        //}
+
+                        break;
+                    default:
+                        break;
+                }
+
                 return (true, returnedString);
             }
             catch (Exception error)
@@ -307,5 +414,52 @@ namespace media_tracker_desktop
 
             }
         }
+
+        private static async Task<(bool, string)> GetTmdbAccountID(string sessionID)
+        {
+            string tmdbBaseUrl = ConfigurationManager.AppSettings["TMDBApiBaseUrl"];
+            string tmdbAuthToken = ConfigurationManager.AppSettings["TMDBNathanAuthToken"];
+
+            string tmdbUrl = $"{tmdbBaseUrl}/account/account_id?session_id={sessionID}";
+
+
+            // initialize client
+            var client = new RestClient();
+
+            // pass the url to request
+            var request = new RestRequest(tmdbUrl);
+
+            request.AddHeader("Authorization", $"Bearer {tmdbAuthToken}");
+
+            // retrieve the response
+            var response = await client.ExecuteAsync(request);
+
+            try
+            {
+                if (response.IsSuccessful)
+                {
+                    // Deserialize
+                    TMDB_Account accountInfo = JsonConvert.DeserializeObject<TMDB_Account>(response.Content);
+                    if (accountInfo != null)
+                    {
+                        return (true, accountInfo.ID.ToString());
+                    }
+                    else
+                    {
+                        return (false, response.Content);
+                    }
+                }
+                else
+                {
+                    return (false, response.Content);
+                }
+            }
+            catch(Exception error) 
+            {
+                return (false, error.Message);
+            }
+        }
+
+        // Note: make method for updating api id.
     }
 }

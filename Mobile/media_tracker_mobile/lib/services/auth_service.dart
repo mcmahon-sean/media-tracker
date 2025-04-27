@@ -1,7 +1,9 @@
 import 'package:media_tracker_test/providers/auth_provider.dart';
+import 'package:media_tracker_test/providers/favorites_provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../config/api_connections.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'user_account_services.dart';
 
 // Registering the AuthService as a Riverpod provider
 // This allows us to inject the Ref object, which is needed to interact with other providers like authProvider
@@ -53,19 +55,25 @@ class AuthService {
           .select('first_name, last_name, email')
           .eq('username', username);
 
+      // Fetch user favorites
+      final userAccountServices = UserAccountServices();
+      final favorites = await userAccountServices.fetchUserFavorites(username);
+      print('User favorites: $favorites');
+      ref.read(favoritesProvider.notifier).state = favorites;
+
       // Fetch linked platform IDs (Steam, Last.fm, TMDB) from the useraccounts table
       // If the Steam ID, last.fm ID, or TMDB ID exists, assign them globally via ApiServices
-      final steamID = await getPlatformID(username, 1);
-      if (steamID != null && steamID.isNotEmpty) {
-        ApiServices.steamUserId = steamID;
+      final steamId = await getPlatformID(username, 1);
+      if (steamId != null && steamId.isNotEmpty) {
+        ApiServices.steamId = steamId;
       }
       final lastfmID = await getPlatformID(username, 2);
       if (lastfmID != null && lastfmID.isNotEmpty) {
-        ApiServices.lastFmUser = lastfmID;
+        ApiServices.lastFmUsername = lastfmID;
       }
       final tmdbID = await getPlatformID(username, 3);
       if (tmdbID != null && tmdbID.isNotEmpty) {
-        ApiServices.tmdbUser = tmdbID;
+        ApiServices.tmdbSessionId = tmdbID;
       }
 
       // If user profile data was found, update the global auth state using authProvider
@@ -78,7 +86,7 @@ class AuthService {
               lastName: userInfo[0]['last_name'] ?? '',
               email: userInfo[0]['email'] ?? '',
               token: result,
-              steamID: steamID,
+              steamID: steamId,
               lastFmUsername: lastfmID,
               tmdbSessionId: tmdbID
             );

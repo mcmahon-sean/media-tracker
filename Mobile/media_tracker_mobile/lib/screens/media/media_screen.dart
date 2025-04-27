@@ -1,21 +1,23 @@
 import 'package:flutter/material.dart';
-import 'media_details_screen.dart';
-
+import 'package:media_tracker_test/models/lastfm/lastfm_top_artist.dart';
 import 'package:media_tracker_test/providers/auth_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:media_tracker_test/providers/favorites_provider.dart';
 
-import '../models/lastfm/lastfm_artist.dart';
-import '../models/lastfm/lastfm_track.dart';
-import '../models/lastfm/lastfm_user.dart';
-import '../models/steam/steam_model.dart';
-import '../models/tmdb/tmdb_account.dart';
-import '../models/tmdb/tmdb_movie.dart';
-import '../models/tmdb/tmdb_tv_show.dart';
-import '../services/media_api/steam_service.dart';
-import '../services/media_api/lastfm_service.dart';
-import '../services/media_api/tmdb_service.dart';
-import 'home_screen.dart';
-import 'widgets/drawer_menu.dart';
+import '../../models/lastfm/lastfm_track.dart';
+import '../../models/lastfm/lastfm_user.dart';
+import '../../models/steam/steam_model.dart';
+import '../../models/tmdb/tmdb_account.dart';
+import '../../models/tmdb/tmdb_movie.dart';
+import '../../models/tmdb/tmdb_tv_show.dart';
+import '../../services/media_api/steam_service.dart';
+import '../../services/media_api/lastfm_service.dart';
+import '../../services/media_api/tmdb_service.dart';
+import 'steam_section.dart';
+import 'lastfm_section.dart';
+import 'tmdb_section.dart';
+import '../home_screen.dart';
+import '../widgets/drawer_menu.dart';
 
 class MediaScreen extends ConsumerStatefulWidget {
   const MediaScreen({super.key});
@@ -33,7 +35,7 @@ class _MediaScreenState extends ConsumerState<MediaScreen> {
 
   // Last.fm
   LastFmUser? _lastFmUser;
-  List<LastFmArtist> _topArtists = [];
+  List<TopArtist> _topArtists = [];
   List<LastFmTrack> _recentTracks = [];
   bool _isLoadingLastFm = false;
 
@@ -46,7 +48,7 @@ class _MediaScreenState extends ConsumerState<MediaScreen> {
   @override
   void initState() {
     super.initState();
-    _loadPlatformData(_selectedIndex); // Load Steam by default
+    _loadPlatformData(_selectedIndex);
   }
 
   // Load the data for the selected platform based on index
@@ -54,29 +56,64 @@ class _MediaScreenState extends ConsumerState<MediaScreen> {
     final auth = ref.read(authProvider);
     switch (index) {
       case 0:
-        if (auth.steamId != null && _steamGames.isEmpty) _loadSteamGames();
+        if (auth.steamId != null) {
+          setState(() {
+            _steamGames = []; // Clear old data
+          });
+          _loadSteamGames();
+        }
         break;
       case 1:
-        if (auth.tmdbSessionId != null && _tmdbAccount == null) _loadTmdbData();
+        if (auth.lastFmUsername != null) {
+          setState(() {
+            _topArtists = [];
+            _recentTracks = [];
+          });
+          _loadLastFmData();
+        }
         break;
       case 2:
-        if (auth.lastFmUsername != null &&
-            (_topArtists.isEmpty || _recentTracks.isEmpty))
-          _loadLastFmData();
+        if (auth.tmdbSessionId != null) {
+          setState(() {
+            _tmdbAccount = null;
+          });
+          _loadTmdbData();
+        }
         break;
     }
   }
 
   // Fetches and sets Steam game data
   Future<void> _loadSteamGames() async {
+    if (_steamGames.isNotEmpty) {
+      return; // Skip loading if games list is populated
+    }
     setState(() => _isLoadingSteam = true);
     try {
       final games = await fetchSteamGames();
+      final favorites = ref.read(favoritesProvider);
+
+      // First make sure both are strings for a clean compare
+      for (var game in games) {
+        if (favorites.any(
+          (fav) =>
+              fav['media']['platform_id'] == 1 &&
+              fav['media']['media_plat_id'] == game.name.toString() &&
+              fav['favorites'] == true,
+        )) {
+          game.isFavorite = true;
+        }
+      }
+
       setState(() => _steamGames = games); // Set game list
-    } catch (e) {
+    } catch (e, stackTrace) {
       print('Steam load error: $e');
+      print('Stack trace: $stackTrace');
+      print('Steam ID: ${ref.read(authProvider).steamId}');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Failed to load Steam data. Try again later.")),
+        const SnackBar(
+          content: Text("Failed to load Steam data. Try again later."),
+        ),
       );
     } finally {
       setState(() => _isLoadingSteam = false);
@@ -109,7 +146,7 @@ class _MediaScreenState extends ConsumerState<MediaScreen> {
     try {
       final account = await TMDBService.fetchAccountDetails();
       final movies = await TMDBService.fetchRatedMovies();
-      final shows = await TMDBService.fetchFavoriteTvShows();
+      final shows = await TMDBService.fetchRatedTvShows();
 
       setState(() {
         _tmdbAccount = account; // Get user profile
@@ -126,6 +163,7 @@ class _MediaScreenState extends ConsumerState<MediaScreen> {
   @override
   Widget build(BuildContext context) {
     final auth = ref.watch(authProvider);
+
     final firstName = auth.firstName;
 
     return Scaffold(
@@ -160,6 +198,7 @@ class _MediaScreenState extends ConsumerState<MediaScreen> {
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: (index) {
+          if (index == _selectedIndex) return; // Ignore redundant tap
           setState(() {
             _selectedIndex = index;
           });
@@ -170,11 +209,11 @@ class _MediaScreenState extends ConsumerState<MediaScreen> {
             icon: Icon(Icons.videogame_asset),
             label: 'Steam',
           ),
-          BottomNavigationBarItem(icon: Icon(Icons.movie), label: 'TMDB'),
           BottomNavigationBarItem(
             icon: Icon(Icons.music_note),
             label: 'Last.fm',
           ),
+          BottomNavigationBarItem(icon: Icon(Icons.movie), label: 'TMDB'),
         ],
       ),
     );
@@ -187,15 +226,23 @@ class _MediaScreenState extends ConsumerState<MediaScreen> {
       case 0:
         if (_isLoadingSteam) return _loading();
         if (auth.steamId == null) return _noMediaLinkedPrompt("Steam");
-        return _buildSteamList();
+        return SteamSection(steamGames: _steamGames);
       case 1:
-        if (_isLoadingTmdb) return _loading();
-        if (auth.tmdbSessionId == null) return _noMediaLinkedPrompt("TMDB");
-        return _buildTmdbSection();
-      case 2:
         if (_isLoadingLastFm) return _loading();
         if (auth.lastFmUsername == null) return _noMediaLinkedPrompt("Last.fm");
-        return _buildLastFmSection();
+        return LastFmSection(
+          user: _lastFmUser,
+          topArtists: _topArtists,
+          recentTracks: _recentTracks,
+        );
+      case 2:
+        if (_isLoadingTmdb) return _loading();
+        if (auth.tmdbSessionId == null) return _noMediaLinkedPrompt("TMDB");
+        return TmdbSection(
+          account: _tmdbAccount,
+          ratedMovies: _ratedMovies,
+          favoriteTvShows: _favoriteTvShows,
+        );
       default:
         return Center(child: Text("Coming soon..."));
     }
@@ -220,145 +267,22 @@ class _MediaScreenState extends ConsumerState<MediaScreen> {
             ElevatedButton.icon(
               icon: Icon(Icons.link),
               label: Text("Link $platform Account"),
-              onPressed: () {
-                Navigator.pushNamed(context, '/linkAccounts');
+              onPressed: () async {
+                final didLink = await Navigator.pushNamed(
+                  context,
+                  '/linkAccounts',
+                );
+                if (didLink == true) {
+                  setState(() {}); // just to rebuild
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    _loadPlatformData(_selectedIndex);
+                  });
+                }
               },
             ),
           ],
         ),
       ),
-    );
-  }
-
- Widget _buildSteamList() {
-    return ListView.builder(
-      itemCount: _steamGames.length,
-      itemBuilder: (context, index) {
-        final game = _steamGames[index];
-        return ListTile(
-          title: Text(game.name),
-          subtitle: Text('Played: ${game.playtimeForever} mins'),
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => MediaDetailsScreen(mediaItem: game),
-              ),
-            );
-          },
-        );
-      },
-    );
-  }
-    
-      
-
-        
-  
-
-Widget _buildLastFmSection() {
-    return ListView(
-      padding: const EdgeInsets.all(12),
-      children: [
-        if (_lastFmUser != null) ...[
-          Text(
-            "User: ${_lastFmUser!.name}",
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-          Text("Plays: ${_lastFmUser!.playCount}"),
-          const SizedBox(height: 12),
-        ],
-        Text(
-          "Top Artists",
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-        ),
-        ..._topArtists.map(
-          (artist) => ListTile(
-            title: Text(artist.name),
-            subtitle: Text("Plays: ${artist.playCount}"),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => MediaDetailsScreen(mediaItem: artist),
-                ),
-              );
-            },
-          ),
-        ),
-        const SizedBox(height: 12),
-        Text(
-          "Recent Tracks",
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-        ),
-        ..._recentTracks.map(
-          (track) => ListTile(
-            title: Text(track.name),
-            subtitle: Text("By: ${track.artist}"),
-            trailing: Text(track.formattedDate ?? "Now Playing"),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => MediaDetailsScreen(mediaItem: track),
-                ),
-              );
-            },
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildTmdbSection() {
-    return ListView(
-      padding: const EdgeInsets.all(12),
-      children: [
-        if (_tmdbAccount != null) ...[
-          Text(
-            "User: ${_tmdbAccount!.username}",
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 12),
-        ],
-        Text(
-          "Rated Movies",
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-        ),
-        ..._ratedMovies.map(
-          (movie) => ListTile(
-            title: Text(movie.title),
-            subtitle: Text(movie.overview),
-            onTap: (){
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_)=>MediaDetailsScreen(mediaItem: movie),
-                ),
-              );
-            },
-          ),
-        ),
-        const SizedBox(height: 12),
-        Text(
-          "Favorite TV Shows",
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-        ),
-        ..._favoriteTvShows.map(
-          (show) =>
-              ListTile(title: Text(show.name), 
-              subtitle: Text(show.overview),
-             onTap: (){
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_)=> MediaDetailsScreen(mediaItem: show),
-                ),
-              );
-             }, 
-             ),
-              
-        ),
-      ],
     );
   }
 }

@@ -57,9 +57,9 @@ class _HomeScreenState extends State<HomeScreen> {
             children: [
               Text(
                 'Not Signed In',
-                style: Theme.of(context).textTheme.headlineLarge
-              )
-            ]
+                style: Theme.of(context).textTheme.headlineLarge,
+              ),
+            ],
           ),
           SizedBox(height: 16),
           Row(

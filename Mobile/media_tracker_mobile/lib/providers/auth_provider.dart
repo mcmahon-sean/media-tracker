@@ -80,6 +80,11 @@ class AuthNotifier extends StateNotifier<AuthState> {
     String? tmdbSessionId,
     String? lastFmUsername,
   }) {
+    // Sync third-party global API variables
+    ApiServices.steamId = steamID ?? "";
+    ApiServices.tmdbSessionId = tmdbSessionId ?? "";
+    ApiServices.lastFmUsername = lastFmUsername ?? "";
+    
     state = AuthState(
       username: username,
       firstName: firstName,
@@ -98,21 +103,24 @@ class AuthNotifier extends StateNotifier<AuthState> {
     state = AuthState.empty();
 
     // Clear any global third-party API user ids
-    ApiServices.steamUserId = "";
-    ApiServices.lastFmUser = "";
-    ApiServices.tmdbUser = "";
+    ApiServices.steamId = "";
+    ApiServices.lastFmUsername = "";
+    ApiServices.tmdbSessionId = "";
   }
 
   // Update methods when a user links third party API service
   void updateSteamId(String? id) {
+    ApiServices.steamId = id ?? "";
     state = state.copyWith(steamId: id, clearSteamId: id == null);
   }
 
   void updateTmdbSessionId(String? id) {
+    ApiServices.tmdbSessionId = id ?? "";
     state = state.copyWith(tmdbSessionId: id, clearTmdbSessionId: id == null);
   }
 
   void updateLastFmUsername(String? username) {
+    ApiServices.lastFmUsername = username ?? "";
     state = state.copyWith(
       lastFmUsername: username,
       clearLastFmUsername: username == null,
