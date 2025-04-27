@@ -26,12 +26,9 @@ class LastFmSection extends ConsumerStatefulWidget {
 }
 
 class _LastFmSectionState extends ConsumerState<LastFmSection> {
-  late List<TopArtist> _topArtists;
-
   @override
   void initState() {
     super.initState();
-    _topArtists = List.from(widget.topArtists); // Make a mutable local copy
   }
 
   @override
@@ -42,7 +39,7 @@ class _LastFmSectionState extends ConsumerState<LastFmSection> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const TabBar(
-            tabs: [Tab(text: 'Recent Tracks'), Tab(text: 'Top Artists')],
+            tabs: [Tab(text: 'Top Artists'), Tab(text: 'Recent Tracks')],
             indicatorColor: Colors.grey,
             labelColor: Colors.white,
             unselectedLabelColor: Colors.grey,
@@ -50,8 +47,8 @@ class _LastFmSectionState extends ConsumerState<LastFmSection> {
           Expanded(
             child: TabBarView(
               children: [
-                _buildRecentTracksList(),
                 _buildTopArtistsList(context),
+                _buildRecentTracksList(),
               ],
             ),
           ),
@@ -63,37 +60,37 @@ class _LastFmSectionState extends ConsumerState<LastFmSection> {
   Widget _buildTopArtistsList(BuildContext context) {
     final auth = ref.watch(authProvider);
     final favorites = ref.watch(favoritesProvider);
-    for (var artist in _topArtists) {
-      artist.isFavorite = favorites.any(
-        (fav) =>
-            fav['media']['platform_id'] == 2 &&
-            fav['media']['media_plat_id'].toString().toLowerCase().trim() ==
-                artist.name.toLowerCase().trim() &&
-            fav['favorites'] == true,
-      );
-    }
 
     return ListView.builder(
-      itemCount: _topArtists.length,
+      itemCount: widget.topArtists.length,
       itemBuilder: (context, index) {
-        final artist = _topArtists[index];
+        final artist = widget.topArtists[index];
+
+        final isFavorite = favorites.any(
+          (fav) =>
+              fav['media']['platform_id'] == 2 &&
+              fav['media']['media_plat_id'].toString().toLowerCase().trim() ==
+                  artist.name.toLowerCase().trim() &&
+              fav['favorites'] == true,
+        );
 
         return ListTile(
           title: Text(artist.name),
           subtitle: Text("Plays: ${artist.playCount}"),
           trailing: IconButton(
             icon: Icon(
-              artist.isFavorite ? Icons.star : Icons.star_border,
-              color: artist.isFavorite ? Colors.yellow : Colors.grey,
+              isFavorite ? Icons.star : Icons.star_border,
+              color: isFavorite ? Colors.yellow : Colors.grey,
             ),
             onPressed: () async {
-              print('Favorite icon clicked for index $index: ${artist.name}');
+              //print('Favorite icon clicked for index $index: ${artist.name}'); // DEBUGGING
               final success = await UserAccountServices().toggleFavoriteMedia(
                 platformId: 2, // Steam, TMDB. last.fm
                 mediaTypeId:
                     6, // Media type name ("Game", "TV Show", "Film", "Song", "Album", or "Artist")
-                mediaPlatId: artist.name,
+                mediaPlatId: artist.name.toLowerCase().trim(),
                 title: artist.name,
+                artist: artist.name,
                 username: auth.username!,
               );
 
@@ -101,24 +98,24 @@ class _LastFmSectionState extends ConsumerState<LastFmSection> {
                 final updatedFavorites = await UserAccountServices()
                     .fetchUserFavorites(auth.username!);
                 ref.read(favoritesProvider.notifier).state = updatedFavorites;
-                // Print out after updating
-                print('Successfully favorited: $success');
-                print('Updated favorites list: $updatedFavorites');
-                print('After favoriting, is ${artist.name} favorited?');
-                print(
-                  updatedFavorites.any(
-                        (fav) =>
-                            fav['media']['platform_id'] == 2 &&
-                            fav['media']['media_plat_id']
-                                    .toString()
-                                    .toLowerCase()
-                                    .trim() ==
-                                artist.name.toLowerCase().trim() &&
-                            fav['favorites'] == true,
-                      )
-                      ? 'YES'
-                      : 'NO',
-                );
+                // // Print out after updating || DEBUGGING
+                // print('Successfully favorited: $success');
+                // printFull('Updated favorites list: $updatedFavorites');
+                // print('After favoriting, is ${artist.name} favorited?');
+                // print(
+                //   updatedFavorites.any(
+                //         (fav) =>
+                //             fav['media']['platform_id'] == 2 &&
+                //             fav['media']['media_plat_id']
+                //                     .toString()
+                //                     .toLowerCase()
+                //                     .trim() ==
+                //                 artist.name.toLowerCase().trim() &&
+                //             fav['favorites'] == true,
+                //       )
+                //       ? 'YES'
+                //       : 'NO',
+                // );
               } else {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Failed to favorite')),

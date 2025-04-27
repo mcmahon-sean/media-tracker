@@ -110,6 +110,7 @@ class UserAccountServices {
           'username_input': username,
         },
       );
+      print('Toggled favorite for $mediaPlatId ($title)');
       print('Success favoriting media');
       return true; // Success
     } catch (e) {
@@ -129,9 +130,11 @@ class UserAccountServices {
           .eq('username', username);
 
       if (response.isEmpty) {
+        print('Fetched favorites: (empty)');
         return [];
       } else {
-        return List<Map<String, dynamic>>.from(response);
+        final favorites = List<Map<String, dynamic>>.from(response);
+        return favorites;
       }
     } catch (e) {
       print('Error fetching user favorites: $e');

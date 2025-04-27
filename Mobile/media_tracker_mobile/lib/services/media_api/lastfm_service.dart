@@ -28,7 +28,7 @@ Future<List<TopArtist>> fetchLastFmTopArtists() async {
       '${ApiServices.lastFmBaseUrl}?method=user.gettopartists'
       '&user=${ApiServices.lastFmUsername}'
       '&api_key=${ApiServices.lastFmApiKey}'
-      '&limit=5'
+      '&limit=10'
       '&format=json';
 
   final response = await http.get(Uri.parse(url));
@@ -46,7 +46,7 @@ Future<List<LastFmTrack>> fetchLastFmRecentTracks() async {
       '${ApiServices.lastFmBaseUrl}?method=user.getrecenttracks'
       '&user=${ApiServices.lastFmUsername}'
       '&api_key=${ApiServices.lastFmApiKey}'
-      '&limit=5'
+      '&limit=10'
       '&format=json';
 
   final response = await http.get(Uri.parse(url));
