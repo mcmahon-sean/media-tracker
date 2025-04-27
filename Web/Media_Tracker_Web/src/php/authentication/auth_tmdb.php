@@ -82,7 +82,7 @@ if ($_GET['callback'] === 'true') {
         $user_tmdb_id = $account_data['id'];
 
         // Replace the original user_plat_id with TMDB ID
-        $_SESSION['user_plat_id'] = $user_tmdb_id;
+        $_SESSION['user_plat_id'] = $session_id;
 
         // Redirect to your DB insert/update logic
         header("Location: ../database/add_3rd_party_id.php?auth_tmdb=true");
