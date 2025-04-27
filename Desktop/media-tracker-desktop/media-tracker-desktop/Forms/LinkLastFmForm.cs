@@ -6,45 +6,108 @@ using media_tracker_desktop.Services;
 using media_tracker_desktop.Models.LastFM;
 using Supabase;
 using media_tracker_desktop.Models;
+using media_tracker_desktop.Models.ApiModels;
+using media_tracker_desktop.Models.Steam;
 
 namespace media_tracker_desktop.Forms
 {
     public partial class LinkLastFmForm : Form
     {
-        private readonly LastFmService _lastFm = new LastFmService();
+        //private readonly LastFmService _lastFm = new LastFmService();
 
         public LinkLastFmForm()
         {
             InitializeComponent();
-            var supaConn = new SupabaseConnection();
-            UserAppAccount.ConnectToDB(supaConn.GetClient());
-            if(!string.IsNullOrEmpty(UserAppAccount.UserLastFmID))
+
+            // If user has a LastFM id,
+            if (!string.IsNullOrEmpty(UserAppAccount.UserLastFmID))
+                // Load display.
                 _ = LoadLastFmAsync();
         }
 
         private async Task LoadLastFmAsync()
         {
+            // Remove link panel.
             pnlLink.Visible = false;
-            var u = UserAppAccount.UserLastFmID;
-            lastFmDataGridView.DataSource = new List<LastFM_User> { await _lastFm.GetUserInfoAsync(u) };
+
+            try
+            {
+                // If user has a LastFM account linked,
+                if (!string.IsNullOrEmpty(UserAppAccount.UserLastFmID))
+                {
+                    // Retrieve user information.
+                    (bool success, LastFM_User? user) = await LastFMApi.GetUserInfo();
+
+                    // If success,
+                    if (success && user != null)
+                    {
+                        // Put the user object into a list since data grid view accepts a list for it to work.
+                        // Display user information.
+                        lastFmDataGridView.DataSource = new List<LastFM_User> { user };
+                    }
+                }
+                // If user doesn't have LastFM account linked,
+                else
+                {
+                    // Display link panel.
+                    pnlLink.Visible = true;
+                }
+            }
+            catch (Exception error)
+            {
+                MessageBox.Show($"Error: {error.Message}");
+            }
         }
+
 
         private async void linkButton_Click(object sender, EventArgs e)
         {
-            var username = lastFmTextBox.Text.Trim();
-            try
+            // Ensure user is logged in.
+            if (!UserAppAccount.UserLoggedIn)
             {
-                var userInfo = await _lastFm.GetUserInfoAsync(username);
-                if(userInfo != null)
+                MessageBox.Show("Please Sign-In first.");
+                return;
+            }
+
+            var username = lastFmTextBox.Text.Trim();
+
+            // If the user inputted a LastFM username,
+            if (!string.IsNullOrEmpty(username))
+            {
+                // Determine if LastFM account is already linked with current user.
+                bool lastFmNotLinked = string.IsNullOrEmpty(UserAppAccount.UserLastFmID);
+
+                // If LastFM is not linked,
+                if (lastFmNotLinked)
                 {
-                    var (added,msg) = await UserAppAccount.AddThirdPartyId(
+                    // Add third party id.
+                    var (added, msg) = await UserAppAccount.AddThirdPartyId(
                         UserAppAccount.LastFMPlatformID,
                         username);
-                    if(added) await LoadLastFmAsync(); else MessageBox.Show($"Link failed: {msg}");
+
+                    // If added,
+                    if (added)
+                    {
+                        // Load display.
+                        await LoadLastFmAsync();
+                    }
+                    else
+                    {
+                        MessageBox.Show($"Link failed: {msg}");
+
+                        // Load display.
+                        await LoadLastFmAsync();
+                    }
                 }
-                else MessageBox.Show("No user found.");
+                else
+                {
+                    MessageBox.Show($"LastFM account is already linked with {UserAppAccount.Username}");
+                }
             }
-            catch(Exception ex){MessageBox.Show($"Error: {ex.Message}");}
+            else
+            {
+                MessageBox.Show("Please enter a LastFM Username.");
+            }
         }
     }
 }

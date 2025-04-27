@@ -19,76 +19,107 @@ namespace media_tracker_desktop.Forms
 
         private void InitializeComponent()
         {
-            this.BackColor   = System.Drawing.Color.FromArgb(45, 45, 48);
-            this.panel1      = new Panel();
-            this.lblUsername = new Label();
-            this.txtUsername = new TextBox();
-            this.lblPassword = new Label();
-            this.txtPassword = new TextBox();
-            this.btnSignIn   = new Button();
-            this.btnRegister = new Button();
-
-            this.panel1.SuspendLayout();
-            this.SuspendLayout();
+            panel1 = new Panel();
+            lblUsername = new Label();
+            txtUsername = new TextBox();
+            lblPassword = new Label();
+            txtPassword = new TextBox();
+            btnSignIn = new Button();
+            btnRegister = new Button();
+            panel1.SuspendLayout();
+            SuspendLayout();
+            // 
             // panel1
-            this.panel1.BackColor = System.Drawing.Color.FromArgb(30, 30, 30);
-            this.panel1.Controls.Add(this.lblUsername);
-            this.panel1.Controls.Add(this.txtUsername);
-            this.panel1.Controls.Add(this.lblPassword);
-            this.panel1.Controls.Add(this.txtPassword);
-            this.panel1.Controls.Add(this.btnSignIn);
-            this.panel1.Controls.Add(this.btnRegister);
-            this.panel1.Location = new System.Drawing.Point(12, 12);
-            this.panel1.Size     = new System.Drawing.Size(360, 180);
+            // 
+            panel1.BackColor = Color.FromArgb(30, 30, 30);
+            panel1.Controls.Add(lblUsername);
+            panel1.Controls.Add(txtUsername);
+            panel1.Controls.Add(lblPassword);
+            panel1.Controls.Add(txtPassword);
+            panel1.Controls.Add(btnSignIn);
+            panel1.Controls.Add(btnRegister);
+            panel1.Location = new Point(12, 12);
+            panel1.Name = "panel1";
+            panel1.Size = new Size(402, 180);
+            panel1.TabIndex = 0;
+            // 
             // lblUsername
-            this.lblUsername.AutoSize = true;
-            this.lblUsername.ForeColor = System.Drawing.Color.White;
-            this.lblUsername.Location = new System.Drawing.Point(20, 20);
-            this.lblUsername.Text     = "Username:";
+            // 
+            lblUsername.AutoSize = true;
+            lblUsername.ForeColor = Color.White;
+            lblUsername.Location = new Point(20, 20);
+            lblUsername.Name = "lblUsername";
+            lblUsername.Size = new Size(95, 25);
+            lblUsername.TabIndex = 0;
+            lblUsername.Text = "Username:";
+            // 
             // txtUsername
-            this.txtUsername.BackColor = System.Drawing.Color.FromArgb(30, 30, 30);
-            this.txtUsername.ForeColor = System.Drawing.Color.White;
-            this.txtUsername.Location  = new System.Drawing.Point(100, 17);
-            this.txtUsername.Size      = new System.Drawing.Size(240, 23);
+            // 
+            txtUsername.BackColor = Color.FromArgb(30, 30, 30);
+            txtUsername.ForeColor = Color.White;
+            txtUsername.Location = new Point(121, 17);
+            txtUsername.Name = "txtUsername";
+            txtUsername.Size = new Size(240, 31);
+            txtUsername.TabIndex = 1;
+            // 
             // lblPassword
-            this.lblPassword.AutoSize = true;
-            this.lblPassword.ForeColor= System.Drawing.Color.White;
-            this.lblPassword.Location = new System.Drawing.Point(20, 60);
-            this.lblPassword.Text     = "Password:";
+            // 
+            lblPassword.AutoSize = true;
+            lblPassword.ForeColor = Color.White;
+            lblPassword.Location = new Point(20, 60);
+            lblPassword.Name = "lblPassword";
+            lblPassword.Size = new Size(91, 25);
+            lblPassword.TabIndex = 2;
+            lblPassword.Text = "Password:";
+            // 
             // txtPassword
-            this.txtPassword.BackColor    = System.Drawing.Color.FromArgb(30, 30, 30);
-            this.txtPassword.ForeColor    = System.Drawing.Color.White;
-            this.txtPassword.Location     = new System.Drawing.Point(100, 57);
-            this.txtPassword.Size         = new System.Drawing.Size(240, 23);
-            this.txtPassword.PasswordChar = '*';
+            // 
+            txtPassword.BackColor = Color.FromArgb(30, 30, 30);
+            txtPassword.ForeColor = Color.White;
+            txtPassword.Location = new Point(121, 57);
+            txtPassword.Name = "txtPassword";
+            txtPassword.PasswordChar = '*';
+            txtPassword.Size = new Size(240, 31);
+            txtPassword.TabIndex = 3;
+            // 
             // btnSignIn
-            this.btnSignIn.BackColor            = System.Drawing.Color.FromArgb(60, 60, 60);
-            this.btnSignIn.FlatAppearance.BorderSize = 0;
-            this.btnSignIn.FlatStyle            = System.Windows.Forms.FlatStyle.Flat;
-            this.btnSignIn.ForeColor            = System.Drawing.Color.White;
-            this.btnSignIn.Location             = new System.Drawing.Point(100, 100);
-            this.btnSignIn.Size                 = new System.Drawing.Size(100, 30);
-            this.btnSignIn.Text                 = "Sign In";
-            this.btnSignIn.UseVisualStyleBackColor = false;
-            this.btnSignIn.Click               += new System.EventHandler(this.btnSignIn_Click);
+            // 
+            btnSignIn.BackColor = Color.FromArgb(60, 60, 60);
+            btnSignIn.FlatAppearance.BorderSize = 0;
+            btnSignIn.FlatStyle = FlatStyle.Flat;
+            btnSignIn.ForeColor = Color.White;
+            btnSignIn.Location = new Point(100, 100);
+            btnSignIn.Name = "btnSignIn";
+            btnSignIn.Size = new Size(100, 30);
+            btnSignIn.TabIndex = 4;
+            btnSignIn.Text = "Sign In";
+            btnSignIn.UseVisualStyleBackColor = false;
+            btnSignIn.Click += btnSignIn_Click;
+            // 
             // btnRegister
-            this.btnRegister.BackColor            = System.Drawing.Color.FromArgb(60, 60, 60);
-            this.btnRegister.FlatAppearance.BorderSize = 0;
-            this.btnRegister.FlatStyle            = System.Windows.Forms.FlatStyle.Flat;
-            this.btnRegister.ForeColor            = System.Drawing.Color.White;
-            this.btnRegister.Location             = new System.Drawing.Point(210, 100);
-            this.btnRegister.Size                 = new System.Drawing.Size(100, 30);
-            this.btnRegister.Text                 = "Register";
-            this.btnRegister.UseVisualStyleBackColor = false;
-            this.btnRegister.Click               += new System.EventHandler(this.btnRegister_Click);
+            // 
+            btnRegister.BackColor = Color.FromArgb(60, 60, 60);
+            btnRegister.FlatAppearance.BorderSize = 0;
+            btnRegister.FlatStyle = FlatStyle.Flat;
+            btnRegister.ForeColor = Color.White;
+            btnRegister.Location = new Point(210, 100);
+            btnRegister.Name = "btnRegister";
+            btnRegister.Size = new Size(100, 30);
+            btnRegister.TabIndex = 5;
+            btnRegister.Text = "Register";
+            btnRegister.UseVisualStyleBackColor = false;
+            btnRegister.Click += btnRegister_Click;
+            // 
             // SigninForm
-            this.ClientSize = new System.Drawing.Size(384, 211);
-            this.Controls.Add(this.panel1);
-            this.Name    = "SigninForm";
-            this.Text    = "Sign In";
-            this.panel1.ResumeLayout(false);
-            this.panel1.PerformLayout();
-            this.ResumeLayout(false);
+            // 
+            BackColor = Color.FromArgb(45, 45, 48);
+            ClientSize = new Size(430, 211);
+            Controls.Add(panel1);
+            Name = "SigninForm";
+            Text = "Sign In";
+            panel1.ResumeLayout(false);
+            panel1.PerformLayout();
+            ResumeLayout(false);
         }
     }
 }

@@ -5,43 +5,39 @@ using System.Configuration;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Documents;
 
 namespace media_tracker_desktop
 {
-    public class SupabaseConnection
+    public static class SupabaseConnection
     {
-        private Client client;
-        private dynamic session;
+        private static Client _client;
+        private static dynamic _session;
 
         // Store a user's email and password.
         // Used to allow CRUD operations on the DB.
         // In Supabase, it may be found under the Authentication tab, then Users.
         // May change.
-        private string userEmailDB = "serviceaccount@gmail.com";
-        private string userPasswordDB = "testaccount";
-
-        public SupabaseConnection()
-        {
-            InitializeDB();
-        }
+        private static string userEmailDB = "serviceaccount@gmail.com";
+        private static string userPasswordDB = "testaccount";
 
         // Getter: Retrieve the database connection.
         // The object returned allows one to perform CRUD operations on the database.
-        public Client GetClient()
+        public static Client GetClient()
         {
-            return client;
+            return _client;
         }
 
         // Getter: Retrieve the session.
         // The object returned allows one to view the session's expiration, etc.
-        public dynamic GetSession()
+        public static dynamic GetSession()
         {
-            return session;
+            return _session;
         }
 
         // Method: Initializes the DB
         // Returns "success" or an error message.
-        private async Task<string> InitializeDB()
+        public static async Task<string> InitializeDB()
         {
             try
             {
@@ -58,10 +54,10 @@ namespace media_tracker_desktop
                 };
 
                 // Create connection.
-                client = new Client(supabaseBaseUrl, supabaseApiKey, supabaseOptions);
+                _client = new Client(supabaseBaseUrl, supabaseApiKey, supabaseOptions);
 
                 // Connect to DB.
-                await client.InitializeAsync();
+                await _client.InitializeAsync();
 
                 // Currently, auto sign's in a user.
                 string signInMessage = await SignInUsingEmail();
@@ -84,12 +80,12 @@ namespace media_tracker_desktop
         }
 
         // Method: Signs in to DB using email.
-        public async Task<string> SignInUsingEmail()
+        public static async Task<string> SignInUsingEmail()
         {
             try
             {
                 // If DB is not initialized,
-                if (client == null)
+                if (_client == null)
                 {
                     throw new Exception("Database has not been initialized.");
                 }
@@ -97,11 +93,11 @@ namespace media_tracker_desktop
                 else
                 {
                     // Sign in to DB.
-                    session = await client.Auth.SignIn(userEmailDB, userPasswordDB);
+                    _session = await _client.Auth.SignIn(userEmailDB, userPasswordDB);
 
                     // Failed to sign in if there is no session returned.
                     // Otherwise, successfully signed in.
-                    return session == null ? "Failed to sign in." : "success";
+                    return _session == null ? "Failed to sign in." : "success";
                 }
             }
             // Return error message if any error occurs.
@@ -109,6 +105,14 @@ namespace media_tracker_desktop
             {
                 return error.Message;
             }
+        }
+
+        // Method: View a table in the database.
+        public static async Task<List<T>> GetTableRecord<T>(Client connection) where T : Supabase.Postgrest.Models.BaseModel, new()
+        {
+            var result = await connection.From<T>().Get();
+
+            return result.Models;
         }
     }
 }

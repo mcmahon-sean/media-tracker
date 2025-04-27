@@ -10,59 +10,113 @@ using media_tracker_desktop.Models;
 using Newtonsoft.Json.Linq;
 using RestSharp;
 using System.Configuration;
+using media_tracker_desktop.Models.ApiModels;
+using media_tracker_desktop.Models.LastFM;
 
 namespace media_tracker_desktop.Forms
 {
     public partial class LinkTmdbForm : Form
     {
-        private readonly TmdbService _tmdbSvc = new TmdbService();
+        //private readonly TmdbService _tmdbSvc = new TmdbService();
 
         public LinkTmdbForm()
         {
             InitializeComponent();
-            var supaConn = new SupabaseConnection();
-            UserAppAccount.ConnectToDB(supaConn.GetClient());
-            if(!string.IsNullOrEmpty(UserAppAccount.UserTmdbSessionID))
+
+            // If user has a TMDB id,
+            if (!string.IsNullOrEmpty(UserAppAccount.UserTmdbSessionID))
+                // Load display.
                 _ = LoadTmdbAsync();
         }
 
         private async Task LoadTmdbAsync()
         {
+            // Remove link panel.
             pnlLink.Visible = false;
-            var session = UserAppAccount.UserTmdbSessionID;
-            var acct = await _tmdbSvc.GetAccountDetailsAsync(session);
-            tmdbDataGridView.DataSource = new List<TMDB_Account> { acct };
+
+            try
+            {
+                // If user has a TMDB account linked,
+                if (!string.IsNullOrEmpty(UserAppAccount.UserTmdbAccountID) && !string.IsNullOrEmpty(UserAppAccount.UserTmdbSessionID))
+                {
+                    // Retrieve user information.
+                    (bool success, TMDB_Account? userAccount) = await TmdbApi.GetAccountDetails();
+
+                    // If success,
+                    if (success && userAccount != null)
+                    {
+                        // Put the user object into a list since data grid view accepts a list for it to work.
+                        // Display user information.
+                        tmdbDataGridView.DataSource = new List<TMDB_Account> { userAccount };
+                    }
+                }
+                // If user doesn't have TMDB account linked,
+                else
+                {
+                    // Display link panel.
+                    pnlLink.Visible = true;
+                }
+            }
+            catch (Exception error)
+            {
+                MessageBox.Show($"Error: {error.Message}");
+            }
         }
 
         private async void linkButton_Click(object sender, EventArgs e)
         {
+            // Ensure user is logged in.
+            if (!UserAppAccount.UserLoggedIn)
+            {
+                MessageBox.Show("Please Sign-In first.");
+                return;
+            }
+
             try
             {
-                string authToken = ConfigurationManager.AppSettings["TMDBNathanAuthToken"];
-                var client  = new RestClient("https://api.themoviedb.org/3/authentication/token/new");
-                var request = new RestRequest();
-                request.AddHeader("Authorization", $"Bearer {authToken}");
-                request.AddHeader("accept", "application/json");
-                var resp = await client.ExecuteAsync(request);
-                var token = JObject.Parse(resp.Content)["request_token"].ToString();
-                Process.Start(new ProcessStartInfo($"https://www.themoviedb.org/authenticate/{token}"){UseShellExecute=true});
-                if(MessageBox.Show("After authorizing click OK","Authorize",MessageBoxButtons.OKCancel)==DialogResult.OK)
+                // Determine if TMDB account is already linked with current user.
+                bool tmdbNotLinked = string.IsNullOrEmpty(UserAppAccount.UserTmdbAccountID) && string.IsNullOrEmpty(UserAppAccount.UserTmdbSessionID);
+
+                // If TMDB is not linked,
+                if (tmdbNotLinked)
                 {
-                    client  = new RestClient("https://api.themoviedb.org/3/authentication/session/new");
-                    request = new RestRequest();
-                    request.AddHeader("Authorization", $"Bearer {authToken}");
-                    request.AddHeader("accept", "application/json");
-                    request.AddJsonBody(new { request_token = token });
-                    resp = await client.ExecuteAsync(request);
-                    var sessionId = JObject.Parse(resp.Content)["session_id"].ToString();
-                    var (added,msg) = await UserAppAccount.AddThirdPartyId(
-                        UserAppAccount.TMDBPlatformID,
-                        sessionId
-                    );
-                    if(added) await LoadTmdbAsync(); else MessageBox.Show($"Link failed: {msg}");
+                    // Execute method for TMDB linking.
+                    string? sessionId = await TmdbApi.RetrieveSessionID();
+
+                    // If linking is successful and session ID is retrieved,
+                    if (sessionId != null)
+                    {
+                        // Add third party id.
+                        (bool added, string message) = await UserAppAccount.AddThirdPartyId(UserAppAccount.TMDBPlatformID, sessionId);
+
+                        // If added,
+                        if (added)
+                        {
+                            // Load display.
+                            await LoadTmdbAsync();
+                        }
+                        else
+                        {
+                            MessageBox.Show($"Link failed: {message}");
+
+                            // Load display.
+                            await LoadTmdbAsync();
+                        }
+                    }
+                    else
+                    {
+                        MessageBox.Show("Failed to link TMDB account, please try again.");
+                    }
+                }
+                else
+                {
+                    MessageBox.Show($"TMDB account is already linked with {UserAppAccount.Username}");
                 }
             }
-            catch(Exception ex){MessageBox.Show($"Error: {ex.Message}");}
+            catch (Exception error)
+            {
+                MessageBox.Show($"Error: {error.Message}");
+            }
         }
     }
 }

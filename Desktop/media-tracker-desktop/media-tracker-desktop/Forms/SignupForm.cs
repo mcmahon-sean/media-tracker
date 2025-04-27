@@ -12,8 +12,7 @@ namespace media_tracker_desktop.Forms
         public SignupForm()
         {
             InitializeComponent();
-            var supaConn = new SupabaseConnection();
-            UserAppAccount.ConnectToDB(supaConn.GetClient());
+            UserAppAccount.ConnectToDB(SupabaseConnection.GetClient());
         }
 
         private async void btnRegister_Click(object sender, EventArgs e)

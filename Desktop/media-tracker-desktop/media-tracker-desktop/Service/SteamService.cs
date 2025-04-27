@@ -13,32 +13,32 @@ namespace media_tracker_desktop.Services
         private readonly string _apiKey = ConfigurationManager.AppSettings["SteamAPIKey"];
         private readonly string _baseUrl = ConfigurationManager.AppSettings["SteamApiBaseUrl"];
 
-        public async Task<List<Steam_Model>> GetOwnedGamesAsync(string steamId)
-        {
-            var client = new RestClient();
-            var url = $"{_baseUrl}key={_apiKey}&steamid={steamId}&include_appinfo=1&format=json";
-            var req = new RestRequest(url, Method.Get);
-            var resp = await client.ExecuteAsync(req);
-            if (!resp.IsSuccessful)
-                throw new Exception($"Steam fetch failed ({resp.StatusCode}): {resp.Content}");
+        //public async Task<List<Steam_Game>> GetOwnedGamesAsync(string steamId)
+        //{
+        //    var client = new RestClient();
+        //    var url = $"{_baseUrl}key={_apiKey}&steamid={steamId}&include_appinfo=1&format=json";
+        //    var req = new RestRequest(url, Method.Get);
+        //    var resp = await client.ExecuteAsync(req);
+        //    if (!resp.IsSuccessful)
+        //        throw new Exception($"Steam fetch failed ({resp.StatusCode}): {resp.Content}");
 
-            var root = JsonConvert.DeserializeObject<SteamRoot>(resp.Content);
-            return root?.Response?.Games ?? new List<Steam_Model>();
-        }
+        //    var root = JsonConvert.DeserializeObject<SteamRoot>(resp.Content);
+        //    return root?.Response?.Games ?? new List<Steam_Game>();
+        //}
     }
 
-    public class SteamOwnedGamesResponse
-    {
-        [JsonProperty("game_count")]
-        public int GameCount { get; set; }
+    //public class SteamOwnedGamesResponse
+    //{
+    //    [JsonProperty("game_count")]
+    //    public int GameCount { get; set; }
 
-        [JsonProperty("games")]
-        public List<Steam_Model> Games { get; set; }
-    }
+    //    [JsonProperty("games")]
+    //    public List<Steam_Model> Games { get; set; }
+    //}
 
-    public class SteamRoot
-    {
-        [JsonProperty("response")]
-        public SteamOwnedGamesResponse Response { get; set; }
-    }
+    //public class SteamRoot
+    //{
+    //    [JsonProperty("response")]
+    //    public SteamOwnedGamesResponse Response { get; set; }
+    //}
 }
