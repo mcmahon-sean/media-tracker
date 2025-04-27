@@ -365,10 +365,12 @@ namespace media_tracker_desktop
                 {
                     MessageBox.Show("Not connected to the DB.");
                 }
+
                 var UserPlatformId = UserPlatformID;
                 var PlatformId = PlatformID;
 
                 (bool linkAdded, string response) result = await UserAppAccount.AddThirdPartyId(PlatformId, UserPlatformId);
+
                 if (result.linkAdded)
                 {
                     MessageBox.Show($"Success!: {result.response}");

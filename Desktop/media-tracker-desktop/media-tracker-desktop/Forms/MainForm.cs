@@ -1,6 +1,7 @@
 using System;
 using System.Windows.Forms;
 using media_tracker_desktop;
+using media_tracker_desktop.Models.ApiModels;
 
 namespace media_tracker_desktop.Forms
 {
@@ -14,7 +15,31 @@ namespace media_tracker_desktop.Forms
 
         private void MainForm_Load(object sender, EventArgs e)
         {
+            InitializeApp();
             ShowHome();
+        }
+
+        // Method: Initialize the components that are necessary for the app to run.
+        private async void InitializeApp()
+        {
+            // Initialize the database.
+            string message = await SupabaseConnection.InitializeDB();
+
+            // If success,
+            if (message == "success")
+            {
+                // Connect the user app account to the DB.
+                UserAppAccount.ConnectToDB(SupabaseConnection.GetClient());
+
+                // Initialize the Api Models.
+                LastFMApi.Initialize();
+                SteamApi.Initialize();
+                TmdbApi.Initialize();
+            }
+            else
+            {
+                MessageBox.Show(message);
+            }
         }
 
         private void ShowHome()
@@ -48,7 +73,8 @@ namespace media_tracker_desktop.Forms
                     Location = new System.Drawing.Point(20, 100),
                     BackColor = System.Drawing.Color.FromArgb(50, 50, 50),
                     ForeColor = System.Drawing.Color.White,
-                    FlatStyle = FlatStyle.Flat
+                    FlatStyle = FlatStyle.Flat,
+                    AutoSize = true
                 };
                 btnLogin.Click += (s, e) => ShowSignin();
 
@@ -58,7 +84,8 @@ namespace media_tracker_desktop.Forms
                     Location = new System.Drawing.Point(100, 100),
                     BackColor = System.Drawing.Color.FromArgb(50, 50, 50),
                     ForeColor = System.Drawing.Color.White,
-                    FlatStyle = FlatStyle.Flat
+                    FlatStyle = FlatStyle.Flat,
+                    AutoSize = true
                 };
                 btnSignup.Click += (s, e) => ShowSignup();
 
@@ -112,6 +139,12 @@ namespace media_tracker_desktop.Forms
             pnlContent.Controls.Clear();
             lblTitle.Text = "Media Tracker | Home";
 
+            string steamIdText = string.IsNullOrEmpty(UserAppAccount.UserSteamID) ? "Not Linked" : UserAppAccount.UserSteamID;
+
+            string lastFmIdText = string.IsNullOrEmpty(UserAppAccount.UserLastFmID) ? "Not Linked" : UserAppAccount.UserLastFmID;
+
+            string tmdbIdText = string.IsNullOrEmpty(UserAppAccount.UserTmdbAccountID) ? "Not Linked" : UserAppAccount.UserTmdbAccountID;
+
             var dashPanel = new Panel { Dock = DockStyle.Fill };
 
             var greeting = new Label
@@ -124,21 +157,21 @@ namespace media_tracker_desktop.Forms
             };
             var steamId = new Label
             {
-                Text = $"Steam ID: {UserAppAccount.UserSteamID ?? "Not linked"}",
+                Text = $"Steam ID: {steamIdText}",
                 ForeColor = System.Drawing.Color.White,
                 Location = new System.Drawing.Point(20, 60),
                 AutoSize = true
             };
             var lastFm = new Label
             {
-                Text = $"Last.FM ID: {UserAppAccount.UserLastFmID ?? "Not linked"}",
+                Text = $"Last.FM ID: {lastFmIdText}",
                 ForeColor = System.Drawing.Color.White,
                 Location = new System.Drawing.Point(20, 90),
                 AutoSize = true
             };
             var tmdb = new Label
             {
-                Text = $"TMDB ID: {UserAppAccount.UserTmdbAccountID ?? "Not linked"}",
+                Text = $"TMDB ID: {tmdbIdText}",
                 ForeColor = System.Drawing.Color.White,
                 Location = new System.Drawing.Point(20, 120),
                 AutoSize = true
@@ -150,17 +183,19 @@ namespace media_tracker_desktop.Forms
                 Location = new System.Drawing.Point(20, 160),
                 BackColor = System.Drawing.Color.FromArgb(50, 50, 50),
                 ForeColor = System.Drawing.Color.White,
-                FlatStyle = FlatStyle.Flat
+                FlatStyle = FlatStyle.Flat,
+                AutoSize = true
             };
             btnEdit.Click += (s, e) => ShowPlatformEdit();
 
             var btnLogout = new Button
             {
                 Text = "Logout",
-                Location = new System.Drawing.Point(160, 160),
+                Location = new System.Drawing.Point(200, 160),
                 BackColor = System.Drawing.Color.FromArgb(50, 50, 50),
                 ForeColor = System.Drawing.Color.White,
-                FlatStyle = FlatStyle.Flat
+                FlatStyle = FlatStyle.Flat,
+                AutoSize = true
             };
             btnLogout.Click += (s, e) => {
                 UserAppAccount.LogOut();
@@ -174,6 +209,9 @@ namespace media_tracker_desktop.Forms
             dashPanel.Controls.Add(btnEdit);
             dashPanel.Controls.Add(btnLogout);
             pnlContent.Controls.Add(dashPanel);
+
+            // Refresh since somewho
+            //this.Refresh();
         }
 
         private void ShowPlatformEdit()
@@ -195,7 +233,7 @@ namespace media_tracker_desktop.Forms
             {
                 Name = "txtSteam",
                 Text = UserAppAccount.UserSteamID ?? "",
-                Location = new System.Drawing.Point(150, 18),
+                Location = new System.Drawing.Point(200, 18),
                 Width = 200
             };
 
@@ -211,7 +249,7 @@ namespace media_tracker_desktop.Forms
             {
                 Name = "txtLastFm",
                 Text = UserAppAccount.UserLastFmID ?? "",
-                Location = new System.Drawing.Point(150, 58),
+                Location = new System.Drawing.Point(200, 58),
                 Width = 200
             };
 
@@ -227,7 +265,7 @@ namespace media_tracker_desktop.Forms
             {
                 Name = "txtTmdb",
                 Text = UserAppAccount.UserTmdbAccountID ?? "",
-                Location = new System.Drawing.Point(150, 98),
+                Location = new System.Drawing.Point(200, 98),
                 Width = 200
             };
 
@@ -238,13 +276,15 @@ namespace media_tracker_desktop.Forms
                 Location = new System.Drawing.Point(150, 140),
                 BackColor = System.Drawing.Color.FromArgb(50, 50, 50),
                 ForeColor = System.Drawing.Color.White,
-                FlatStyle = FlatStyle.Flat
+                FlatStyle = FlatStyle.Flat,
+                AutoSize = true
             };
             btnSave.Click += (s, e) =>
             {
-                UserAppAccount.UserSteamID = txtSteam.Text.Trim();
-                UserAppAccount.UserLastFmID = txtLastFm.Text.Trim();
-                UserAppAccount.UserTmdbAccountID = txtTmdb.Text.Trim();
+                //UserAppAccount.UserSteamID = txtSteam.Text.Trim();
+                //UserAppAccount.UserLastFmID = txtLastFm.Text.Trim();
+                //UserAppAccount.UserTmdbAccountID = txtTmdb.Text.Trim();
+
                 MessageBox.Show("Platform info updated!", "Saved", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 ShowDashboard();
             };
@@ -256,7 +296,8 @@ namespace media_tracker_desktop.Forms
                 Location = new System.Drawing.Point(230, 140),
                 BackColor = System.Drawing.Color.FromArgb(50, 50, 50),
                 ForeColor = System.Drawing.Color.White,
-                FlatStyle = FlatStyle.Flat
+                FlatStyle = FlatStyle.Flat,
+                AutoSize = true
             };
             btnCancel.Click += (s, e) => ShowDashboard();
 

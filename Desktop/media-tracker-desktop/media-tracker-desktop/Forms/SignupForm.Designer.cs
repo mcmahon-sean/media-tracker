@@ -16,123 +16,186 @@
 
         private void InitializeComponent()
         {
-            this.BackColor    = System.Drawing.Color.FromArgb(45, 45, 48);
-            this.panel2       = new Panel();
-            this.SignUpLabel  = new Label();
-            this.panel1       = new Panel();
-            this.lblUsername  = new Label();
-            this.txtUsername  = new TextBox();
-            this.lblFN        = new Label();
-            this.txtFN        = new TextBox();
-            this.lblLN        = new Label();
-            this.txtLN        = new TextBox();
-            this.lblEmail     = new Label();
-            this.txtEmail     = new TextBox();
-            this.PWLabel      = new Label();
-            this.txtPassword  = new TextBox();
-            this.btnRegister  = new Button();
-
-            this.panel2.SuspendLayout();
-            this.panel1.SuspendLayout();
-            this.SuspendLayout();
+            panel2 = new Panel();
+            SignUpLabel = new Label();
+            panel1 = new Panel();
+            lblUsername = new Label();
+            txtUsername = new TextBox();
+            lblFN = new Label();
+            txtFN = new TextBox();
+            lblLN = new Label();
+            txtLN = new TextBox();
+            lblEmail = new Label();
+            txtEmail = new TextBox();
+            PWLabel = new Label();
+            txtPassword = new TextBox();
+            btnRegister = new Button();
+            panel2.SuspendLayout();
+            panel1.SuspendLayout();
+            SuspendLayout();
+            // 
             // panel2
-            this.panel2.BackColor = System.Drawing.Color.FromArgb(30, 30, 30);
-            this.panel2.Controls.Add(this.SignUpLabel);
-            this.panel2.Location = new System.Drawing.Point(12, 12);
-            this.panel2.Size     = new System.Drawing.Size(360, 60);
+            // 
+            panel2.BackColor = Color.FromArgb(30, 30, 30);
+            panel2.Controls.Add(SignUpLabel);
+            panel2.Location = new Point(12, 12);
+            panel2.Name = "panel2";
+            panel2.Size = new Size(360, 60);
+            panel2.TabIndex = 0;
+            // 
             // SignUpLabel
-            this.SignUpLabel.AutoSize  = true;
-            this.SignUpLabel.Font      = new System.Drawing.Font("Segoe UI", 14F, System.Drawing.FontStyle.Bold);
-            this.SignUpLabel.ForeColor = System.Drawing.Color.White;
-            this.SignUpLabel.Location  = new System.Drawing.Point(130, 15);
-            this.SignUpLabel.Text      = "Sign Up";
+            // 
+            SignUpLabel.AutoSize = true;
+            SignUpLabel.Font = new Font("Segoe UI", 14F, FontStyle.Bold);
+            SignUpLabel.ForeColor = Color.White;
+            SignUpLabel.Location = new Point(130, 15);
+            SignUpLabel.Name = "SignUpLabel";
+            SignUpLabel.Size = new Size(120, 38);
+            SignUpLabel.TabIndex = 0;
+            SignUpLabel.Text = "Sign Up";
+            // 
             // panel1
-            this.panel1.BackColor = System.Drawing.Color.FromArgb(30, 30, 30);
-            this.panel1.Controls.Add(this.panel2);
-            this.panel1.Controls.Add(this.lblUsername);
-            this.panel1.Controls.Add(this.txtUsername);
-            this.panel1.Controls.Add(this.lblFN);
-            this.panel1.Controls.Add(this.txtFN);
-            this.panel1.Controls.Add(this.lblLN);
-            this.panel1.Controls.Add(this.txtLN);
-            this.panel1.Controls.Add(this.lblEmail);
-            this.panel1.Controls.Add(this.txtEmail);
-            this.panel1.Controls.Add(this.PWLabel);
-            this.panel1.Controls.Add(this.txtPassword);
-            this.panel1.Controls.Add(this.btnRegister);
-            this.panel1.Location = new System.Drawing.Point(12, 12);
-            this.panel1.Size     = new System.Drawing.Size(360, 350);
+            // 
+            panel1.BackColor = Color.FromArgb(30, 30, 30);
+            panel1.Controls.Add(panel2);
+            panel1.Controls.Add(lblUsername);
+            panel1.Controls.Add(txtUsername);
+            panel1.Controls.Add(lblFN);
+            panel1.Controls.Add(txtFN);
+            panel1.Controls.Add(lblLN);
+            panel1.Controls.Add(txtLN);
+            panel1.Controls.Add(lblEmail);
+            panel1.Controls.Add(txtEmail);
+            panel1.Controls.Add(PWLabel);
+            panel1.Controls.Add(txtPassword);
+            panel1.Controls.Add(btnRegister);
+            panel1.Location = new Point(12, 12);
+            panel1.Name = "panel1";
+            panel1.Size = new Size(385, 350);
+            panel1.TabIndex = 0;
+            // 
             // lblUsername
-            this.lblUsername.AutoSize = true;
-            this.lblUsername.ForeColor= System.Drawing.Color.White;
-            this.lblUsername.Location = new System.Drawing.Point(20, 90);
-            this.lblUsername.Text     = "Username:";
+            // 
+            lblUsername.AutoSize = true;
+            lblUsername.ForeColor = Color.White;
+            lblUsername.Location = new Point(20, 90);
+            lblUsername.Name = "lblUsername";
+            lblUsername.Size = new Size(95, 25);
+            lblUsername.TabIndex = 1;
+            lblUsername.Text = "Username:";
+            // 
             // txtUsername
-            this.txtUsername.BackColor = System.Drawing.Color.FromArgb(30, 30, 30);
-            this.txtUsername.ForeColor = System.Drawing.Color.White;
-            this.txtUsername.Location  = new System.Drawing.Point(120, 87);
-            this.txtUsername.Size      = new System.Drawing.Size(240, 23);
+            // 
+            txtUsername.BackColor = Color.FromArgb(30, 30, 30);
+            txtUsername.ForeColor = Color.White;
+            txtUsername.Location = new Point(132, 87);
+            txtUsername.Name = "txtUsername";
+            txtUsername.Size = new Size(240, 31);
+            txtUsername.TabIndex = 2;
+            // 
             // lblFN
-            this.lblFN.AutoSize    = true;
-            this.lblFN.ForeColor   = System.Drawing.Color.White;
-            this.lblFN.Location    = new System.Drawing.Point(20, 130);
-            this.lblFN.Text        = "First Name:";
+            // 
+            lblFN.AutoSize = true;
+            lblFN.ForeColor = Color.White;
+            lblFN.Location = new Point(20, 130);
+            lblFN.Name = "lblFN";
+            lblFN.Size = new Size(101, 25);
+            lblFN.TabIndex = 3;
+            lblFN.Text = "First Name:";
+            // 
             // txtFN
-            this.txtFN.BackColor   = System.Drawing.Color.FromArgb(30, 30, 30);
-            this.txtFN.ForeColor   = System.Drawing.Color.White;
-            this.txtFN.Location    = new System.Drawing.Point(120, 127);
-            this.txtFN.Size        = new System.Drawing.Size(240, 23);
+            // 
+            txtFN.BackColor = Color.FromArgb(30, 30, 30);
+            txtFN.ForeColor = Color.White;
+            txtFN.Location = new Point(132, 127);
+            txtFN.Name = "txtFN";
+            txtFN.Size = new Size(240, 31);
+            txtFN.TabIndex = 4;
+            // 
             // lblLN
-            this.lblLN.AutoSize    = true;
-            this.lblLN.ForeColor   = System.Drawing.Color.White;
-            this.lblLN.Location    = new System.Drawing.Point(20, 170);
-            this.lblLN.Text        = "Last Name:";
+            // 
+            lblLN.AutoSize = true;
+            lblLN.ForeColor = Color.White;
+            lblLN.Location = new Point(20, 170);
+            lblLN.Name = "lblLN";
+            lblLN.Size = new Size(99, 25);
+            lblLN.TabIndex = 5;
+            lblLN.Text = "Last Name:";
+            // 
             // txtLN
-            this.txtLN.BackColor   = System.Drawing.Color.FromArgb(30, 30, 30);
-            this.txtLN.ForeColor   = System.Drawing.Color.White;
-            this.txtLN.Location    = new System.Drawing.Point(120, 167);
-            this.txtLN.Size        = new System.Drawing.Size(240, 23);
+            // 
+            txtLN.BackColor = Color.FromArgb(30, 30, 30);
+            txtLN.ForeColor = Color.White;
+            txtLN.Location = new Point(132, 167);
+            txtLN.Name = "txtLN";
+            txtLN.Size = new Size(240, 31);
+            txtLN.TabIndex = 6;
+            // 
             // lblEmail
-            this.lblEmail.AutoSize  = true;
-            this.lblEmail.ForeColor = System.Drawing.Color.White;
-            this.lblEmail.Location  = new System.Drawing.Point(20, 210);
-            this.lblEmail.Text      = "Email:";
+            // 
+            lblEmail.AutoSize = true;
+            lblEmail.ForeColor = Color.White;
+            lblEmail.Location = new Point(20, 210);
+            lblEmail.Name = "lblEmail";
+            lblEmail.Size = new Size(58, 25);
+            lblEmail.TabIndex = 7;
+            lblEmail.Text = "Email:";
+            // 
             // txtEmail
-            this.txtEmail.BackColor = System.Drawing.Color.FromArgb(30, 30, 30);
-            this.txtEmail.ForeColor = System.Drawing.Color.White;
-            this.txtEmail.Location  = new System.Drawing.Point(120, 207);
-            this.txtEmail.Size      = new System.Drawing.Size(240, 23);
+            // 
+            txtEmail.BackColor = Color.FromArgb(30, 30, 30);
+            txtEmail.ForeColor = Color.White;
+            txtEmail.Location = new Point(132, 207);
+            txtEmail.Name = "txtEmail";
+            txtEmail.Size = new Size(240, 31);
+            txtEmail.TabIndex = 8;
+            // 
             // PWLabel
-            this.PWLabel.AutoSize   = true;
-            this.PWLabel.ForeColor  = System.Drawing.Color.White;
-            this.PWLabel.Location   = new System.Drawing.Point(20, 250);
-            this.PWLabel.Text       = "Password:";
+            // 
+            PWLabel.AutoSize = true;
+            PWLabel.ForeColor = Color.White;
+            PWLabel.Location = new Point(20, 250);
+            PWLabel.Name = "PWLabel";
+            PWLabel.Size = new Size(91, 25);
+            PWLabel.TabIndex = 9;
+            PWLabel.Text = "Password:";
+            // 
             // txtPassword
-            this.txtPassword.BackColor    = System.Drawing.Color.FromArgb(30, 30, 30);
-            this.txtPassword.ForeColor    = System.Drawing.Color.White;
-            this.txtPassword.Location     = new System.Drawing.Point(120, 247);
-            this.txtPassword.Size         = new System.Drawing.Size(240, 23);
-            this.txtPassword.PasswordChar = '*';
+            // 
+            txtPassword.BackColor = Color.FromArgb(30, 30, 30);
+            txtPassword.ForeColor = Color.White;
+            txtPassword.Location = new Point(132, 247);
+            txtPassword.Name = "txtPassword";
+            txtPassword.PasswordChar = '*';
+            txtPassword.Size = new Size(240, 31);
+            txtPassword.TabIndex = 10;
+            // 
             // btnRegister
-            this.btnRegister.BackColor            = System.Drawing.Color.FromArgb(60, 60, 60);
-            this.btnRegister.FlatAppearance.BorderSize = 0;
-            this.btnRegister.FlatStyle            = System.Windows.Forms.FlatStyle.Flat;
-            this.btnRegister.ForeColor            = System.Drawing.Color.White;
-            this.btnRegister.Location             = new System.Drawing.Point(130, 290);
-            this.btnRegister.Size                 = new System.Drawing.Size(100, 30);
-            this.btnRegister.Text                 = "Register";
-            this.btnRegister.UseVisualStyleBackColor = false;
-            this.btnRegister.Click               += new System.EventHandler(this.btnRegister_Click);
+            // 
+            btnRegister.BackColor = Color.FromArgb(60, 60, 60);
+            btnRegister.FlatAppearance.BorderSize = 0;
+            btnRegister.FlatStyle = FlatStyle.Flat;
+            btnRegister.ForeColor = Color.White;
+            btnRegister.Location = new Point(130, 290);
+            btnRegister.Name = "btnRegister";
+            btnRegister.Size = new Size(100, 30);
+            btnRegister.TabIndex = 11;
+            btnRegister.Text = "Register";
+            btnRegister.UseVisualStyleBackColor = false;
+            btnRegister.Click += btnRegister_Click;
+            // 
             // SignupForm
-            this.ClientSize = new System.Drawing.Size(384, 401);
-            this.Controls.Add(this.panel1);
-            this.Name    = "SignupForm";
-            this.Text    = "Sign Up";
-            this.panel2.ResumeLayout(false);
-            this.panel2.PerformLayout();
-            this.panel1.ResumeLayout(false);
-            this.panel1.PerformLayout();
-            this.ResumeLayout(false);
+            // 
+            BackColor = Color.FromArgb(45, 45, 48);
+            ClientSize = new Size(409, 386);
+            Controls.Add(panel1);
+            Name = "SignupForm";
+            Text = "Sign Up";
+            panel2.ResumeLayout(false);
+            panel2.PerformLayout();
+            panel1.ResumeLayout(false);
+            panel1.PerformLayout();
+            ResumeLayout(false);
         }
     }
 }
