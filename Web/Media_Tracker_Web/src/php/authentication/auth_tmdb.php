@@ -28,7 +28,7 @@ if (!isset($_GET['callback'])) {
             $_SESSION['request_token'] = $request_token;
 
             // Build TMDB redirect URL
-            $redirect_url = urlencode("http://localhost/Testing/Media_Tracker_Web/src/php/authentication/auth_tmdb.php?callback=true");
+            $redirect_url = urlencode("http://localhost/media-tracker/Web/Media_Tracker_Web/src/php/authentication/auth_tmdb.php?callback=true");
             $auth_url = "https://www.themoviedb.org/authenticate/{$request_token}?redirect_to={$redirect_url}";
 
             header("Location: $auth_url");
