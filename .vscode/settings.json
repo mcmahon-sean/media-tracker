@@ -4,11 +4,14 @@
     ],
     "cSpell.words": [
         "emailvar",
+        "favorited",
+        "favoriting",
         "firstnamevar",
         "lastnamevar",
         "passwordvar",
         "prefs",
         "useraccounts",
+        "userfavorites",
         "usernamevar"
     ]
 }

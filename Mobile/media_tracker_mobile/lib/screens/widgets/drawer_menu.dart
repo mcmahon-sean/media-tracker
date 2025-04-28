@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:media_tracker_test/providers/auth_provider.dart';
+import 'package:media_tracker_test/screens/auth/account_settings.dart';
 
 class DrawerMenu extends ConsumerWidget {
   final String firstName;
@@ -13,6 +15,7 @@ class DrawerMenu extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final auth = ref.watch(authProvider);
     return Drawer(
       backgroundColor: Color.fromARGB(255, 72, 72, 72),
       child: ListView(
@@ -43,7 +46,14 @@ class DrawerMenu extends ConsumerWidget {
             title: const Text('Account Settings'),
             onTap: () {
               Navigator.pop(context);
-              Navigator.pushNamed(context, '/accountSettings');
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder:
+                      (context) =>
+                          AccountSettings(initialUsername: auth.username!),
+                ),
+              );
             },
           ),
         ],
