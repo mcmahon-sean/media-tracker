@@ -49,6 +49,9 @@
             btnCheckSteam = new Button();
             btnCheckLastFM = new Button();
             btnCheckTMDB = new Button();
+            txtLinkingBox = new TextBox();
+            label1 = new Label();
+            btnLogOut = new Button();
             SuspendLayout();
             // 
             // btnDBConnectionTest
@@ -255,11 +258,40 @@
             btnCheckTMDB.UseVisualStyleBackColor = true;
             btnCheckTMDB.Click += btnCheckTMDB_Click;
             // 
+            // txtLinkingBox
+            // 
+            txtLinkingBox.Location = new Point(12, 282);
+            txtLinkingBox.Name = "txtLinkingBox";
+            txtLinkingBox.Size = new Size(190, 31);
+            txtLinkingBox.TabIndex = 23;
+            // 
+            // label1
+            // 
+            label1.AutoSize = true;
+            label1.Location = new Point(208, 282);
+            label1.Name = "label1";
+            label1.Size = new Size(84, 25);
+            label1.TabIndex = 24;
+            label1.Text = "Steam ID";
+            // 
+            // btnLogOut
+            // 
+            btnLogOut.Location = new Point(215, 205);
+            btnLogOut.Name = "btnLogOut";
+            btnLogOut.Size = new Size(112, 34);
+            btnLogOut.TabIndex = 25;
+            btnLogOut.Text = "Log Out";
+            btnLogOut.UseVisualStyleBackColor = true;
+            btnLogOut.Click += btnLogOut_Click;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 450);
+            Controls.Add(btnLogOut);
+            Controls.Add(label1);
+            Controls.Add(txtLinkingBox);
             Controls.Add(btnCheckTMDB);
             Controls.Add(btnCheckLastFM);
             Controls.Add(btnCheckSteam);
@@ -310,5 +342,8 @@
         private Button btnCheckSteam;
         private Button btnCheckLastFM;
         private Button btnCheckTMDB;
+        private TextBox txtLinkingBox;
+        private Label label1;
+        private Button btnLogOut;
     }
 }

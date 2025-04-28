@@ -105,6 +105,7 @@ class TMDBService {
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       final results = data['results'] as List<dynamic>;
+      print(results);
       return results.map((json) => TMDBMovie.fromJson(json)).toList();
     } else {
       throw Exception('Failed to fetch rated movies');
@@ -112,9 +113,9 @@ class TMDBService {
   }
 
   // Fetches the user's favorite TV shows, sorted by the order they were favorited
-  static Future<List<TMDBTvShow>> fetchFavoriteTvShows() async {
+  static Future<List<TMDBTvShow>> fetchRatedTvShows() async {
     final url = Uri.parse(
-      'https://api.themoviedb.org/3/account/${ApiServices.tmdbAccountId}/favorite/tv'
+      'https://api.themoviedb.org/3/account/${ApiServices.tmdbAccountId}/rated/tv'
       '?api_key=${ApiServices.tmdbApiKey}&session_id=${ApiServices.tmdbSessionId}'
       '&language=en-US&page=1&sort_by=created_at.asc',
     );
@@ -125,6 +126,7 @@ class TMDBService {
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       final results = data['results'] as List<dynamic>;
+      print(results);
       return results.map((json) => TMDBTvShow.fromJson(json)).toList();
     } else {
       throw Exception('Failed to fetch favorite TV shows');

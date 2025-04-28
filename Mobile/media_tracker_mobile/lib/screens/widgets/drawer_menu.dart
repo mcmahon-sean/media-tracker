@@ -42,8 +42,8 @@ class DrawerMenu extends ConsumerWidget {
           ListTile(
             title: const Text('Account Settings'),
             onTap: () {
-              onSectionSelected(0);
               Navigator.pop(context);
+              Navigator.pushNamed(context, '/accountSettings');
             },
           ),
         ],

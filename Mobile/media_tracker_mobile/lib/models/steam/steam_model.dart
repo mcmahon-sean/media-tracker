@@ -10,6 +10,7 @@ class SteamGame {
   final int playtimeDeck;
   final int rtimeLastPlayed;
   final int playtimeDisconnected;
+  bool isFavorite;
 
   SteamGame({
     required this.appId,
@@ -23,6 +24,7 @@ class SteamGame {
     required this.playtimeDeck,
     required this.rtimeLastPlayed,
     required this.playtimeDisconnected,
+    this.isFavorite = false,
   });
 
   factory SteamGame.fromJson(Map<String, dynamic> json) {
@@ -38,8 +40,7 @@ class SteamGame {
       playtimeDeck: json['playtime_deck_forever'] ?? 0,
       rtimeLastPlayed: json['rtime_last_played'] ?? 0,
       playtimeDisconnected: json['playtime_disconnected'] ?? 0,
+      isFavorite: false,
     );
   }
-
-  bool get isFavorite => false;
 }

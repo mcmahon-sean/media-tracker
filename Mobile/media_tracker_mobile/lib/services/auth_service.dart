@@ -1,7 +1,9 @@
 import 'package:media_tracker_test/providers/auth_provider.dart';
+import 'package:media_tracker_test/providers/favorites_provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../config/api_connections.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'user_account_services.dart';
 
 // Registering the AuthService as a Riverpod provider
 // This allows us to inject the Ref object, which is needed to interact with other providers like authProvider
@@ -52,6 +54,12 @@ class AuthService {
           .from('users')
           .select('first_name, last_name, email')
           .eq('username', username);
+
+      // Fetch user favorites
+      final userAccountServices = UserAccountServices();
+      final favorites = await userAccountServices.fetchUserFavorites(username);
+      print('User favorites: $favorites');
+      ref.read(favoritesProvider.notifier).state = favorites;
 
       // Fetch linked platform IDs (Steam, Last.fm, TMDB) from the useraccounts table
       // If the Steam ID, last.fm ID, or TMDB ID exists, assign them globally via ApiServices

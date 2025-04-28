@@ -3,7 +3,7 @@ class ApiServices {
   static const String steamApiKey = '5553B2F6E49998D47EB298C086A05084';
   static String steamId = '';
   static String get steamOwnedGamesUrl =>
-      'http://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=$steamApiKey&steamid=$steamId&include_appinfo=1&format=json';
+      'https://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=$steamApiKey&steamid=$steamId&include_appinfo=1&format=json';
 
   // LAST.FM CREDENTIALS
   static String lastFmUsername = '';
