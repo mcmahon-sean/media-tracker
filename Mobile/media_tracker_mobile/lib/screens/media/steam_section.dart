@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:media_tracker_test/models/sort_options.dart';
 import 'package:media_tracker_test/providers/auth_provider.dart';
 import 'package:media_tracker_test/providers/favorites_provider.dart';
 import 'package:media_tracker_test/screens/media/media_details_screen.dart';
@@ -8,20 +9,24 @@ import '../../models/steam/steam_model.dart';
 
 class SteamSection extends ConsumerStatefulWidget {
   final List<SteamGame> steamGames;
+  final SortOption sortOption;
+  final SortDirection sortDirection;
 
-  const SteamSection({super.key, required this.steamGames});
+  const SteamSection({
+    super.key,
+    required this.steamGames,
+    required this.sortOption,
+    required this.sortDirection,
+  });
 
   @override
   ConsumerState<SteamSection> createState() => _SteamSectionState();
 }
 
 class _SteamSectionState extends ConsumerState<SteamSection> {
-  //late List<SteamGame> _steamGames;
-
   @override
   void initState() {
     super.initState();
-    //_steamGames = List.from(widget.steamGames); // Make mutable local copy
   }
 
   @override
@@ -29,22 +34,38 @@ class _SteamSectionState extends ConsumerState<SteamSection> {
     final auth = ref.watch(authProvider);
     final favorites = ref.watch(favoritesProvider);
     //print('Favorites: $favorites'); // DEBUGGING
-    
-    final displayGames = widget.steamGames.map((game) {
-    return game.copyWith(
-      isFavorite: favorites.any(
-        (fav) =>
-            fav['media']['platform_id'] == 1 &&
-            fav['media']['media_plat_id'] == game.name &&
-            fav['favorites'] == true,
-      ),
+
+    final displayGames =
+        widget.steamGames.map((game) {
+          return game.copyWith(
+            isFavorite: favorites.any(
+              (fav) =>
+                  fav['media']['platform_id'] == 1 &&
+                  fav['media']['media_plat_id'] == game.name &&
+                  fav['favorites'] == true,
+            ),
+          );
+        }).toList();
+
+    final sortedGames = applySorting<SteamGame>(
+      list: displayGames,
+      option: widget.sortOption,
+      direction: widget.sortDirection,
+      getField: (game) {
+        if (widget.sortOption == SortOption.name) {
+          return game.name.toLowerCase();
+        } else if (widget.sortOption == SortOption.playtime) {
+          return game.playtimeForever;
+        }
+        return game.name.toLowerCase(); // fallback
+      },
+      isFavorite: (game) => game.isFavorite,
     );
-  }).toList();
 
     return ListView.builder(
-      itemCount: displayGames.length,
+      itemCount: sortedGames.length,
       itemBuilder: (context, index) {
-        final game = displayGames[index];
+        final game = sortedGames[index];
         return ListTile(
           title: Text(game.name),
           subtitle: Text('Played: ${game.playtimeForever} mins'),

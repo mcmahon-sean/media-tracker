@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:media_tracker_test/models/sort_options.dart';
 import 'package:media_tracker_test/providers/auth_provider.dart';
 import 'package:media_tracker_test/providers/favorites_provider.dart';
 import 'package:media_tracker_test/services/user_account_services.dart';
@@ -13,12 +14,16 @@ class LastFmSection extends ConsumerStatefulWidget {
   final LastFmUser? user;
   final List<TopArtist> topArtists;
   final List<LastFmTrack> recentTracks;
+  final SortOption sortOption;
+  final SortDirection sortDirection;
 
   const LastFmSection({
     super.key,
     required this.user,
     required this.topArtists,
     required this.recentTracks,
+    required this.sortOption,
+    required this.sortDirection,
   });
 
   @override
@@ -61,10 +66,35 @@ class _LastFmSectionState extends ConsumerState<LastFmSection> {
     final auth = ref.watch(authProvider);
     final favorites = ref.watch(favoritesProvider);
 
+    final sortedArtists = applySorting(
+      list: widget.topArtists,
+      option: widget.sortOption,
+      direction: widget.sortDirection,
+      getField: (artist) {
+        if (widget.sortOption == SortOption.name) {
+          return artist.name.toLowerCase();
+        } else if (widget.sortOption == SortOption.playtime) {
+          return artist.playCount;
+        } else {
+          return artist.name.toLowerCase(); // fallback
+        }
+      },
+      isFavorite: (artist) {
+        final favorites = ref.read(favoritesProvider);
+        return favorites.any(
+          (fav) =>
+              fav['media']['platform_id'] == 2 &&
+              fav['media']['media_plat_id'].toString().toLowerCase().trim() ==
+                  artist.name.toLowerCase().trim() &&
+              fav['favorites'] == true,
+        );
+      },
+    );
+
     return ListView.builder(
-      itemCount: widget.topArtists.length,
+      itemCount: sortedArtists.length,
       itemBuilder: (context, index) {
-        final artist = widget.topArtists[index];
+        final artist = sortedArtists[index];
 
         final isFavorite = favorites.any(
           (fav) =>
@@ -98,24 +128,6 @@ class _LastFmSectionState extends ConsumerState<LastFmSection> {
                 final updatedFavorites = await UserAccountServices()
                     .fetchUserFavorites(auth.username!);
                 ref.read(favoritesProvider.notifier).state = updatedFavorites;
-                // // Print out after updating || DEBUGGING
-                // print('Successfully favorited: $success');
-                // printFull('Updated favorites list: $updatedFavorites');
-                // print('After favoriting, is ${artist.name} favorited?');
-                // print(
-                //   updatedFavorites.any(
-                //         (fav) =>
-                //             fav['media']['platform_id'] == 2 &&
-                //             fav['media']['media_plat_id']
-                //                     .toString()
-                //                     .toLowerCase()
-                //                     .trim() ==
-                //                 artist.name.toLowerCase().trim() &&
-                //             fav['favorites'] == true,
-                //       )
-                //       ? 'YES'
-                //       : 'NO',
-                // );
               } else {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Failed to favorite')),

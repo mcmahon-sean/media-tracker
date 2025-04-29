@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:media_tracker_test/models/sort_options.dart';
 import 'package:media_tracker_test/providers/auth_provider.dart';
 import 'package:media_tracker_test/providers/favorites_provider.dart';
 import 'package:media_tracker_test/services/user_account_services.dart';
@@ -12,12 +13,16 @@ class TmdbSection extends ConsumerStatefulWidget {
   final TMDBAccount? account;
   final List<TMDBMovie> ratedMovies;
   final List<TMDBTvShow> favoriteTvShows;
+  final SortOption sortOption;
+  final SortDirection sortDirection;
 
   const TmdbSection({
     super.key,
     required this.account,
     required this.ratedMovies,
     required this.favoriteTvShows,
+    required this.sortOption,
+    required this.sortDirection,
   });
 
   @override
@@ -57,15 +62,32 @@ class _TmdbSectionState extends ConsumerState<TmdbSection> {
 
   Widget _buildMediaList(
     BuildContext context,
-    List items, {
+    List<dynamic> items, {
     required bool isMovie,
   }) {
     final auth = ref.watch(authProvider);
     final favorites = ref.watch(favoritesProvider);
+
+    final sortedItems = applySorting(
+      list: items,
+      option: widget.sortOption,
+      direction: widget.sortDirection,
+      getField: (item) {
+        if (widget.sortOption == SortOption.name) {
+          return item.title.toLowerCase();
+        } else if (widget.sortOption == SortOption.playtime) {
+          return item.releaseDate ?? '';
+        } else {
+          return item.title.toLowerCase(); // fallback
+        }
+      },
+      isFavorite: (item) => item.isFavorite,
+    );
+
     return ListView.builder(
-      itemCount: items.length,
+      itemCount: sortedItems.length,
       itemBuilder: (context, index) {
-        final item = items[index];
+        final item = sortedItems[index];
         final title = item.title;
 
         // Check if this item is favorited
@@ -78,6 +100,11 @@ class _TmdbSectionState extends ConsumerState<TmdbSection> {
 
         return ListTile(
           title: Text(title),
+          subtitle: Text(
+            item.releaseDate != null && item.releaseDate!.isNotEmpty
+                ? 'Release Date: ${_formatDate(item.releaseDate!)}'
+                : 'Release Date: Unknown',
+          ),
           trailing: IconButton(
             icon: Icon(
               item.isFavorite ? Icons.star : Icons.star_border,
@@ -126,5 +153,33 @@ class _TmdbSectionState extends ConsumerState<TmdbSection> {
         );
       },
     );
+  }
+
+  // Helper function to format the release date
+  String _formatDate(String dateStr) {
+    try {
+      final date = DateTime.parse(dateStr);
+      return '${_monthName(date.month)} ${date.day}, ${date.year}';
+    } catch (e) {
+      return dateStr; // fallback if parsing fails
+    }
+  }
+
+  String _monthName(int month) {
+    const months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
+    return months[month - 1];
   }
 }

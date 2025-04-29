@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:media_tracker_test/models/lastfm/lastfm_top_artist.dart';
+import 'package:media_tracker_test/models/sort_options.dart';
 import 'package:media_tracker_test/providers/auth_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:media_tracker_test/providers/favorites_provider.dart';
@@ -17,7 +18,6 @@ import '../../services/media_api/tmdb_service.dart';
 import 'steam_section.dart';
 import 'lastfm_section.dart';
 import 'tmdb_section.dart';
-//import '../home_screen.dart';
 import '../widgets/drawer_menu.dart';
 
 class MediaScreen extends ConsumerStatefulWidget {
@@ -33,6 +33,10 @@ class _MediaScreenState extends ConsumerState<MediaScreen> {
   // Search Bar
   bool _isSearching = false;
   final TextEditingController _searchController = TextEditingController();
+
+  // Sort Options
+  SortOption _currentSortOption = SortOption.name;
+  SortDirection _currentSortDirection = SortDirection.asc;
 
   // Steam
   List<SteamGame> _steamGames = [];
@@ -95,12 +99,12 @@ class _MediaScreenState extends ConsumerState<MediaScreen> {
 
   // Fetches and sets Steam game data
   Future<void> _loadSteamGames() async {
-    // if (_steamGames.isNotEmpty && _filteredSteamGames.isNotEmpty) {
-    //   return; // Skip loading if games list is populated
-    // }
     setState(() => _isLoadingSteam = true);
     try {
       final games = await fetchSteamGames();
+      games.sort(
+        (a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()),
+      ); // Sort the games alphabetically
       final favorites = ref.read(favoritesProvider);
 
       // First make sure both are strings for a clean compare
@@ -188,73 +192,21 @@ class _MediaScreenState extends ConsumerState<MediaScreen> {
         isSearching: _isSearching,
         firstName: firstName,
         searchController: _searchController,
-        onSearchToggle: () {
+        onSearchToggle: _handleSearchToggle,
+        onSearchQueryChanged: _handleSearchQueryChanged,
+        currentSortOption: _currentSortOption,
+        currentSortDirection: _currentSortDirection,
+        onSortOptionChanged: (option) {
           setState(() {
-            if (_isSearching) {
-              _searchController.clear();
-              if (_selectedIndex == 0) {
-                _filteredSteamGames = List.from(_steamGames);
-              } else if (_selectedIndex == 1) {
-                _filteredTopArtists = List.from(_topArtists);
-                _filteredRecentTracks = List.from(_recentTracks);
-              } else if (_selectedIndex == 2) {
-                _filteredRatedMovies = List.from(_ratedMovies);
-                _filteredFavoriteTvShows = List.from(_favoriteTvShows);
-              }
-            }
-            _isSearching = !_isSearching;
+            _currentSortOption = option;
           });
         },
-        onSearchQueryChanged: (query) {
+        onSortDirectionChanged: (direction) {
           setState(() {
-            if (query.isEmpty) {
-              if (_selectedIndex == 0) {
-                _filteredSteamGames = List.from(_steamGames);
-              } else if (_selectedIndex == 1) {
-                _filteredTopArtists = List.from(_topArtists);
-                _filteredRecentTracks = List.from(_recentTracks);
-              } else if (_selectedIndex == 2) {
-                _filteredRatedMovies = List.from(_ratedMovies);
-                _filteredFavoriteTvShows = List.from(_favoriteTvShows);
-              }
-            } else {
-              if (_selectedIndex == 0) {
-                _filteredSteamGames =
-                    _steamGames.where((game) {
-                      return game.name.toLowerCase().contains(
-                        query.toLowerCase(),
-                      );
-                    }).toList();
-              } else if (_selectedIndex == 1) {
-                _filteredTopArtists =
-                    _topArtists.where((artist) {
-                      return artist.name.toLowerCase().contains(
-                        query.toLowerCase(),
-                      );
-                    }).toList();
-                _filteredRecentTracks =
-                    _recentTracks.where((track) {
-                      return track.name.toLowerCase().contains(
-                        query.toLowerCase(),
-                      );
-                    }).toList();
-              } else if (_selectedIndex == 2) {
-                _filteredRatedMovies =
-                    _ratedMovies.where((movie) {
-                      return movie.title.toLowerCase().contains(
-                        query.toLowerCase(),
-                      );
-                    }).toList();
-                _filteredFavoriteTvShows =
-                    _favoriteTvShows.where((show) {
-                      return show.title.toLowerCase().contains(
-                        query.toLowerCase(),
-                      );
-                    }).toList();
-              }
-            }
+            _currentSortDirection = direction;
           });
         },
+        platformLabel: _getCurrentPlatformLabel(_selectedIndex),
       ),
       drawer: DrawerMenu(
         firstName: firstName,
@@ -297,7 +249,11 @@ class _MediaScreenState extends ConsumerState<MediaScreen> {
       case 0:
         if (_isLoadingSteam) return _loading();
         if (auth.steamId == null) return _noMediaLinkedPrompt("Steam");
-        return SteamSection(steamGames: _filteredSteamGames);
+        return SteamSection(
+          steamGames: _filteredSteamGames,
+          sortOption: _currentSortOption,
+          sortDirection: _currentSortDirection,
+        );
       case 1:
         if (_isLoadingLastFm) return _loading();
         if (auth.lastFmUsername == null) return _noMediaLinkedPrompt("Last.fm");
@@ -305,6 +261,8 @@ class _MediaScreenState extends ConsumerState<MediaScreen> {
           user: _lastFmUser,
           topArtists: _filteredTopArtists,
           recentTracks: _filteredRecentTracks,
+          sortOption: _currentSortOption,
+          sortDirection: _currentSortDirection,
         );
       case 2:
         if (_isLoadingTmdb) return _loading();
@@ -313,6 +271,8 @@ class _MediaScreenState extends ConsumerState<MediaScreen> {
           account: _tmdbAccount,
           ratedMovies: _filteredRatedMovies,
           favoriteTvShows: _filteredFavoriteTvShows,
+          sortOption: _currentSortOption,
+          sortDirection: _currentSortDirection,
         );
       default:
         return Center(child: Text("Coming soon..."));
@@ -355,5 +315,98 @@ class _MediaScreenState extends ConsumerState<MediaScreen> {
         ),
       ),
     );
+  }
+
+  // Toggles the search mode on or off
+  void _handleSearchToggle() {
+    setState(() {
+      if (_isSearching) {
+        // If closing search, clear search field and reset to original lists
+        _searchController.clear();
+        if (_selectedIndex == 0) {
+          _filteredSteamGames = List.from(_steamGames);
+        } else if (_selectedIndex == 1) {
+          _filteredTopArtists = List.from(_topArtists);
+          _filteredRecentTracks = List.from(_recentTracks);
+        } else if (_selectedIndex == 2) {
+          _filteredRatedMovies = List.from(_ratedMovies);
+          _filteredFavoriteTvShows = List.from(_favoriteTvShows);
+        }
+      }
+      _isSearching = !_isSearching;
+    });
+  }
+
+  // Handles changes to the search query text
+  void _handleSearchQueryChanged(String query) {
+    setState(() {
+      if (query.isEmpty) {
+        // If query is cleared, reset to full lists
+        if (_selectedIndex == 0) {
+          _filteredSteamGames = List.from(_steamGames);
+        } else if (_selectedIndex == 1) {
+          _filteredTopArtists = List.from(_topArtists);
+          _filteredRecentTracks = List.from(_recentTracks);
+        } else if (_selectedIndex == 2) {
+          _filteredRatedMovies = List.from(_ratedMovies);
+          _filteredFavoriteTvShows = List.from(_favoriteTvShows);
+        }
+      } else {
+        // If query exists, filter lists by lowercase matching
+        if (_selectedIndex == 0) {
+          _filteredSteamGames =
+              _steamGames
+                  .where(
+                    (game) =>
+                        game.name.toLowerCase().contains(query.toLowerCase()),
+                  )
+                  .toList();
+        } else if (_selectedIndex == 1) {
+          _filteredTopArtists =
+              _topArtists
+                  .where(
+                    (artist) =>
+                        artist.name.toLowerCase().contains(query.toLowerCase()),
+                  )
+                  .toList();
+          _filteredRecentTracks =
+              _recentTracks
+                  .where(
+                    (track) =>
+                        track.name.toLowerCase().contains(query.toLowerCase()),
+                  )
+                  .toList();
+        } else if (_selectedIndex == 2) {
+          _filteredRatedMovies =
+              _ratedMovies
+                  .where(
+                    (movie) =>
+                        movie.title.toLowerCase().contains(query.toLowerCase()),
+                  )
+                  .toList();
+          _filteredFavoriteTvShows =
+              _favoriteTvShows
+                  .where(
+                    (show) =>
+                        show.title.toLowerCase().contains(query.toLowerCase()),
+                  )
+                  .toList();
+        }
+      }
+    });
+  }
+
+  // Helper function to conditionally check which platform index is selected for sort options
+  String _getCurrentPlatformLabel(int index) {
+    switch (index) {
+      case 0:
+        return 'Steam';
+      case 1:
+        return 'Last.fm';
+      case 2:
+        return 'TMDB';
+      default:
+        return 'Steam';
+    }
   }
 }
