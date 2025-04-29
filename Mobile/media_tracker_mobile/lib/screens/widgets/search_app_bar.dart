@@ -8,13 +8,13 @@ class SearchAppBar extends StatelessWidget implements PreferredSizeWidget {
   final ValueChanged<String> onSearchQueryChanged;
 
   const SearchAppBar({
-    Key? key,
+    super.key,
     required this.isSearching,
     required this.firstName,
     required this.searchController,
     required this.onSearchToggle,
     required this.onSearchQueryChanged,
-  }) : super(key: key);
+  });
 
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
@@ -31,6 +31,8 @@ class SearchAppBar extends StatelessWidget implements PreferredSizeWidget {
                 decoration: const InputDecoration(
                   hintText: 'Search...',
                   border: InputBorder.none,
+                  focusedBorder: InputBorder.none,
+                  enabledBorder: InputBorder.none,
                 ),
                 style: const TextStyle(color: Colors.white, fontSize: 18),
                 onChanged: onSearchQueryChanged,

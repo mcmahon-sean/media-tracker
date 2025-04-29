@@ -192,6 +192,15 @@ class _MediaScreenState extends ConsumerState<MediaScreen> {
           setState(() {
             if (_isSearching) {
               _searchController.clear();
+              if (_selectedIndex == 0) {
+                _filteredSteamGames = List.from(_steamGames);
+              } else if (_selectedIndex == 1) {
+                _filteredTopArtists = List.from(_topArtists);
+                _filteredRecentTracks = List.from(_recentTracks);
+              } else if (_selectedIndex == 2) {
+                _filteredRatedMovies = List.from(_ratedMovies);
+                _filteredFavoriteTvShows = List.from(_favoriteTvShows);
+              }
             }
             _isSearching = !_isSearching;
           });
