@@ -181,30 +181,12 @@ class _MediaScreenState extends ConsumerState<MediaScreen> {
   Widget build(BuildContext context) {
     final auth = ref.watch(authProvider);
 
-    final firstName = auth.firstName;
+    final firstName = auth.firstName ?? 'User';
 
     return Scaffold(
-      // appBar: AppBar(
-      //   title: Text('$firstName\'s Media'),
-      //   actions: [
-      //     IconButton(
-      //       icon: const Icon(Icons.logout),
-      //       color: Colors.grey,
-      //       tooltip: 'Logout',
-      //       onPressed: () {
-      //         // Clear auth state
-      //         ref.read(authProvider.notifier).logout();
-      //         // Navigate back to the home screen
-      //         Navigator.of(context).pushReplacement(
-      //           MaterialPageRoute(builder: (_) => const HomeScreen()),
-      //         );
-      //       },
-      //     ),
-      //   ],
-      // ),
       appBar: SearchAppBar(
         isSearching: _isSearching,
-        firstName: firstName!,
+        firstName: firstName,
         searchController: _searchController,
         onSearchToggle: () {
           setState(() {
