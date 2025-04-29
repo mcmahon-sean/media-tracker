@@ -95,9 +95,9 @@ class _MediaScreenState extends ConsumerState<MediaScreen> {
 
   // Fetches and sets Steam game data
   Future<void> _loadSteamGames() async {
-    if (_steamGames.isNotEmpty && _filteredSteamGames.isNotEmpty) {
-      return; // Skip loading if games list is populated
-    }
+    // if (_steamGames.isNotEmpty && _filteredSteamGames.isNotEmpty) {
+    //   return; // Skip loading if games list is populated
+    // }
     setState(() => _isLoadingSteam = true);
     try {
       final games = await fetchSteamGames();

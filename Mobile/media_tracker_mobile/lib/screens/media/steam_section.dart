@@ -16,12 +16,12 @@ class SteamSection extends ConsumerStatefulWidget {
 }
 
 class _SteamSectionState extends ConsumerState<SteamSection> {
-  late List<SteamGame> _steamGames;
+  //late List<SteamGame> _steamGames;
 
   @override
   void initState() {
     super.initState();
-    _steamGames = List.from(widget.steamGames); // Make mutable local copy
+    //_steamGames = List.from(widget.steamGames); // Make mutable local copy
   }
 
   @override
@@ -30,19 +30,21 @@ class _SteamSectionState extends ConsumerState<SteamSection> {
     final favorites = ref.watch(favoritesProvider);
     //print('Favorites: $favorites'); // DEBUGGING
     
-    for (var game in _steamGames) {
-      game.isFavorite = favorites.any(
+    final displayGames = widget.steamGames.map((game) {
+    return game.copyWith(
+      isFavorite: favorites.any(
         (fav) =>
             fav['media']['platform_id'] == 1 &&
-            fav['media']['media_plat_id'] == game.name.toString() &&
+            fav['media']['media_plat_id'] == game.name &&
             fav['favorites'] == true,
-      );
-    }
+      ),
+    );
+  }).toList();
 
     return ListView.builder(
-      itemCount: _steamGames.length,
+      itemCount: displayGames.length,
       itemBuilder: (context, index) {
-        final game = _steamGames[index];
+        final game = displayGames[index];
         return ListTile(
           title: Text(game.name),
           subtitle: Text('Played: ${game.playtimeForever} mins'),
