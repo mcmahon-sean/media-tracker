@@ -33,7 +33,7 @@ Future<List<TopArtist>> fetchLastFmTopArtists() async {
 
   final response = await http.get(Uri.parse(url));
   if (response.statusCode == 200) {
-    final data = jsonDecode(response.body);
+    final data = jsonDecode(utf8.decode(response.bodyBytes));
     final artists = data['topartists']['artist'] as List<dynamic>;
     return artists.map((json) => TopArtist.fromJson(json)).toList();
   } else {
@@ -51,7 +51,7 @@ Future<List<LastFmTrack>> fetchLastFmRecentTracks() async {
 
   final response = await http.get(Uri.parse(url));
   if (response.statusCode == 200) {
-    final data = jsonDecode(response.body);
+    final data = jsonDecode(utf8.decode(response.bodyBytes));
     final tracks = data['recenttracks']['track'] as List<dynamic>;
     return tracks.map((json) => LastFmTrack.fromJson(json)).toList();
   } else {
@@ -70,7 +70,7 @@ Future<LastFmArtist> fetchArtistDetail(String artistName) async {
   final response = await http.get(Uri.parse(url));
 
   if (response.statusCode == 200) {
-    final data = jsonDecode(response.body);
+    final data = jsonDecode(utf8.decode(response.bodyBytes));
     print(jsonEncode(data));
     return LastFmArtist.fromJson(data);
   } else {
@@ -91,7 +91,7 @@ Future<List<Map<String, dynamic>>> fetchArtistTopTracks(
   final response = await http.get(Uri.parse(url));
 
   if (response.statusCode == 200) {
-    final data = jsonDecode(response.body);
+    final data = jsonDecode(utf8.decode(response.bodyBytes));
     print(jsonEncode(data)); // DEBUGGING
 
     final tracks =
@@ -124,7 +124,7 @@ Future<List<Map<String, dynamic>>> fetchArtistTopAlbums(
   final response = await http.get(Uri.parse(url));
 
   if (response.statusCode == 200) {
-    final data = jsonDecode(response.body);
+    final data = jsonDecode(utf8.decode(response.bodyBytes));
     print(jsonEncode(data)); // DEBUGGING
 
     final albums =
@@ -160,7 +160,7 @@ Future<List<Map<String, dynamic>>> fetchSimilarArtists(
   final response = await http.get(Uri.parse(url));
 
   if (response.statusCode == 200) {
-    final data = jsonDecode(response.body);
+    final data = jsonDecode(utf8.decode(response.bodyBytes));
     print(jsonEncode(data)); // DEBUGGING
 
     final artists =
@@ -198,7 +198,7 @@ Future<Map<String, dynamic>> fetchAlbumDetail(
   final response = await http.get(Uri.parse(url));
 
   if (response.statusCode == 200) {
-    final data = jsonDecode(response.body);
+    final data = jsonDecode(utf8.decode(response.bodyBytes));
     print(jsonEncode(data)); // DEBUGGING
 
     final albumData = data['track']?['album'];
@@ -228,7 +228,7 @@ Future<Map<String, dynamic>> fetchFullAlbumDetails(String artistName, String alb
   final response = await http.get(Uri.parse(url));
 
   if (response.statusCode == 200) {
-    final data = jsonDecode(response.body);
+    final data = jsonDecode(utf8.decode(response.bodyBytes));
     final album = data['album'];
 
     final rawTracks = album['tracks']['track'];

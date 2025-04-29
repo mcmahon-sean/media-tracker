@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:media_tracker_test/models/lastfm/lastfm_top_artist.dart';
+import 'package:media_tracker_test/models/sort_options.dart';
 import 'package:media_tracker_test/providers/auth_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:media_tracker_test/providers/favorites_provider.dart';
+import 'package:media_tracker_test/screens/widgets/search_app_bar.dart';
 
 import '../../models/lastfm/lastfm_track.dart';
 import '../../models/lastfm/lastfm_user.dart';
@@ -16,7 +18,6 @@ import '../../services/media_api/tmdb_service.dart';
 import 'steam_section.dart';
 import 'lastfm_section.dart';
 import 'tmdb_section.dart';
-import '../home_screen.dart';
 import '../widgets/drawer_menu.dart';
 
 class MediaScreen extends ConsumerStatefulWidget {
@@ -29,20 +30,33 @@ class MediaScreen extends ConsumerStatefulWidget {
 class _MediaScreenState extends ConsumerState<MediaScreen> {
   int _selectedIndex = 0;
 
+  // Search Bar
+  bool _isSearching = false;
+  final TextEditingController _searchController = TextEditingController();
+
+  // Sort Options
+  SortOption _currentSortOption = SortOption.name;
+  SortDirection _currentSortDirection = SortDirection.asc;
+
   // Steam
   List<SteamGame> _steamGames = [];
+  List<SteamGame> _filteredSteamGames = [];
   bool _isLoadingSteam = false;
 
   // Last.fm
   LastFmUser? _lastFmUser;
   List<TopArtist> _topArtists = [];
   List<LastFmTrack> _recentTracks = [];
+  List<TopArtist> _filteredTopArtists = [];
+  List<LastFmTrack> _filteredRecentTracks = [];
   bool _isLoadingLastFm = false;
 
   // TMDB
   TMDBAccount? _tmdbAccount;
   List<TMDBMovie> _ratedMovies = [];
   List<TMDBTvShow> _favoriteTvShows = [];
+  List<TMDBMovie> _filteredRatedMovies = [];
+  List<TMDBTvShow> _filteredFavoriteTvShows = [];
   bool _isLoadingTmdb = false;
 
   @override
@@ -85,12 +99,12 @@ class _MediaScreenState extends ConsumerState<MediaScreen> {
 
   // Fetches and sets Steam game data
   Future<void> _loadSteamGames() async {
-    if (_steamGames.isNotEmpty) {
-      return; // Skip loading if games list is populated
-    }
     setState(() => _isLoadingSteam = true);
     try {
       final games = await fetchSteamGames();
+      games.sort(
+        (a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()),
+      ); // Sort the games alphabetically
       final favorites = ref.read(favoritesProvider);
 
       // First make sure both are strings for a clean compare
@@ -105,7 +119,10 @@ class _MediaScreenState extends ConsumerState<MediaScreen> {
         }
       }
 
-      setState(() => _steamGames = games); // Set game list
+      setState(() {
+        _steamGames = games;
+        _filteredSteamGames = games; // Filter steam games
+      }); // Set game list
     } catch (e, stackTrace) {
       print('Steam load error: $e');
       print('Stack trace: $stackTrace');
@@ -132,6 +149,8 @@ class _MediaScreenState extends ConsumerState<MediaScreen> {
         _lastFmUser = user; // Get user profile
         _topArtists = artists; // Get top artists
         _recentTracks = tracks; // Get recent tracks
+        _filteredTopArtists = artists; // Filter top artists
+        _filteredRecentTracks = tracks; // Filter recent tracks
         _isLoadingLastFm = false; // Stop loading
       });
     } catch (e) {
@@ -152,6 +171,8 @@ class _MediaScreenState extends ConsumerState<MediaScreen> {
         _tmdbAccount = account; // Get user profile
         _ratedMovies = movies; // Get rated movies
         _favoriteTvShows = shows; // Get favorite shows
+        _filteredRatedMovies = movies; // Filter rated movies
+        _filteredFavoriteTvShows = shows; // Filter favorite TV shows
         _isLoadingTmdb = false; // Stop loading
       });
     } catch (e) {
@@ -164,29 +185,31 @@ class _MediaScreenState extends ConsumerState<MediaScreen> {
   Widget build(BuildContext context) {
     final auth = ref.watch(authProvider);
 
-    final firstName = auth.firstName;
+    final firstName = auth.firstName ?? 'User';
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text('$firstName\'s Media'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            color: Colors.grey,
-            tooltip: 'Logout',
-            onPressed: () {
-              // Clear auth state
-              ref.read(authProvider.notifier).logout();
-              // Navigate back to the home screen
-              Navigator.of(context).pushReplacement(
-                MaterialPageRoute(builder: (_) => const HomeScreen()),
-              );
-            },
-          ),
-        ],
+      appBar: SearchAppBar(
+        isSearching: _isSearching,
+        firstName: firstName,
+        searchController: _searchController,
+        onSearchToggle: _handleSearchToggle,
+        onSearchQueryChanged: _handleSearchQueryChanged,
+        currentSortOption: _currentSortOption,
+        currentSortDirection: _currentSortDirection,
+        onSortOptionChanged: (option) {
+          setState(() {
+            _currentSortOption = option;
+          });
+        },
+        onSortDirectionChanged: (direction) {
+          setState(() {
+            _currentSortDirection = direction;
+          });
+        },
+        platformLabel: _getCurrentPlatformLabel(_selectedIndex),
       ),
       drawer: DrawerMenu(
-        firstName: firstName ?? '',
+        firstName: firstName,
         onSectionSelected: (index) {
           setState(() {
             _selectedIndex = index;
@@ -226,22 +249,30 @@ class _MediaScreenState extends ConsumerState<MediaScreen> {
       case 0:
         if (_isLoadingSteam) return _loading();
         if (auth.steamId == null) return _noMediaLinkedPrompt("Steam");
-        return SteamSection(steamGames: _steamGames);
+        return SteamSection(
+          steamGames: _filteredSteamGames,
+          sortOption: _currentSortOption,
+          sortDirection: _currentSortDirection,
+        );
       case 1:
         if (_isLoadingLastFm) return _loading();
         if (auth.lastFmUsername == null) return _noMediaLinkedPrompt("Last.fm");
         return LastFmSection(
           user: _lastFmUser,
-          topArtists: _topArtists,
-          recentTracks: _recentTracks,
+          topArtists: _filteredTopArtists,
+          recentTracks: _filteredRecentTracks,
+          sortOption: _currentSortOption,
+          sortDirection: _currentSortDirection,
         );
       case 2:
         if (_isLoadingTmdb) return _loading();
         if (auth.tmdbSessionId == null) return _noMediaLinkedPrompt("TMDB");
         return TmdbSection(
           account: _tmdbAccount,
-          ratedMovies: _ratedMovies,
-          favoriteTvShows: _favoriteTvShows,
+          ratedMovies: _filteredRatedMovies,
+          favoriteTvShows: _filteredFavoriteTvShows,
+          sortOption: _currentSortOption,
+          sortDirection: _currentSortDirection,
         );
       default:
         return Center(child: Text("Coming soon..."));
@@ -284,5 +315,98 @@ class _MediaScreenState extends ConsumerState<MediaScreen> {
         ),
       ),
     );
+  }
+
+  // Toggles the search mode on or off
+  void _handleSearchToggle() {
+    setState(() {
+      if (_isSearching) {
+        // If closing search, clear search field and reset to original lists
+        _searchController.clear();
+        if (_selectedIndex == 0) {
+          _filteredSteamGames = List.from(_steamGames);
+        } else if (_selectedIndex == 1) {
+          _filteredTopArtists = List.from(_topArtists);
+          _filteredRecentTracks = List.from(_recentTracks);
+        } else if (_selectedIndex == 2) {
+          _filteredRatedMovies = List.from(_ratedMovies);
+          _filteredFavoriteTvShows = List.from(_favoriteTvShows);
+        }
+      }
+      _isSearching = !_isSearching;
+    });
+  }
+
+  // Handles changes to the search query text
+  void _handleSearchQueryChanged(String query) {
+    setState(() {
+      if (query.isEmpty) {
+        // If query is cleared, reset to full lists
+        if (_selectedIndex == 0) {
+          _filteredSteamGames = List.from(_steamGames);
+        } else if (_selectedIndex == 1) {
+          _filteredTopArtists = List.from(_topArtists);
+          _filteredRecentTracks = List.from(_recentTracks);
+        } else if (_selectedIndex == 2) {
+          _filteredRatedMovies = List.from(_ratedMovies);
+          _filteredFavoriteTvShows = List.from(_favoriteTvShows);
+        }
+      } else {
+        // If query exists, filter lists by lowercase matching
+        if (_selectedIndex == 0) {
+          _filteredSteamGames =
+              _steamGames
+                  .where(
+                    (game) =>
+                        game.name.toLowerCase().contains(query.toLowerCase()),
+                  )
+                  .toList();
+        } else if (_selectedIndex == 1) {
+          _filteredTopArtists =
+              _topArtists
+                  .where(
+                    (artist) =>
+                        artist.name.toLowerCase().contains(query.toLowerCase()),
+                  )
+                  .toList();
+          _filteredRecentTracks =
+              _recentTracks
+                  .where(
+                    (track) =>
+                        track.name.toLowerCase().contains(query.toLowerCase()),
+                  )
+                  .toList();
+        } else if (_selectedIndex == 2) {
+          _filteredRatedMovies =
+              _ratedMovies
+                  .where(
+                    (movie) =>
+                        movie.title.toLowerCase().contains(query.toLowerCase()),
+                  )
+                  .toList();
+          _filteredFavoriteTvShows =
+              _favoriteTvShows
+                  .where(
+                    (show) =>
+                        show.title.toLowerCase().contains(query.toLowerCase()),
+                  )
+                  .toList();
+        }
+      }
+    });
+  }
+
+  // Helper function to conditionally check which platform index is selected for sort options
+  String _getCurrentPlatformLabel(int index) {
+    switch (index) {
+      case 0:
+        return 'Steam';
+      case 1:
+        return 'Last.fm';
+      case 2:
+        return 'TMDB';
+      default:
+        return 'Steam';
+    }
   }
 }

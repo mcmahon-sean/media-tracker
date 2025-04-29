@@ -33,9 +33,7 @@ class _HomeScreenState extends State<HomeScreen> {
       );
 
       // If the call is successful, show a SnackBar with the result
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(result.toString())));
+      print(result.toString());
     } catch (e) {
       // If there’s an error (e.g., procedure not found, bad params),
       // catch it and show an error SnackBar instead
