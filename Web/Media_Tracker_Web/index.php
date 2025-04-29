@@ -148,9 +148,27 @@ require_once 'src/php/config.php';
           <?php endif; ?>
           <?php if (isset($_SESSION['signed_in'])): ?>
             <p>Hello, <strong><?= htmlspecialchars($_SESSION['username']) ?></strong>!</p>
-            <p>Steam ID: <strong><?= htmlspecialchars($_SESSION['user_platform_ids']['steam']) ?></strong></p>
-            <p>Last.fm ID: <strong><?= htmlspecialchars($_SESSION['user_platform_ids']['lastfm']) ?></strong></p>
-            <p>TMDB ID: <strong><?= htmlspecialchars($_SESSION['user_platform_ids']['tmdb']) ?></strong></p>
+            <p>Steam ID: 
+                <strong>
+                    <?= isset($_SESSION['user_platform_ids']['steam']) && $_SESSION['user_platform_ids']['steam'] !== '' 
+                        ? htmlspecialchars($_SESSION['user_platform_ids']['steam']) 
+                        : 'No account linked' ?>
+                </strong>
+            </p>
+            <p>Last.fm ID: 
+                <strong>
+                    <?= isset($_SESSION['user_platform_ids']['lastfm']) && $_SESSION['user_platform_ids']['lastfm'] !== '' 
+                        ? htmlspecialchars($_SESSION['user_platform_ids']['lastfm']) 
+                        : 'No account linked' ?>
+                </strong>
+            </p>
+            <p>TMDB ID: 
+                <strong>
+                    <?= isset($_SESSION['user_platform_ids']['tmdb']) && $_SESSION['user_platform_ids']['tmdb'] !== '' 
+                        ? htmlspecialchars($_SESSION['user_platform_ids']['tmdb']) 
+                        : 'No account linked' ?>
+                </strong>
+            </p>
             <button onclick="window.location.href='src/php/views/add_edit_3rd_party.php'">Add/Edit Platforms</button>
             <button onclick="window.location.href='src/php/authentication/logout.php'">Logout</button>
           <?php else: ?>
