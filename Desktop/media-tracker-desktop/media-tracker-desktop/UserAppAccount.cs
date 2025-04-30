@@ -460,7 +460,7 @@ namespace media_tracker_desktop
             }
         }
 
-        // Note: make method for updating api id.
+        
 
         public static async Task<(bool, string)> UpdateUserPlatformID(int platformID, string newUserPlatformID)
         {
@@ -505,6 +505,11 @@ namespace media_tracker_desktop
             }
 
             return platformName;
+        }
+
+        private static void FavoriteMedia()
+        {
+
         }
     }
 }
