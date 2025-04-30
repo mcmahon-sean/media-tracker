@@ -28,18 +28,20 @@ class LastFmTrack {
       artist: json['artist']['#text'] ?? '',
       album: json['album']['#text'] ?? '',
       url: json['url'] ?? '',
-      timestamp: json['date'] != null
-          ? int.tryParse(json['date']['uts'] ?? '')
-          : null, // null if currently playing
+      timestamp:
+          json['date'] != null
+              ? int.tryParse(json['date']['uts'] ?? '')
+              : null, // null if currently playing
       imageUrl: image['#text'],
     );
   }
 
-  // formatted date string for display
+  // formatted date string for display (MM/DD/YYYY)
   String? get formattedDate {
     if (timestamp == null) return null;
     final dt = DateTime.fromMillisecondsSinceEpoch(timestamp! * 1000);
-    return '${dt.year}-${dt.month.toString().padLeft(2, '0')}-${dt.day.toString().padLeft(2, '0')} '
-           '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
+    return '${dt.month.toString().padLeft(2, '0')}/'
+        '${dt.day.toString().padLeft(2, '0')}/'
+        '${dt.year}';
   }
 }

@@ -5,6 +5,7 @@ class TMDBTvShow {
   final List<int> genreIds;
   final String releaseDate;
   final String posterPath;
+  bool isFavorite;
 
   TMDBTvShow({
     required this.id,
@@ -13,6 +14,7 @@ class TMDBTvShow {
     required this.genreIds,
     required this.releaseDate,
     required this.posterPath,
+    this.isFavorite = false,
   });
 
   factory TMDBTvShow.fromJson(Map<String, dynamic> json) {
@@ -23,8 +25,7 @@ class TMDBTvShow {
       genreIds: List<int>.from(json['genre_ids']),
       releaseDate: json['first_air_date'] ?? 'Unknown',
       posterPath: json['poster_path'] ?? '',
+      isFavorite: false,
     );
   }
-
-  bool get isFavorite => false;
 }

@@ -23,10 +23,10 @@ class UserAccountServices {
           'user_plat_id_input': userPlatformId,
         },
       );
-      print('Successful save or updating of data.');
+      print('Successful save or updating of data.'); // DEBUGGING
       return true;
     } catch (e) {
-      print('Failed to link platform ID: $e');
+      print('Failed to link platform ID: $e'); // DEBUGGING
       return false;
     }
   }
@@ -46,10 +46,10 @@ class UserAccountServices {
           'user_plat_id_input': userPlatformId,
         },
       );
-      print('Successfully removed 3rd party credentials');
+      print('Successfully removed 3rd party credentials'); // DEBUGGING
       return true;
     } catch (e) {
-      print('Failed to remove 3rd party credentials: $e');
+      print('Failed to remove 3rd party credentials: $e'); // DEBUGGING
       return false;
     }
   }
@@ -76,14 +76,99 @@ class UserAccountServices {
         if (data['response']['success'] == 1) {
           return data['response']['steamid'];
         } else {
-          print('Vanity URL not found: ${data['response']['message']}');
+          print(
+            'Vanity URL not found: ${data['response']['message']}',
+          ); // DEBUGGING
         }
       } else {
-        print('Failed to fetch Steam ID: HTTP ${response.statusCode}');
+        print(
+          'Failed to fetch Steam ID: HTTP ${response.statusCode}',
+        ); // DEBUGGING
       }
     } catch (e) {
-      print('Failed to resolve Steam ID from Vanity username: $e');
+      print('Failed to resolve Steam ID from Vanity username: $e'); // DEBUGGING
     }
     return '';
+  }
+
+  // Call stored procedure to favorite a media item
+  Future<bool> toggleFavoriteMedia({
+    required int platformId,
+    required int mediaTypeId,
+    required String mediaPlatId,
+    required String title,
+    String? album,
+    String? artist,
+    required String username,
+  }) async {
+    try {
+      await supabase.rpc(
+        'initial_media_fav',
+        params: {
+          'platform_id_input': platformId,
+          'media_type_id_input': mediaTypeId,
+          'media_plat_id_input': mediaPlatId,
+          'title_input': title,
+          'album_input': album ?? '',
+          'artist_input': artist ?? '',
+          'username_input': username,
+        },
+      );
+      print('Toggled favorite for $mediaPlatId ($title)'); // DEBUGGING
+      print('Success favoriting media'); // DEBUGGING
+      return true; // Success
+    } catch (e) {
+      print('Failed to favorite media: $e'); // DEBUGGING
+      return false;
+    }
+  }
+
+  // Fetch all favorited media IDs for a given user
+  Future<List<Map<String, dynamic>>> fetchUserFavorites(String username) async {
+    try {
+      final response = await supabase
+          .from('userfavorites')
+          .select(
+            'media_id, favorites, media (platform_id, media_type_id, media_plat_id, title, album, artist)',
+          )
+          .eq('username', username);
+
+      if (response.isEmpty) {
+        print('Fetched favorites: (empty)'); // DEBUGGING
+        return [];
+      } else {
+        final favorites = List<Map<String, dynamic>>.from(response);
+        return favorites;
+      }
+    } catch (e) {
+      print('Error fetching user favorites: $e'); // DEBUGGING
+      return [];
+    }
+  }
+
+  Future<bool> updateUserProfile({
+    required String username,
+    String? firstName,
+    String? lastName,
+    String? email,
+    String? password,
+  }) async {
+    try {
+      await supabase.rpc(
+        'update_user',
+        params: {
+          'username_input': username,
+          'first_name_input': firstName,
+          'last_name_input': lastName,
+          'email_input': email,
+          'password_input': password,
+        },
+      );
+      print('Successfully updated user information.');
+      return true;
+    } catch (e) {
+      print('Exception during updateUserProfile: $e');
+      return false;
+    }
   }
 }

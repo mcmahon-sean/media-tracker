@@ -12,7 +12,7 @@ Future<List<SteamGame>> fetchSteamGames() async {
   print('URL: ${ApiServices.steamOwnedGamesUrl}');
 
   if (response.statusCode == 200) {
-    final data = json.decode(response.body);
+    final data = jsonDecode(utf8.decode(response.bodyBytes));
     final gameList = data['response']['games'];
 
     if (gameList == null) {
@@ -35,7 +35,7 @@ Future<Map<String, dynamic>?> fetchSteamAppDetails(String appId) async {
     );
 
     if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
+      final data = jsonDecode(utf8.decode(response.bodyBytes));
       final appData = data[appId];
       if (appData['success'] == true) {
         return appData['data'];

@@ -243,7 +243,9 @@ class _MediaDetailsScreenState extends State<MediaDetailsScreen> {
                               )
                               : null,
                       title: Text(album['name']),
-                      subtitle: Text('Playcount: ${album['playcount']}'),
+                      subtitle: Text(
+                        'Playcount: ${formatNumber(album['playcount'] ?? '')}',
+                        ),
                     ),
                   ),
               if (_topAlbums.length > 5)

@@ -10,6 +10,7 @@ class SteamGame {
   final int playtimeDeck;
   final int rtimeLastPlayed;
   final int playtimeDisconnected;
+  bool isFavorite;
 
   SteamGame({
     required this.appId,
@@ -23,6 +24,7 @@ class SteamGame {
     required this.playtimeDeck,
     required this.rtimeLastPlayed,
     required this.playtimeDisconnected,
+    this.isFavorite = false,
   });
 
   factory SteamGame.fromJson(Map<String, dynamic> json) {
@@ -38,8 +40,37 @@ class SteamGame {
       playtimeDeck: json['playtime_deck_forever'] ?? 0,
       rtimeLastPlayed: json['rtime_last_played'] ?? 0,
       playtimeDisconnected: json['playtime_disconnected'] ?? 0,
+      isFavorite: false,
     );
   }
 
-  bool get isFavorite => false;
+  SteamGame copyWith({
+    int? appId,
+    String? name,
+    int? playtimeForever,
+    String? imgIconUrl,
+    bool? hasCommunityStats,
+    int? playtimeWindows,
+    int? playtimeMac,
+    int? playtimeLinux,
+    int? playtimeDeck,
+    int? rtimeLastPlayed,
+    int? playtimeDisconnected,
+    bool? isFavorite,
+  }) {
+    return SteamGame(
+      appId: appId ?? this.appId,
+      name: name ?? this.name,
+      playtimeForever: playtimeForever ?? this.playtimeForever,
+      imgIconUrl: imgIconUrl ?? this.imgIconUrl,
+      hasCommunityStats: hasCommunityStats ?? this.hasCommunityStats,
+      playtimeWindows: playtimeWindows ?? this.playtimeWindows,
+      playtimeMac: playtimeMac ?? this.playtimeMac,
+      playtimeLinux: playtimeLinux ?? this.playtimeLinux,
+      playtimeDeck: playtimeDeck ?? this.playtimeDeck,
+      rtimeLastPlayed: rtimeLastPlayed ?? this.rtimeLastPlayed,
+      playtimeDisconnected: playtimeDisconnected ?? this.playtimeDisconnected,
+      isFavorite: isFavorite ?? this.isFavorite,
+    );
+  }
 }

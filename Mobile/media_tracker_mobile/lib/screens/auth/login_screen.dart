@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:media_tracker_test/providers/auth_provider.dart';
 import 'package:media_tracker_test/screens/media/media_screen.dart';
 import '../../services/auth_service.dart';
 
@@ -30,7 +31,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         builder:
             (_) => AlertDialog(
               title: Text('Invalid Input'),
-              content: Text('Please enter a valid username and password.', style: TextStyle(color: Colors.black)),
+              content: Text(
+                'Please enter a valid username and password.',
+                style: TextStyle(color: Colors.black),
+              ),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(context),
@@ -51,12 +55,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       );
 
       if (success) {
-        usernameController.clear();
-        passwordController.clear();
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => MediaScreen()),
-        );
+        final auth = ref.read(authProvider);
+
+        if (auth.username != null) {
+          usernameController.clear();
+          passwordController.clear();
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => MediaScreen()),
+          );
+        } else {
+          print('Login succeeded but user data is missing.');
+        }
       } else {
         showDialog(
           context: context,

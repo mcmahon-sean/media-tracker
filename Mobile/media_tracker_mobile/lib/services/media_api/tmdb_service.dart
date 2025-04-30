@@ -83,7 +83,7 @@ class TMDBService {
 
     // Parse and return as a TMDBAccount model
     if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
+      final data = jsonDecode(utf8.decode(response.bodyBytes));
       ApiServices.tmdbAccountId = data['id'].toString(); // Cache the ID
       return TMDBAccount.fromJson(data);
     } else {
@@ -103,7 +103,7 @@ class TMDBService {
 
     // Parse and return as a list of TMDBMovie objects
     if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
+      final data = jsonDecode(utf8.decode(response.bodyBytes));
       final results = data['results'] as List<dynamic>;
       print(results);
       return results.map((json) => TMDBMovie.fromJson(json)).toList();
@@ -124,7 +124,7 @@ class TMDBService {
 
     // Parse and return as a list of TMDBTvShow objects
     if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
+      final data = jsonDecode(utf8.decode(response.bodyBytes));
       final results = data['results'] as List<dynamic>;
       print(results);
       return results.map((json) => TMDBTvShow.fromJson(json)).toList();
