@@ -13,7 +13,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Top Artists</title>
+    <title>Favorite Shows</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../../../styles.css"> 
 </head>
@@ -71,7 +71,12 @@
 
             <main class="col-md-10 ms-sm-auto px-4">
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                    <h2>Media Tracker</h2>
+                    <h2 class="display-6">
+                        Media Tracker
+                        <small class="text-title-secondary">
+                            Favorite Shows
+                        </small>
+                    </h2>
                 </div>
 
                 <div class="card bg-dark text-light mb-4">

@@ -10,7 +10,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Top Artists</title>
+    <title>Add/Edit 3rd Party Accounts</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../../../styles.css"> 
 </head>
@@ -68,15 +68,14 @@
 
             <main class="col-md-10 ms-sm-auto px-4">
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                    <h2>Media Tracker</h2>
+                    <h2 class="display-6">
+                        Media Tracker
+                        <small class="text-title-secondary">
+                            Add/Edit Platforms
+                        </small>
+                    </h2>
                 </div>
 
-                <div class="card bg-dark text-light mb-4">
-                    <div class="card-body">
-                        <input type="text" class="form-control" placeholder="Search Titles...">
-                    </div>
-                </div>
-                <h3>Add/Edit Platforms</h3>
                 <div class="table-responsive">
                 <?php if (isset($error)): ?>
                     <p><?php echo $error; ?></p>
@@ -84,16 +83,27 @@
                     <div class="form-container">
                         <form id="addEditForm" action="../database/add_3rd_party_id.php" method="post">
                             <input type="hidden" name="username" value="<?php echo htmlspecialchars($_SESSION['username']); ?>">
-                            <label for="platform_id">Choose a platform:</label>
-                            <select name="platform_id" id="platform_id" onchange="updateFormAction()">
-                                <option value="1">Steam</option>
-                                <option value="2">Last.fm</option>
-                                <option value="3">TMDB</option>
-                            </select>
-                            <br><br>
-                            <label for="user_plat_id">Enter your username:</label>
-                            <input type="text" name="user_plat_id" id="user_plat_id" required><br><br>
-                            <input type="submit" value="Add/Edit">
+                            <div class="row mb-3 mx-1">
+                                <label class="form-label col-xxl-2 col-lg-3 col-md-5 lead" for="platform_id">
+                                    Choose a platform:
+                                </label>
+                                <div class="col-xl-2 col-lg-3 col-md-4">
+                                    <select class="form-select" name="platform_id" id="platform_id" onchange="updateFormAction()">
+                                        <option value="1">Steam</option>
+                                        <option value="2">Last.fm</option>
+                                        <option value="3">TMDB</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row mb-3 mx-1">
+                                <label id="usrLabel" class="form-label col-xxl-2 col-lg-3 col-md-5 lead" for="user_plat_id">
+                                    Enter Username:
+                                </label>
+                                <div class="col-xl-4 col-lg-6 col-md">
+                                    <input class="form-control" type="text" name="user_plat_id" id="user_plat_id" required>
+                                </div>
+                            </div>
+                            <input class="btn bg-dark-secondary text-white" type="submit" value="Add/Edit">
                         </form>
                     </div>
 
