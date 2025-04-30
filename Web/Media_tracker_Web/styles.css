@@ -11,6 +11,12 @@ body {
     color: white;
 }
 
+.text-title-secondary {
+    color: rgb(200,200,200);
+    border-left: 1px solid rgb(150,150,150);
+    padding-left: .6rem;
+}
+
 .tab-icon {
     max-width: 40px;
 }
@@ -26,6 +32,8 @@ body {
 .sidebar {
     height: 100vh;
     padding: 10px 20px 20px 20px;
+    position: sticky;
+    top: 0;
 }
 
 .sidebar h3 {
@@ -42,8 +50,8 @@ body {
 }
 
 .sidebar a:hover {
-    background: #e3c7c7;
-    color: #0c0c0c;
+    background: #323539;
+    color: #ffffff;
 }
 
 .sidebar hr {
