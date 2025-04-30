@@ -328,7 +328,7 @@ namespace media_tracker_desktop
         /// In addition, the user's id in each api models are also updated.
         /// </summary>
         /// <param name="PlatformId"></param>
-        /// <param name="UserPlatformId"></param>
+        /// <param name="UserPlatformId">Steam: the steam ID. LastFM: the lastFM username. TMDB: the TMDB session ID.</param>
         /// <returns></returns>
         public static async Task<(bool, string)> AddThirdPartyId(int? PlatformId, string UserPlatformId)
         {
@@ -389,17 +389,17 @@ namespace media_tracker_desktop
                         _userTmdbSessionID = UserPlatformId;
                         TmdbApi.SessionID = _userTmdbSessionID;
 
-                        //var (accountIDFound, accountID) = await GetTmdbAccountID(userAccount.UserPlatID.ToString());
+                        (bool accountIDFound, string accountID) = await GetTmdbAccountID(_userTmdbSessionID);
 
-                        //if (accountIDFound)
-                        //{
-                        //    _userTmdbAccountID = accountID;
-                        //    TmdbApi.AccountID = _userTmdbAccountID;
-                        //}
-                        //else
-                        //{
-                        //    Console.WriteLine("Account Id Not Found");
-                        //}
+                        if (accountIDFound)
+                        {
+                            _userTmdbAccountID = accountID;
+                            TmdbApi.AccountID = _userTmdbAccountID;
+                        }
+                        else
+                        {
+                            Console.WriteLine("Account Id Not Found");
+                        }
 
                         break;
                     default:
@@ -461,5 +461,50 @@ namespace media_tracker_desktop
         }
 
         // Note: make method for updating api id.
+
+        public static async Task<(bool, string)> UpdateUserPlatformID(int platformID, string newUserPlatformID)
+        {
+            string platformName = GetPlatformName(platformID);
+
+            if (string.IsNullOrEmpty(newUserPlatformID))
+            {
+                return (false, $"New User {platformName} ID is null.");
+            }
+            else
+            {
+                (bool updateSuccess, string message) = await AddThirdPartyId(platformID, newUserPlatformID);
+                
+                if (updateSuccess)
+                {
+                    return (true, $"User {platformName} ID updated.");
+                }
+                else
+                {
+                    return (false, $"Unable to update user {platformName} ID");
+                }
+            }
+        }
+
+        private static string GetPlatformName(int platformID)
+        {
+            string platformName = string.Empty;
+
+            switch (platformID)
+            {
+                case STEAM_PLATFORM_ID:
+                    platformName = "Steam";
+                    break;
+                case LASTFM_PLATFORM_ID:
+                    platformName = "LastFM";
+                    break;
+                case TMDB_PLATFORM_ID:
+                    platformName = "TMDB";
+                    break;
+                default:
+                    break;
+            }
+
+            return platformName;
+        }
     }
 }
