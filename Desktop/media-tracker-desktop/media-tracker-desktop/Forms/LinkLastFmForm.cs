@@ -45,6 +45,11 @@ namespace media_tracker_desktop.Forms
                         // Display user information.
                         lastFmDataGridView.DataSource = new List<LastFM_User> { user };
                     }
+                    else if (user == null)
+                    {
+                        MessageBox.Show("LastFM account not found.");
+                        pnlLink.Visible = true;
+                    }
                 }
                 // If user doesn't have LastFM account linked,
                 else
