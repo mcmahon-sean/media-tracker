@@ -11,6 +11,7 @@ using Supabase;
 using System.Configuration;
 using System.Diagnostics;
 using System.Security.Policy;
+using System.Security.Principal;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using static System.Net.WebRequestMethods;
@@ -77,6 +78,41 @@ namespace media_tracker_desktop
 
             MessageBox.Show(displayString);
 
+            displayString = "";
+
+            //-------------
+            var mediaTypeRecords = await SupabaseConnection.GetTableRecord<MediaType>(connection);
+
+            displayString = "";
+
+            foreach (var mediaType in mediaTypeRecords)
+            {
+                displayString += $"{mediaType.MediaTypeID} - {mediaType.MediaTypeName}\n\n";
+            }
+            MessageBox.Show(displayString);
+            //------------
+            displayString = "";
+
+            var mediaRecords = await SupabaseConnection.GetTableRecord<Media>(connection);
+
+            foreach (var media in mediaRecords)
+            {
+                displayString += $"{media.MediaID} - {media.PlatformID} - {media.MediaTypeID} - {media.MediaPlatID} - {media.Title} - {media.Album} - {media.Artist}\n\n";
+            }
+
+            MessageBox.Show(displayString);
+            //-------
+            displayString = "";
+
+            var userFavorite = await SupabaseConnection.GetTableRecord<UserFavorite>(connection);
+
+            foreach (var favorite in userFavorite)
+            {
+                displayString += $"{favorite.Username} - {favorite.MediaID} - {favorite.Favorite}\n\n";
+            }
+
+            MessageBox.Show(displayString);
+
 
             // Initializing connection.
             UserAppAccount.ConnectToDB(connection);
@@ -84,6 +120,8 @@ namespace media_tracker_desktop
             LastFMApi.Initialize();
             SteamApi.Initialize();
             TmdbApi.Initialize();
+
+            //UserAppAccount.FavoriteMedia();
         }
 
         // Testing user create. Normally should be done in a separate form.

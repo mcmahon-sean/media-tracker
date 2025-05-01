@@ -29,11 +29,28 @@ namespace media_tracker_desktop.Models
 
         public UserRegistrationParam(string username, string firstName, string lastName, string email, string password)
         {
-            this.Username = EnsureFieldNotNullOrEmpty("Username", username);
+            this.Username = ValidateUsername(username);
             this.FirstName = EnsureFieldNotNullOrEmpty("First Name", firstName);
             this.LastName = lastName;
             this.Email = ValidateEmail(email);
             this.Password = EnsureFieldNotNullOrEmpty("Password", password);
+        }
+
+        // Method: Validates the username field.
+        private string ValidateUsername(string username)
+        {
+            // Make sure it is not null or empty.
+            string usernameNotNullOrEmpty = EnsureFieldNotNullOrEmpty("Username", username);
+
+            // Make sure that it is no larger than 15 characters.
+            if (usernameNotNullOrEmpty.Length > 15)
+            {
+                throw new Exception("Please enter a username that is no larger than 15 characters.");
+            }
+            else
+            {
+                return username;
+            }
         }
 
         // Method: Throws an exception if the field is null or empty.
@@ -41,7 +58,7 @@ namespace media_tracker_desktop.Models
         {
             if (string.IsNullOrEmpty(fieldValue))
             {
-                throw new ArgumentNullException($"{fieldName} must not be null or empty.");
+                throw new Exception($"Please enter a value for {fieldName}.");
             }
 
             return fieldValue;
