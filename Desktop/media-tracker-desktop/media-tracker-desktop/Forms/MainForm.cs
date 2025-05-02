@@ -375,7 +375,7 @@ namespace media_tracker_desktop.Forms
 
         private void btnLinkSteam_Click(object sender, EventArgs e)
         {
-            var f = new LinkSteamForm { TopLevel = false, FormBorderStyle = FormBorderStyle.None, Dock = DockStyle.Fill };
+            var f = new LinkSteamForm() { TopLevel = false, FormBorderStyle = FormBorderStyle.None, Dock = DockStyle.Fill };
             pnlContent.Controls.Clear(); pnlContent.Controls.Add(f); f.Show(); lblTitle.Text = "Steam";
         }
         private void btnLinkLastFM_Click(object sender, EventArgs e)

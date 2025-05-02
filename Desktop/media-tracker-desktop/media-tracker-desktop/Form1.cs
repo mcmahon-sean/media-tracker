@@ -9,6 +9,7 @@ using Newtonsoft.Json.Linq;
 using RestSharp;
 using Supabase;
 using System.Configuration;
+using System.Data.Common;
 using System.Diagnostics;
 using System.Security.Policy;
 using System.Security.Principal;
@@ -66,31 +67,56 @@ namespace media_tracker_desktop
             //}
 
             //MessageBox.Show(displayString);
+            //------------
 
-            displayString = "";
+            //displayString = "";
 
-            var tmdbAccounts = records.Where(a => a.PlatformID == 3).ToList();
+            //var tmdbAccounts = records.Where(a => a.PlatformID == 3).ToList();
 
-            foreach (var account in tmdbAccounts)
-            {
-                displayString += $"{account.UserPlatID} - {account.Username} - {account.PlatformID}\n\n";
-            }
+            //foreach (var account in tmdbAccounts)
+            //{
+            //    displayString += $"{account.UserPlatID} - {account.Username} - {account.PlatformID}\n\n";
+            //}
 
-            MessageBox.Show(displayString);
+            //MessageBox.Show(displayString);
 
-            displayString = "";
+            //displayString = "";
 
             //-------------
-            var mediaTypeRecords = await SupabaseConnection.GetTableRecord<MediaType>(connection);
+            //var mediaTypeRecords = await SupabaseConnection.GetTableRecord<MediaType>(connection);
 
-            displayString = "";
+            //displayString = "";
 
-            foreach (var mediaType in mediaTypeRecords)
-            {
-                displayString += $"{mediaType.MediaTypeID} - {mediaType.MediaTypeName}\n\n";
-            }
-            MessageBox.Show(displayString);
+            //foreach (var mediaType in mediaTypeRecords)
+            //{
+            //    displayString += $"{mediaType.MediaTypeID} - {mediaType.MediaTypeName}\n\n";
+            //}
+            //MessageBox.Show(displayString);
             //------------
+            //displayString = "";
+
+            //var mediaRecords = await SupabaseConnection.GetTableRecord<Media>(connection);
+
+            //foreach (var media in mediaRecords)
+            //{
+            //    displayString += $"{media.MediaID} - {media.PlatformID} - {media.MediaTypeID} - {media.MediaPlatID} - {media.Title} - {media.Album} - {media.Artist}\n\n";
+            //}
+
+            //MessageBox.Show(displayString);
+            //-------
+            //displayString = "";
+
+            //var userFavorite = await SupabaseConnection.GetTableRecord<UserFavorite>(connection);
+
+            //foreach (var favorite in userFavorite)
+            //{
+            //    displayString += $"{favorite.Username} - {favorite.MediaID} - {favorite.Favorite}\n\n";
+            //}
+
+            //MessageBox.Show(displayString);
+
+            //----------
+
             displayString = "";
 
             var mediaRecords = await SupabaseConnection.GetTableRecord<Media>(connection);
@@ -101,14 +127,21 @@ namespace media_tracker_desktop
             }
 
             MessageBox.Show(displayString);
-            //-------
+
             displayString = "";
 
-            var userFavorite = await SupabaseConnection.GetTableRecord<UserFavorite>(connection);
-
-            foreach (var favorite in userFavorite)
+            QueryOptions<Media> options = new QueryOptions<Media>
             {
-                displayString += $"{favorite.Username} - {favorite.MediaID} - {favorite.Favorite}\n\n";
+                Where = m => m.PlatformID == 2,
+                OrderBy = m => m.MediaID,
+                OrderByDirection = "desc"
+            };
+
+            var sorted = DataFunctions.Sort(mediaRecords, options);
+
+            foreach (var smedia in sorted)
+            {
+                displayString += $"{smedia.MediaID} - {smedia.PlatformID} - {smedia.MediaTypeID} - {smedia.MediaPlatID} - {smedia.Title} - {smedia.Album} - {smedia.Artist}\n\n";
             }
 
             MessageBox.Show(displayString);

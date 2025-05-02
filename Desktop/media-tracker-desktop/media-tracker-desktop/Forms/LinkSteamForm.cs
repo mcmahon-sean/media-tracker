@@ -19,16 +19,24 @@ namespace media_tracker_desktop.Forms
         {
             InitializeComponent();
 
-            // If user has a steam id,
-            if (!string.IsNullOrEmpty(UserAppAccount.UserSteamID))
-                // Load display.
-                _ = LoadSteamAsync();
+            //// If user has a steam id,
+            //if (!string.IsNullOrEmpty(UserAppAccount.UserSteamID))
+            //    // Load display.
+            //    _ = LoadSteamAsync();
+        }
+
+        private async void LinkSteamForm_Load(object sender, EventArgs e)
+        {
+            // Can't await in the constructor.
+            await LoadSteamAsync();
         }
 
         private List<UserFavoriteMedia> _favorites = [];
 
         private async Task LoadSteamAsync()
         {
+            //MessageBox.Show(_mainForm)
+
             // Remove link panel.
             pnlLink.Visible = false;
 
@@ -38,12 +46,12 @@ namespace media_tracker_desktop.Forms
                 if (!string.IsNullOrEmpty(UserAppAccount.UserSteamID))
                 {
                     // Retrieve owned games.
-                    (bool success, List<Steam_Game>? games) = await SteamApi.GetOwnedGames(); 
+                    (bool success, List<Steam_Game>? games) = await SteamApi.GetOwnedGames();
 
                     // If success,
                     if (success)
                     {
-                        await DisplayGames(games ?? []);   
+                        await DisplayGames(games ?? []);
                     }
                     else
                     {
@@ -62,6 +70,8 @@ namespace media_tracker_desktop.Forms
                 MessageBox.Show($"Error: {error.Message}");
             }
         }
+
+
 
         // Method: Display the list of games.
         private async Task DisplayGames(List<Steam_Game> games)
@@ -236,5 +246,7 @@ namespace media_tracker_desktop.Forms
                 MessageBox.Show("Please enter a Steam ID.");
             }
         }
+
+        
     }
 }

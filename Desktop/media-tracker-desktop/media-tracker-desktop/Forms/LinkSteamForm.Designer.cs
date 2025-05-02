@@ -10,57 +10,73 @@ namespace media_tracker_desktop.Forms
 
         private void InitializeComponent()
         {
-            this.pnlLink = new System.Windows.Forms.Panel();
-            this.steamTextBox = new System.Windows.Forms.TextBox();
-            this.linkButton = new System.Windows.Forms.Button();
-            this.steamDataGridView = new System.Windows.Forms.DataGridView();
-            this.pnlLink.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.steamDataGridView)).BeginInit();
-            this.SuspendLayout();
-            
+            pnlLink = new Panel();
+            steamTextBox = new TextBox();
+            linkButton = new Button();
+            steamDataGridView = new DataGridView();
+            pnlLink.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)steamDataGridView).BeginInit();
+            SuspendLayout();
+            // 
             // pnlLink
-            this.pnlLink.Controls.Add(this.steamTextBox);
-            this.pnlLink.Controls.Add(this.linkButton);
-            this.pnlLink.Dock = System.Windows.Forms.DockStyle.Top;
-            this.pnlLink.BackColor = System.Drawing.Color.FromArgb(45, 45, 48);
-            this.pnlLink.Location = new System.Drawing.Point(0, 0);
-            this.pnlLink.Name = "pnlLink";
-            this.pnlLink.Size = new System.Drawing.Size(800, 50);
-
+            // 
+            pnlLink.BackColor = Color.FromArgb(45, 45, 48);
+            pnlLink.Controls.Add(steamTextBox);
+            pnlLink.Controls.Add(linkButton);
+            pnlLink.Dock = DockStyle.Top;
+            pnlLink.Location = new Point(0, 0);
+            pnlLink.Margin = new Padding(4, 5, 4, 5);
+            pnlLink.Name = "pnlLink";
+            pnlLink.Size = new Size(1143, 83);
+            pnlLink.TabIndex = 1;
+            // 
             // steamTextBox
-            this.steamTextBox.Location = new System.Drawing.Point(12, 12);
-            this.steamTextBox.Name = "steamTextBox";
-            this.steamTextBox.Size = new System.Drawing.Size(300, 23);
-
+            // 
+            steamTextBox.Location = new Point(17, 20);
+            steamTextBox.Margin = new Padding(4, 5, 4, 5);
+            steamTextBox.Name = "steamTextBox";
+            steamTextBox.Size = new Size(427, 31);
+            steamTextBox.TabIndex = 0;
+            // 
             // linkButton
-            this.linkButton.Location = new System.Drawing.Point(320, 12);
-            this.linkButton.Name = "linkButton";
-            this.linkButton.Size = new System.Drawing.Size(100, 23);
-            this.linkButton.Text = "Link Steam";
-            this.linkButton.UseVisualStyleBackColor = true;
-            this.linkButton.Click += new System.EventHandler(this.linkButton_Click);
-
+            // 
+            linkButton.Location = new Point(457, 20);
+            linkButton.Margin = new Padding(4, 5, 4, 5);
+            linkButton.Name = "linkButton";
+            linkButton.Size = new Size(143, 38);
+            linkButton.TabIndex = 1;
+            linkButton.Text = "Link Steam";
+            linkButton.UseVisualStyleBackColor = true;
+            linkButton.Click += linkButton_Click;
+            // 
             // steamDataGridView
-            this.steamDataGridView.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.steamDataGridView.BackgroundColor = System.Drawing.Color.FromArgb(30, 30, 30);
-            this.steamDataGridView.Location = new System.Drawing.Point(0, 50);
-            this.steamDataGridView.Name = "steamDataGridView";
-            this.steamDataGridView.Size = new System.Drawing.Size(800, 400);
-            this.steamDataGridView.TabIndex = 0;
-
+            // 
+            steamDataGridView.BackgroundColor = Color.FromArgb(30, 30, 30);
+            steamDataGridView.ColumnHeadersHeight = 34;
+            steamDataGridView.Dock = DockStyle.Fill;
+            steamDataGridView.Location = new Point(0, 83);
+            steamDataGridView.Margin = new Padding(4, 5, 4, 5);
+            steamDataGridView.Name = "steamDataGridView";
+            steamDataGridView.RowHeadersWidth = 62;
+            steamDataGridView.Size = new Size(1143, 667);
+            steamDataGridView.TabIndex = 0;
+            // 
             // LinkSteamForm
-            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackColor = System.Drawing.Color.FromArgb(30, 30, 30);
-            this.ClientSize = new System.Drawing.Size(800, 450);
-            this.Controls.Add(this.steamDataGridView);
-            this.Controls.Add(this.pnlLink);
-            this.Name = "LinkSteamForm";
-            this.Text = "Link Steam Account";
-            this.pnlLink.ResumeLayout(false);
-            this.pnlLink.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.steamDataGridView)).EndInit();
-            this.ResumeLayout(false);
+            // 
+            AutoScaleDimensions = new SizeF(10F, 25F);
+            AutoScaleMode = AutoScaleMode.Font;
+            BackColor = Color.FromArgb(30, 30, 30);
+            ClientSize = new Size(1143, 750);
+            Controls.Add(steamDataGridView);
+            Controls.Add(pnlLink);
+            Margin = new Padding(4, 5, 4, 5);
+            Name = "LinkSteamForm";
+            Text = "Link Steam Account";
+            Load += LinkSteamForm_Load;
+            pnlLink.ResumeLayout(false);
+            pnlLink.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)steamDataGridView).EndInit();
+            ResumeLayout(false);
         }
     }
 }
