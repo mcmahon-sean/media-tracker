@@ -45,7 +45,14 @@ namespace media_tracker_desktop
                 }
             }
 
-            return query.ToList();
+            try
+            {
+                return query.ToList();
+            }
+            catch (NullReferenceException)
+            {
+                return null;
+            }
         }
     }
 }
