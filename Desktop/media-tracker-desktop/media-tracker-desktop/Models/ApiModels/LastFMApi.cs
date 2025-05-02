@@ -9,6 +9,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Configuration;
+using System.Net;
 
 namespace media_tracker_desktop.Models.ApiModels
 {
@@ -217,6 +218,11 @@ namespace media_tracker_desktop.Models.ApiModels
             request.AddParameter("format", "json");
 
             var response = await _client.ExecuteAsync(request);
+
+            if (response.StatusCode == HttpStatusCode.NotFound)
+            {
+                return (false, null);
+            }
 
             // If response is not successful, throw exception.
             if (!response.IsSuccessful)
