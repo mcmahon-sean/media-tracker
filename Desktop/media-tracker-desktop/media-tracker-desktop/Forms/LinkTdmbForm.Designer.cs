@@ -73,12 +73,15 @@ namespace media_tracker_desktop.Forms
             tmdbDataGridView.GridColor = Color.Gray;
             tmdbDataGridView.Location = new Point(0, 60);
             tmdbDataGridView.Name = "tmdbDataGridView";
+            tmdbDataGridView.RowHeadersVisible = false;
             tmdbDataGridView.RowHeadersWidth = 62;
             tmdbDataGridView.Size = new Size(638, 184);
             tmdbDataGridView.TabIndex = 0;
             // 
             // LinkTmdbForm
             // 
+            AutoScaleDimensions = new SizeF(7F, 15F);
+            AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.FromArgb(30, 30, 30);
             ClientSize = new Size(638, 244);
             Controls.Add(tmdbDataGridView);

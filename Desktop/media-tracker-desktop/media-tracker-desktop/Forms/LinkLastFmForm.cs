@@ -13,7 +13,7 @@ namespace media_tracker_desktop.Forms
 {
     public partial class LinkLastFmForm : Form
     {
-        //private readonly LastFmService _lastFm = new LastFmService();
+        private readonly LastFmService _lastFm = new LastFmService();
 
         public LinkLastFmForm()
         {

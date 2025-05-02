@@ -80,6 +80,8 @@ namespace media_tracker_desktop.Forms
             DataTable table = new DataTable();
 
             // Add the columns to be displayed.
+
+
             table.Columns.Add("AppID");
             table.Columns.Add("Title");
 
@@ -98,9 +100,15 @@ namespace media_tracker_desktop.Forms
 
             // Add the table.
             steamDataGridView.DataSource = table;
-            // Set the AppID row to not be visible to users.
+
             // This is to retrieve the game's ID from the row in which the favorite button is clicked.
+            //hide the appid column and the row header
             steamDataGridView.Columns["AppID"].Visible = false;
+            steamDataGridView.RowHeadersVisible = false;
+            steamDataGridView.AllowUserToAddRows = false;
+
+            //set width for title column
+            steamDataGridView.Columns["Title"].Width = 500;
 
             // Create a data grid button column.
             DataGridViewButtonColumn favoriteButtons = new DataGridViewButtonColumn();
@@ -109,6 +117,8 @@ namespace media_tracker_desktop.Forms
             favoriteButtons.Name = "btnFavorite";
             // Header text is displayed as the column title.
             favoriteButtons.HeaderText = " ";
+            favoriteButtons.FlatStyle = FlatStyle.Popup;
+
 
             // Add the button column to the data grid.
             steamDataGridView.Columns.Add(favoriteButtons);
@@ -246,7 +256,5 @@ namespace media_tracker_desktop.Forms
                 MessageBox.Show("Please enter a Steam ID.");
             }
         }
-
-        
     }
 }
