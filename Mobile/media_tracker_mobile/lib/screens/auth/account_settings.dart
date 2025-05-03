@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:media_tracker_test/providers/auth_provider.dart';
 import 'package:media_tracker_test/services/user_account_services.dart';
 
-class AccountSettings extends StatefulWidget {
+class AccountSettings extends ConsumerStatefulWidget {
   final String initialUsername;
 
   const AccountSettings({super.key, required this.initialUsername});
 
   @override
-  State<AccountSettings> createState() => _AccountSettingsScreenState();
+  ConsumerState<AccountSettings> createState() => _AccountSettingsScreenState();
 }
 
-class _AccountSettingsScreenState extends State<AccountSettings> {
+class _AccountSettingsScreenState extends ConsumerState<AccountSettings> {
   final _formKey = GlobalKey<FormState>();
 
   final _firstNameController = TextEditingController();
@@ -35,20 +37,35 @@ class _AccountSettingsScreenState extends State<AccountSettings> {
     super.dispose();
   }
 
+  // Passes null if a field is left empty
+  String? nullIfEmpty(String? value) {
+    final trimmed = value?.trim();
+    return (trimmed == null || trimmed.isEmpty) ? null : trimmed;
+  }
+
   Future<void> _saveProfile() async {
     if (_formKey.currentState?.validate() ?? false) {
       final success = await UserAccountServices().updateUserProfile(
         username: _usernameController.text.trim(),
-        firstName: _firstNameController.text.trim(),
-        lastName: _lastNameController.text.trim(),
-        email: _emailController.text.trim(),
+        firstName: nullIfEmpty(_firstNameController.text),
+        lastName: nullIfEmpty(_lastNameController.text),
+        email: nullIfEmpty(_emailController.text),
         password: null, // To be added
       );
 
       if (success) {
+        // Update provider state with new first/last/email
+        ref.read(authProvider.notifier).updateUserInfo(
+          firstName: _firstNameController.text.trim(),
+          lastName: _lastNameController.text.trim(),
+          email: _emailController.text.trim(),
+        );
+
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Profile updated successfully')),
         );
+
+        Navigator.pop(context);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Failed to update profile')),
@@ -126,7 +143,11 @@ class _AccountSettingsScreenState extends State<AccountSettings> {
                     _isUsernameEditable = !_isUsernameEditable;
                   });
                 },
-                child: Text(_isUsernameEditable ? 'Cancel Change Username' : 'Change Username'),
+                child: Text(
+                  _isUsernameEditable
+                      ? 'Cancel Change Username'
+                      : 'Change Username',
+                ),
               ),
               const SizedBox(height: 32),
               ElevatedButton(

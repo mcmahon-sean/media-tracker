@@ -6,13 +6,18 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 class UserAccountServices {
   final supabase = Supabase.instance.client;
 
+  // Function to save/update third party credentials to the DB
   Future<bool> savePlatformCredentials({
     required String username,
     required int platformId,
     required String userPlatformId,
   }) async {
     try {
-      if (platformId <= 0 || username.trim().isEmpty || userPlatformId.trim().isEmpty) return false;
+      // Call the PostgreSQL RPC to commit/update the 3rd party service credentials
+      if (platformId <= 0 ||
+          username.trim().isEmpty ||
+          userPlatformId.trim().isEmpty)
+        return false;
 
       final cleanedUsername = username.trim();
       final cleanedPlatformId = platformId;
@@ -39,7 +44,11 @@ class UserAccountServices {
     required String userPlatformId,
   }) async {
     try {
-      if (platformId <= 0 || username.trim().isEmpty || userPlatformId.trim().isEmpty) return false;
+      // Call the PostgreSQL RPC to remove 3rd party service credentials
+      if (platformId <= 0 ||
+          username.trim().isEmpty ||
+          userPlatformId.trim().isEmpty)
+        return false;
 
       final cleanedUsername = username.trim();
       final cleanedUserPlatformId = userPlatformId.trim();
@@ -59,17 +68,21 @@ class UserAccountServices {
     }
   }
 
+  // Function to fetch Steam ID from a Vanity username
   Future<String> fetchSteamIDFromVanity(String username) async {
     try {
       final isSteamId = RegExp(r'^\d{17}$').hasMatch(username);
+      // If input looks like a 64-bit numeric Steam ID, return it directly
       if (isSteamId) return username;
 
+      // Otherwise, treat it as a vanity URL and resolve it using Steam Web API
       final response = await http.get(
         Uri.parse(
           'http://api.steampowered.com/ISteamUser/ResolveVanityURL/v0001/?key=${ApiServices.steamApiKey}&vanityurl=$username',
         ),
       );
 
+      // If resolution was successful, return the resolved Steam ID
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         if (data['response']['success'] == 1) {
@@ -82,6 +95,7 @@ class UserAccountServices {
     return '';
   }
 
+  // Call stored procedure to favorite a media item
   Future<bool> toggleFavoriteMedia({
     required int platformId,
     required int mediaTypeId,
@@ -93,7 +107,10 @@ class UserAccountServices {
   }) async {
     try {
       if (platformId <= 0 || mediaTypeId <= 0) return false;
-      if (mediaPlatId.trim().isEmpty || title.trim().isEmpty || username.trim().isEmpty) return false;
+      if (mediaPlatId.trim().isEmpty ||
+          title.trim().isEmpty ||
+          username.trim().isEmpty)
+        return false;
 
       final cleanedMediaPlatId = mediaPlatId.trim();
       final cleanedTitle = title.trim();
@@ -121,6 +138,7 @@ class UserAccountServices {
     }
   }
 
+  // Fetch all favorited media IDs for a given user
   Future<List<Map<String, dynamic>>> fetchUserFavorites(String username) async {
     try {
       final cleanedUsername = username.trim();
@@ -147,29 +165,40 @@ class UserAccountServices {
     String? password,
   }) async {
     try {
-      if (username.trim().isEmpty) return false;
-
-      final cleanedUsername = username.trim();
-      final cleanedFirstName = (firstName ?? '').trim();
-      final cleanedLastName = (lastName ?? '').trim();
-      final cleanedEmail = (email ?? '').trim();
-      final cleanedPassword = (password ?? '').trim();
-
       await supabase.rpc(
         'update_user',
         params: {
-          'username_input': cleanedUsername,
-          'first_name_input': cleanedFirstName,
-          'last_name_input': cleanedLastName,
-          'email_input': cleanedEmail,
-          'password_input': cleanedPassword,
+          'username_input': username,
+          'first_name_input': firstName,
+          'last_name_input': lastName,
+          'email_input': email,
+          'password_input': password,
         },
       );
-
+      print('Successfully updated user information.'); // DEBUGGING
+      final userData = await fetchUserProfile(username); // DEBUGGING
+      print('Updated user data: $userData'); // DEBUGGING
       return true;
     } catch (e) {
       print('Exception during updateUserProfile: $e');
       return false;
+    }
+  }
+
+  // FOR TESTING UPDATING USERS
+  Future<Map<String, dynamic>?> fetchUserProfile(String username) async {
+    try {
+      final response =
+          await supabase
+              .from('users')
+              .select()
+              .eq('username', username)
+              .single();
+
+      return response;
+    } catch (e) {
+      print('Error fetching user profile: $e');
+      return null;
     }
   }
 }

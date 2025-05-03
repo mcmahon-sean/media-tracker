@@ -46,7 +46,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Home')),
+      appBar: AppBar(title: Text('Media Tracker')),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -54,7 +54,7 @@ class _HomeScreenState extends State<HomeScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                'Not Signed In',
+                'Media Tracker',
                 style: Theme.of(context).textTheme.headlineLarge,
               ),
             ],
@@ -84,7 +84,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     MaterialPageRoute(builder: (context) => RegisterScreen()),
                   );
                 },
-                child: Text('Sign Up'),
+                child: Text('Register'),
               ),
             ],
           ),
