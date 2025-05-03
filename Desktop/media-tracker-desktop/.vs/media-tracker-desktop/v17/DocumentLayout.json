@@ -3,28 +3,32 @@
   "WorkspaceRootPath": "C:\\Users\\nicol\\Documents\\GitHub\\media-tracker\\Desktop\\media-tracker-desktop\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{E1D13E99-C696-41F3-9B58-A1C5D7155072}|media-tracker-desktop\\media-tracker-desktop.csproj|c:\\users\\nicol\\documents\\github\\media-tracker\\desktop\\media-tracker-desktop\\media-tracker-desktop\\forms\\linksteamform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{E1D13E99-C696-41F3-9B58-A1C5D7155072}|media-tracker-desktop\\media-tracker-desktop.csproj|solutionrelative:media-tracker-desktop\\forms\\linksteamform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{E1D13E99-C696-41F3-9B58-A1C5D7155072}|media-tracker-desktop\\media-tracker-desktop.csproj|c:\\users\\nicol\\documents\\github\\media-tracker\\desktop\\media-tracker-desktop\\media-tracker-desktop\\forms\\linklastfmform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E1D13E99-C696-41F3-9B58-A1C5D7155072}|media-tracker-desktop\\media-tracker-desktop.csproj|solutionrelative:media-tracker-desktop\\forms\\linklastfmform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{E1D13E99-C696-41F3-9B58-A1C5D7155072}|media-tracker-desktop\\media-tracker-desktop.csproj|c:\\users\\nicol\\documents\\github\\media-tracker\\desktop\\media-tracker-desktop\\media-tracker-desktop\\forms\\linktdmbform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{E1D13E99-C696-41F3-9B58-A1C5D7155072}|media-tracker-desktop\\media-tracker-desktop.csproj|solutionrelative:media-tracker-desktop\\forms\\linktdmbform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{E1D13E99-C696-41F3-9B58-A1C5D7155072}|media-tracker-desktop\\media-tracker-desktop.csproj|c:\\users\\nicol\\documents\\github\\media-tracker\\desktop\\media-tracker-desktop\\media-tracker-desktop\\forms\\linklastfmform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{E1D13E99-C696-41F3-9B58-A1C5D7155072}|media-tracker-desktop\\media-tracker-desktop.csproj|solutionrelative:media-tracker-desktop\\forms\\linklastfmform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{E1D13E99-C696-41F3-9B58-A1C5D7155072}|media-tracker-desktop\\media-tracker-desktop.csproj|c:\\users\\nicol\\documents\\github\\media-tracker\\desktop\\media-tracker-desktop\\media-tracker-desktop\\forms\\linksteamform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
-      "RelativeMoniker": "D:0:0:{E1D13E99-C696-41F3-9B58-A1C5D7155072}|media-tracker-desktop\\media-tracker-desktop.csproj|solutionrelative:media-tracker-desktop\\forms\\linksteamform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{E1D13E99-C696-41F3-9B58-A1C5D7155072}|media-tracker-desktop\\media-tracker-desktop.csproj|c:\\users\\nicol\\documents\\github\\media-tracker\\desktop\\media-tracker-desktop\\media-tracker-desktop\\forms\\linktdmbform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
-      "RelativeMoniker": "D:0:0:{E1D13E99-C696-41F3-9B58-A1C5D7155072}|media-tracker-desktop\\media-tracker-desktop.csproj|solutionrelative:media-tracker-desktop\\forms\\linktdmbform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
+      "AbsoluteMoniker": "D:0:0:{E1D13E99-C696-41F3-9B58-A1C5D7155072}|media-tracker-desktop\\media-tracker-desktop.csproj|c:\\users\\nicol\\documents\\github\\media-tracker\\desktop\\media-tracker-desktop\\media-tracker-desktop\\userappaccount.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E1D13E99-C696-41F3-9B58-A1C5D7155072}|media-tracker-desktop\\media-tracker-desktop.csproj|solutionrelative:media-tracker-desktop\\userappaccount.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{E1D13E99-C696-41F3-9B58-A1C5D7155072}|media-tracker-desktop\\media-tracker-desktop.csproj|c:\\users\\nicol\\documents\\github\\media-tracker\\desktop\\media-tracker-desktop\\media-tracker-desktop\\models\\apimodels\\lastfmapi.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{E1D13E99-C696-41F3-9B58-A1C5D7155072}|media-tracker-desktop\\media-tracker-desktop.csproj|solutionrelative:media-tracker-desktop\\models\\apimodels\\lastfmapi.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E1D13E99-C696-41F3-9B58-A1C5D7155072}|media-tracker-desktop\\media-tracker-desktop.csproj|c:\\users\\nicol\\documents\\github\\media-tracker\\desktop\\media-tracker-desktop\\media-tracker-desktop\\forms\\linksteamform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E1D13E99-C696-41F3-9B58-A1C5D7155072}|media-tracker-desktop\\media-tracker-desktop.csproj|solutionrelative:media-tracker-desktop\\forms\\linksteamform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E1D13E99-C696-41F3-9B58-A1C5D7155072}|media-tracker-desktop\\media-tracker-desktop.csproj|c:\\users\\nicol\\documents\\github\\media-tracker\\desktop\\media-tracker-desktop\\media-tracker-desktop\\models\\lastfm\\lastfm_track.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E1D13E99-C696-41F3-9B58-A1C5D7155072}|media-tracker-desktop\\media-tracker-desktop.csproj|solutionrelative:media-tracker-desktop\\models\\lastfm\\lastfm_track.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E1D13E99-C696-41F3-9B58-A1C5D7155072}|media-tracker-desktop\\media-tracker-desktop.csproj|c:\\users\\nicol\\documents\\github\\media-tracker\\desktop\\media-tracker-desktop\\media-tracker-desktop\\service\\lastfmservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E1D13E99-C696-41F3-9B58-A1C5D7155072}|media-tracker-desktop\\media-tracker-desktop.csproj|solutionrelative:media-tracker-desktop\\service\\lastfmservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -34,7 +38,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 232,
-          "SelectedChildIndex": 6,
+          "SelectedChildIndex": 5,
           "Children": [
             {
               "$type": "Bookmark",
@@ -42,50 +46,65 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "LinkSteamForm.cs [Design]",
-              "DocumentMoniker": "C:\\Users\\nicol\\Documents\\GitHub\\media-tracker\\Desktop\\media-tracker-desktop\\media-tracker-desktop\\Forms\\LinkSteamForm.cs",
-              "RelativeDocumentMoniker": "media-tracker-desktop\\Forms\\LinkSteamForm.cs",
-              "ToolTip": "C:\\Users\\nicol\\Documents\\GitHub\\media-tracker\\Desktop\\media-tracker-desktop\\media-tracker-desktop\\Forms\\LinkSteamForm.cs [Design]",
-              "RelativeToolTip": "media-tracker-desktop\\Forms\\LinkSteamForm.cs [Design]",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-05-02T18:28:41.151Z",
-              "EditorCaption": " [Design]"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "LinkTdmbForm.cs [Design]",
-              "DocumentMoniker": "C:\\Users\\nicol\\Documents\\GitHub\\media-tracker\\Desktop\\media-tracker-desktop\\media-tracker-desktop\\Forms\\LinkTdmbForm.cs",
-              "RelativeDocumentMoniker": "media-tracker-desktop\\Forms\\LinkTdmbForm.cs",
-              "ToolTip": "C:\\Users\\nicol\\Documents\\GitHub\\media-tracker\\Desktop\\media-tracker-desktop\\media-tracker-desktop\\Forms\\LinkTdmbForm.cs [Design]",
-              "RelativeToolTip": "media-tracker-desktop\\Forms\\LinkTdmbForm.cs [Design]",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-05-02T18:28:38.475Z",
-              "EditorCaption": " [Design]"
-            },
-            {
-              "$type": "Document",
               "DocumentIndex": 5,
+              "Title": "LastFM_Track.cs",
+              "DocumentMoniker": "C:\\Users\\nicol\\Documents\\GitHub\\media-tracker\\Desktop\\media-tracker-desktop\\media-tracker-desktop\\Models\\LastFM\\LastFM_Track.cs",
+              "RelativeDocumentMoniker": "media-tracker-desktop\\Models\\LastFM\\LastFM_Track.cs",
+              "ToolTip": "C:\\Users\\nicol\\Documents\\GitHub\\media-tracker\\Desktop\\media-tracker-desktop\\media-tracker-desktop\\Models\\LastFM\\LastFM_Track.cs",
+              "RelativeToolTip": "media-tracker-desktop\\Models\\LastFM\\LastFM_Track.cs",
+              "ViewState": "AgIAACUAAAAAAAAAAAAcwAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-05-03T14:02:53.725Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "LastFmService.cs",
+              "DocumentMoniker": "C:\\Users\\nicol\\Documents\\GitHub\\media-tracker\\Desktop\\media-tracker-desktop\\media-tracker-desktop\\Service\\LastFmService.cs",
+              "RelativeDocumentMoniker": "media-tracker-desktop\\Service\\LastFmService.cs",
+              "ToolTip": "C:\\Users\\nicol\\Documents\\GitHub\\media-tracker\\Desktop\\media-tracker-desktop\\media-tracker-desktop\\Service\\LastFmService.cs",
+              "RelativeToolTip": "media-tracker-desktop\\Service\\LastFmService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-05-03T13:43:32.571Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "UserAppAccount.cs",
+              "DocumentMoniker": "C:\\Users\\nicol\\Documents\\GitHub\\media-tracker\\Desktop\\media-tracker-desktop\\media-tracker-desktop\\UserAppAccount.cs",
+              "RelativeDocumentMoniker": "media-tracker-desktop\\UserAppAccount.cs",
+              "ToolTip": "C:\\Users\\nicol\\Documents\\GitHub\\media-tracker\\Desktop\\media-tracker-desktop\\media-tracker-desktop\\UserAppAccount.cs",
+              "RelativeToolTip": "media-tracker-desktop\\UserAppAccount.cs",
+              "ViewState": "AgIAABkCAAAAAAAAAAAowB8CAAA/AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-05-03T13:43:27.178Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
               "Title": "LastFMApi.cs",
               "DocumentMoniker": "C:\\Users\\nicol\\Documents\\GitHub\\media-tracker\\Desktop\\media-tracker-desktop\\media-tracker-desktop\\Models\\ApiModels\\LastFMApi.cs",
               "RelativeDocumentMoniker": "media-tracker-desktop\\Models\\ApiModels\\LastFMApi.cs",
               "ToolTip": "C:\\Users\\nicol\\Documents\\GitHub\\media-tracker\\Desktop\\media-tracker-desktop\\media-tracker-desktop\\Models\\ApiModels\\LastFMApi.cs",
               "RelativeToolTip": "media-tracker-desktop\\Models\\ApiModels\\LastFMApi.cs",
-              "ViewState": "AgIAAO4AAAAAAAAAAAAQwPoAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAFMAAAAAAAAAAAAwwGoAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-05-02T18:14:45.069Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 0,
               "Title": "LinkLastFmForm.cs",
               "DocumentMoniker": "C:\\Users\\nicol\\Documents\\GitHub\\media-tracker\\Desktop\\media-tracker-desktop\\media-tracker-desktop\\Forms\\LinkLastFmForm.cs",
               "RelativeDocumentMoniker": "media-tracker-desktop\\Forms\\LinkLastFmForm.cs",
               "ToolTip": "C:\\Users\\nicol\\Documents\\GitHub\\media-tracker\\Desktop\\media-tracker-desktop\\media-tracker-desktop\\Forms\\LinkLastFmForm.cs",
               "RelativeToolTip": "media-tracker-desktop\\Forms\\LinkLastFmForm.cs",
-              "ViewState": "AgIAAB0AAAAAAAAAAAAQwCkAAAAUAAAAAAAAAA==",
+              "ViewState": "AgIAAG8AAAAAAAAAAAAmwHUAAAAQAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-05-02T18:08:34.501Z",
               "EditorCaption": ""
@@ -98,20 +117,20 @@
               "RelativeDocumentMoniker": "media-tracker-desktop\\Forms\\LinkTdmbForm.cs",
               "ToolTip": "C:\\Users\\nicol\\Documents\\GitHub\\media-tracker\\Desktop\\media-tracker-desktop\\media-tracker-desktop\\Forms\\LinkTdmbForm.cs",
               "RelativeToolTip": "media-tracker-desktop\\Forms\\LinkTdmbForm.cs",
-              "ViewState": "AgIAAEMAAAAAAAAAAAAswFcAAAAgAAAAAAAAAA==",
+              "ViewState": "AgIAAJ4AAAAAAAAAAAAIwPQAAAAJAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-05-02T15:50:40.697Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 4,
               "Title": "LinkSteamForm.cs",
               "DocumentMoniker": "C:\\Users\\nicol\\Documents\\GitHub\\media-tracker\\Desktop\\media-tracker-desktop\\media-tracker-desktop\\Forms\\LinkSteamForm.cs",
               "RelativeDocumentMoniker": "media-tracker-desktop\\Forms\\LinkSteamForm.cs",
               "ToolTip": "C:\\Users\\nicol\\Documents\\GitHub\\media-tracker\\Desktop\\media-tracker-desktop\\media-tracker-desktop\\Forms\\LinkSteamForm.cs",
               "RelativeToolTip": "media-tracker-desktop\\Forms\\LinkSteamForm.cs",
-              "ViewState": "AgIAAEsAAAAAAAAAAAAYwF8AAAAuAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAMAAAAQAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-05-02T13:51:55.498Z",
               "EditorCaption": ""

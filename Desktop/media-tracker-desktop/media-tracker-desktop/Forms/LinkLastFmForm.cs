@@ -8,12 +8,15 @@ using Supabase;
 using media_tracker_desktop.Models;
 using media_tracker_desktop.Models.ApiModels;
 using media_tracker_desktop.Models.Steam;
+using media_tracker_desktop.Models.TMDB;
+using System.Data;
 
 namespace media_tracker_desktop.Forms
 {
     public partial class LinkLastFmForm : Form
     {
         private readonly LastFmService _lastFm = new LastFmService();
+        private List<UserFavoriteMedia> _favorites = [];
 
         public LinkLastFmForm()
         {
@@ -42,8 +45,9 @@ namespace media_tracker_desktop.Forms
                     if (success && user != null)
                     {
                         // Put the user object into a list since data grid view accepts a list for it to work.
-                        // Display user information.
-                        lastFmDataGridView.DataSource = new List<LastFM_User> { user };
+                        (bool success1, List<LastFM_Artist>? topArtists) = await LastFMApi.GetUserTopArtists();
+                        (bool success2, List<LastFM_Track>? recentTracks) = await LastFMApi.GetUserRecentTracks();
+                        BuildViewGrid(topArtists, recentTracks);
                     }
                     else if (user == null)
                     {
@@ -64,6 +68,129 @@ namespace media_tracker_desktop.Forms
             }
         }
 
+        public async void BuildViewGrid(List<LastFM_Artist> topArtists, List<LastFM_Track> recentTracks)
+        {
+            DataTable table = new DataTable();
+
+            table.Columns.Add("ID");//probably won't need this
+            table.Columns.Add("Top Type");
+            table.Columns.Add("Artist Name");
+            table.Columns.Add("Top Track");
+
+            foreach (LastFM_Artist artist in topArtists)
+            {
+                table.Rows.Add(artist.Mbid, "Top Artist",artist.Name, null);
+            }
+            foreach (LastFM_Track track in recentTracks)
+            {
+                table.Rows.Add("", "Top Track", track.ArtistName, track.Name);
+            }
+
+            lastFmDataGridView.DataSource = table;
+
+            lastFmDataGridView.Columns["ID"].Visible = false;
+            lastFmDataGridView.RowHeadersVisible = false;
+            lastFmDataGridView.AllowUserToAddRows = false;
+
+            lastFmDataGridView.Columns["Artist Name"].Width = 200;
+            lastFmDataGridView.Columns["Top Track"].Width = 200;
+
+            DataGridViewButtonColumn favoriteButtons = new DataGridViewButtonColumn();
+            // Add the button properties.
+            favoriteButtons.Name = "btnFavorite";
+            // Header text is displayed as the column title.
+            favoriteButtons.HeaderText = " ";
+            favoriteButtons.FlatStyle = FlatStyle.Popup;
+
+            // Add the button column to the data grid.
+            lastFmDataGridView.Columns.Add(favoriteButtons);
+
+            // Retrieve the list of user's favorite media.
+            _favorites = await UserAppAccount.GetFavoriteMediaList();
+
+            // Foreach row in the data grid,
+            foreach (DataGridViewRow row in lastFmDataGridView.Rows)
+            {
+                // Retrieve the current game ID.
+                string currentRowTitle = (string)row.Cells["Artist Name"].Value;
+
+                // Default: Unfavorite the button.
+                row.Cells["btnFavorite"].Value = "\u2730";
+
+                // Retrieve the game with the same artist/track name from the favorite list.
+                // Make sure that it is from the lastFM platform.
+                var favoriteMusic = _favorites.FirstOrDefault(
+                    g => ((g.Title == currentRowTitle) || (g.Artist == currentRowTitle)) && (g.MediaTypeID == 4) || (g.MediaTypeID == 6));
+
+                // If a game exist, mark the button as favorite.
+                if (favoriteMusic != null)
+                {
+                    row.Cells["btnFavorite"].Value = "\u2605";
+                }
+            }
+
+            // Subscribe to event handler that specifies what happens when any of the favorite buttons are clicked.
+            lastFmDataGridView.CellClick += btnFavorite_CellClick;
+        }
+
+
+        private async void btnFavorite_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            try
+            {
+                var currentButton = lastFmDataGridView.Rows[e.RowIndex].Cells[e.ColumnIndex];
+
+                // Ignore clicks that are not the favorite buttons.
+                if (e.RowIndex < 0 || e.ColumnIndex != lastFmDataGridView.Columns["btnFavorite"].Index)
+                {
+                    return;
+                }
+
+                // Retrieve the current artist or track name.
+                string currentRowTitle = (string)lastFmDataGridView.Rows[e.RowIndex].Cells["Artist Name"].Value;
+
+                // Retrieve the show with the same show ID from the favorite list.
+                // Make sure that it is from the TMDB platform.
+                var favoriteShow = _favorites.FirstOrDefault(
+                    g => g.Title == currentRowTitle && ((g.MediaTypeID == 4) || (g.MediaTypeID == 6)));
+
+                // If there is no game,
+                if (favoriteShow == null)
+                {
+                    // Fill in the star.
+                    currentButton.Value = "\u2605";
+                }
+                // Else,
+                else
+                {
+                    // Empty the star.
+                    currentButton.Value = "\u2730";
+                }
+
+                // Retrieve the title of the current row.
+
+                var format = UserAppAccount.MediaTypeID.Song;
+                if ((string)lastFmDataGridView.Rows[e.RowIndex].Cells["Top Type"].Value == "Top Artist")
+                {
+                    format = UserAppAccount.MediaTypeID.Artist;
+                }
+
+                // Update the favorite status of the media.
+                // The SP unfavorites/favorites media.
+                await UserAppAccount.FavoriteMedia(
+                    platformID: UserAppAccount.LastFMPlatformID,
+                    username: UserAppAccount.Username,
+                    mediaTypeID: format,
+                    title: currentRowTitle,
+                    artist: currentRowTitle
+                    );
+
+            }
+            catch (Exception error)
+            {
+                MessageBox.Show($"Error: {error.Message}");
+            }
+        }
 
         private async void linkButton_Click(object sender, EventArgs e)
         {
