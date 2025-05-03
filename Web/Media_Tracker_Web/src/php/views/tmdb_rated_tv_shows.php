@@ -5,6 +5,25 @@
 
     // Required
     require_once '../media/TMDB/get_rated_tv_shows.php';
+    require_once '../filter_functions.php';
+
+    $has_filter = isset($_GET["searchString"]) && $_GET["searchString"] != "";
+    // Grab the input string and selected category for searching from the post array
+    $filter_string = $_GET["searchString"] ?? "";
+    
+    $filtUrl = $has_filter ? "searchString=$filter_string" : "";
+
+    // Get sort options from URL
+    if (isset($_GET["sort"])){
+        $split = explode('_', $_GET["sort"]);
+        $sort_field = $split[0];
+        $sort_dir = $split[1];
+    } else {
+        $sort_field = "name";
+        $sort_dir = "asc";
+    }
+
+    $rated_shows_filt = sortBy(filter($ratedTvShows, "name", $filter_string, $movie = true), $sort_field, $sort_dir);
 
 ?>
 
@@ -79,11 +98,37 @@
                     </h2>
                 </div>
 
+                <!-- Search Bar -->
                 <div class="card bg-dark text-light mb-4">
-                    <div class="card-body">
-                        <input type="text" class="form-control" placeholder="Search Titles...">
+                    <div class="card-body <?php echo ($has_filter) ? 'pb-2' : '' ?>">
+                        <form method="get" class="row pe-3 ps-0 mb-0">
+                            <?php if (isset($_GET["sort"])): ?>
+                                <input type="hidden" name="sort" value="<?php echo $_GET["sort"] ?>" />
+                            <?php endif; ?>
+                            <div class="col-9 col-md-10">
+                                <div class="input-group">
+                                    <input name="searchString" type="text" class="form-control" placeholder="Search..." 
+                                        <?php echo ($filter_string != "") ? 'value="'.$filter_string.'"' : "" ?>
+                                    />
+                                    <span class="input-group-text search-select pe-3">Titles</span>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn bg-dark-secondary text-white col-3 col-md-2">Search</button>
+                        </form>
+                        <?php if($has_filter): ?>
+                            <form method="get" class="row mt-2 ms-1 filter-label">
+                                <?php if (isset($_GET["sort"])): ?>
+                                    <input type="hidden" name="sort" value="<?php echo $_GET["sort"] ?>" />
+                                <?php endif; ?>
+                                <div>
+                                    <p>Searching for "<?php echo $filter_string ?>"</p>
+                                </div>
+                                <button type="submit" class="btn bg-dark-secondary text-white">Clear Filter</button>
+                            </form>
+                        <?php endif; ?>
                     </div>
                 </div>
+                
                 <h3>Rated TV Shows</h3>
                 <div class="table-responsive">
                     <?php if (isset($error)): ?>
@@ -92,26 +137,42 @@
                         <table class="table table-dark table-hover">
                             <thead>
                                 <tr>
-                                    <th>ID</th>
-                                    <th>Name</th>
-                                    <th>Your Rating</th>
-                                    <th>Average Rating</th>
-                                    <th>Vote Count</th>
+                                <th><a class="sort-link"<?php echo sortLink($sort_field, $sort_dir, "id", $filtUrl) ?>>
+                                        ID
+                                    </a></th>
+                                    <th><a class="sort-link"<?php echo sortLink($sort_field, $sort_dir, "name", $filtUrl) ?>>
+                                        Name
+                                    </a></th>
+                                    <th><a class="sort-link"<?php echo sortLink($sort_field, $sort_dir, "userRating", $filtUrl) ?>>
+                                        Your Rating
+                                    </a></th>
+                                    <th><a class="sort-link"<?php echo sortLink($sort_field, $sort_dir, "avgRating", $filtUrl) ?>>
+                                        Average Rating
+                                    </a></th>
+                                    <th><a class="sort-link"<?php echo sortLink($sort_field, $sort_dir, "votes", $filtUrl) ?>>
+                                        Vote Count
+                                    </a></th>
                                     <th>Overview</th>
 
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php foreach ($ratedTvShows as $show): ?>
+                                <?php if (count($rated_shows_filt) > 0): ?>
+                                    <?php foreach ($rated_shows_filt as $show): ?>
+                                        <tr>
+                                            <td><?php echo htmlspecialchars($show->id); ?></td>
+                                            <td><?php echo htmlspecialchars($show->name); ?></td>
+                                            <td><?php echo htmlspecialchars($show->user_rating); ?></td>
+                                            <td><?php echo htmlspecialchars($show->average_rating); ?></td>
+                                            <td><?php echo htmlspecialchars($show->vote_count); ?></td>
+                                            <td><?php echo htmlspecialchars($show->overview); ?></td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                <?php else: ?>
                                     <tr>
-                                        <td><?php echo htmlspecialchars($show->id); ?></td>
-                                        <td><?php echo htmlspecialchars($show->name); ?></td>
-                                        <td><?php echo htmlspecialchars($show->user_rating); ?></td>
-                                        <td><?php echo htmlspecialchars($show->average_rating); ?></td>
-                                        <td><?php echo htmlspecialchars($show->vote_count); ?></td>
-                                        <td><?php echo htmlspecialchars($show->overview); ?></td>
+                                        <td colspan="3" class="lead text-center">No items match the filter</td>
                                     </tr>
-                                <?php endforeach; ?>
+                                <?php endif; ?>
                             </tbody>
                         </table>
                     <?php endif; ?>

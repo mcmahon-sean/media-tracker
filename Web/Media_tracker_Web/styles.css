@@ -21,6 +21,22 @@ body {
     max-width: 40px;
 }
 
+.search-select {
+    max-width: min-content;
+    font-size: 1.1rem;
+    background-color: rgb(240,240,240);
+    border-left: 1px solid rgb(200,200,200);
+}
+
+.search-select option {
+    background-color: white;
+}
+
+img.game-icon {
+    height: 32px;
+    margin-right: .5rem;
+}
+
 .media-tab {
     font-size: 1.2rem;
 }
@@ -58,6 +74,23 @@ body {
     margin: .75rem 0;
 }
 
+.filter-label > div {
+    align-content: center;
+    max-width: fit-content;
+}
+
+.filter-label p, .filter-label button {
+    max-width: fit-content;
+    margin-bottom: 0;
+}
+
+.filter-label button {
+    font-size: 0.9rem;
+    min-width: fit-content;
+    padding-top: .25rem;
+    padding-bottom: .25rem;
+}
+
 .favorite {
     cursor: pointer;
 }
@@ -73,6 +106,10 @@ body {
 
 .table thead th {
     background: rgb(16,16,16);
+}
+
+a.sort-link {
+    color: white;
 }
 
 .card {
