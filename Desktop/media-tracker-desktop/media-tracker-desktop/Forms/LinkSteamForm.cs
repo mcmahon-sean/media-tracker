@@ -1,7 +1,6 @@
 using System;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using media_tracker_desktop.Services;
 using Supabase;
 using media_tracker_desktop.Models;
 using media_tracker_desktop.Models.Steam;
@@ -13,16 +12,9 @@ namespace media_tracker_desktop.Forms
 {
     public partial class LinkSteamForm : Form
     {
-        //private readonly SteamService _steam = new SteamService();
-
         public LinkSteamForm()
         {
             InitializeComponent();
-
-            //// If user has a steam id,
-            //if (!string.IsNullOrEmpty(UserAppAccount.UserSteamID))
-            //    // Load display.
-            //    _ = LoadSteamAsync();
         }
 
         private async void LinkSteamForm_Load(object sender, EventArgs e)
@@ -35,8 +27,6 @@ namespace media_tracker_desktop.Forms
 
         private async Task LoadSteamAsync()
         {
-            //MessageBox.Show(_mainForm)
-
             // Remove link panel.
             pnlLink.Visible = false;
 

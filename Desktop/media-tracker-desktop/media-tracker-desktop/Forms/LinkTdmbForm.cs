@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using media_tracker_desktop.Services;
 using media_tracker_desktop.Models.TMDB;
 using Supabase;
 using media_tracker_desktop.Models;
@@ -18,7 +17,6 @@ namespace media_tracker_desktop.Forms
 {
     public partial class LinkTmdbForm : Form
     {
-        private readonly TmdbService _tmdbSvc = new TmdbService();
         private List<UserFavoriteMedia> _favorites = [];
 
         public LinkTmdbForm()

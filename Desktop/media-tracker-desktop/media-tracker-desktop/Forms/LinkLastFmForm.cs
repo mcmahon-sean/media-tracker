@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using media_tracker_desktop.Services;
 using media_tracker_desktop.Models.LastFM;
 using Supabase;
 using media_tracker_desktop.Models;
@@ -15,7 +14,6 @@ namespace media_tracker_desktop.Forms
 {
     public partial class LinkLastFmForm : Form
     {
-        private readonly LastFmService _lastFm = new LastFmService();
         private List<UserFavoriteMedia> _favorites = [];
 
         public LinkLastFmForm()
@@ -111,21 +109,45 @@ namespace media_tracker_desktop.Forms
             // Foreach row in the data grid,
             foreach (DataGridViewRow row in lastFmDataGridView.Rows)
             {
-                // Retrieve the current game ID.
-                string currentRowTitle = (string)row.Cells["Artist Name"].Value;
+                // Retrieve the type of the row. (Top Artist or Top Track)
+                string currentRowTopType = (string)row.Cells["Top Type"].Value;
 
-                // Default: Unfavorite the button.
+                // Default: Unfavorite button.
                 row.Cells["btnFavorite"].Value = "\u2730";
 
-                // Retrieve the game with the same artist/track name from the favorite list.
-                // Make sure that it is from the lastFM platform.
-                var favoriteMusic = _favorites.FirstOrDefault(
-                    g => ((g.Title == currentRowTitle) || (g.Artist == currentRowTitle)) && (g.MediaTypeID == 4) || (g.MediaTypeID == 6));
-
-                // If a game exist, mark the button as favorite.
-                if (favoriteMusic != null)
+                // If type is Top Artist,
+                if (currentRowTopType == "Top Artist")
                 {
-                    row.Cells["btnFavorite"].Value = "\u2605";
+                    // Retrieve the current artist name.
+                    string currentRowArtistName = (string)row.Cells["Artist Name"].Value;
+
+                    // Retrieve the artist with the same name from the favorite list.
+                    // Ensure that the record is of the Artist media type.
+                    var favoriteArtist = _favorites.FirstOrDefault(a => a.Artist == currentRowArtistName && a.MediaTypeID == (int)UserAppAccount.MediaTypeID.Artist);
+
+                    // If there is an artist,
+                    if (favoriteArtist != null)
+                    {
+                        // Favorite the button.
+                        row.Cells["btnFavorite"].Value = "\u2605";
+                    }
+                }
+                // If type is Top Track,
+                else if (currentRowTopType == "Top Track")
+                {
+                    // Retrieve the current track name.
+                    string currentRowTrackName = (string)row.Cells["Top Track"].Value;
+
+                    // Retrieve the track with the same name from the favorite list.
+                    // Ensure that the record is of the Song media type.
+                    var favoriteTrack = _favorites.FirstOrDefault(t => t.Title == currentRowTrackName && t.MediaTypeID == (int)UserAppAccount.MediaTypeID.Song);
+
+                    // If there is a track,
+                    if (favoriteTrack != null)
+                    {
+                        // Favorite the button.
+                        row.Cells["btnFavorite"].Value = "\u2605";
+                    }
                 }
             }
 
@@ -138,6 +160,7 @@ namespace media_tracker_desktop.Forms
         {
             try
             {
+                // Retrieve the clicked button.
                 var currentButton = lastFmDataGridView.Rows[e.RowIndex].Cells[e.ColumnIndex];
 
                 // Ignore clicks that are not the favorite buttons.
@@ -146,45 +169,79 @@ namespace media_tracker_desktop.Forms
                     return;
                 }
 
-                // Retrieve the current artist or track name.
-                string currentRowTitle = (string)lastFmDataGridView.Rows[e.RowIndex].Cells["Artist Name"].Value;
+                // Retrieve the current type (Top Artist or Top Track).
+                string currentRowTopType = (string)lastFmDataGridView.Rows[e.RowIndex].Cells["Top Type"].Value;
 
-                // Retrieve the show with the same show ID from the favorite list.
-                // Make sure that it is from the TMDB platform.
-                var favoriteShow = _favorites.FirstOrDefault(
-                    g => g.Title == currentRowTitle && ((g.MediaTypeID == 4) || (g.MediaTypeID == 6)));
+                // Retrieve the artist name, which matters for both favoriting the artist and the track.
+                string currentRowArtistName = (string)lastFmDataGridView.Rows[e.RowIndex].Cells["Artist Name"].Value;
 
-                // If there is no game,
-                if (favoriteShow == null)
+                // Update the list of user's favorite media.
+                _favorites = await UserAppAccount.GetFavoriteMediaList();
+
+                // If current type is Top Artist,
+                if (currentRowTopType == "Top Artist")
                 {
-                    // Fill in the star.
-                    currentButton.Value = "\u2605";
-                }
-                // Else,
-                else
-                {
-                    // Empty the star.
-                    currentButton.Value = "\u2730";
-                }
+                    // Retrieve the artist with the same name from the favorite list.
+                    // Ensure that the record is of the Artist media type.
+                    var favoriteArtist = _favorites.FirstOrDefault(a => a.Artist == currentRowArtistName && a.MediaTypeID == (int)UserAppAccount.MediaTypeID.Artist);
 
-                // Retrieve the title of the current row.
+                    // If there is no favorite artist,
+                    if (favoriteArtist == null)
+                    {
+                        // Fill in the star.
+                        currentButton.Value = "\u2605";
+                    }
+                    // Else,
+                    else
+                    {
+                        // Empty the star.
+                        currentButton.Value = "\u2730";
+                    }
 
-                var format = UserAppAccount.MediaTypeID.Song;
-                if ((string)lastFmDataGridView.Rows[e.RowIndex].Cells["Top Type"].Value == "Top Artist")
-                {
-                    format = UserAppAccount.MediaTypeID.Artist;
-                }
-
-                // Update the favorite status of the media.
-                // The SP unfavorites/favorites media.
-                await UserAppAccount.FavoriteMedia(
-                    platformID: UserAppAccount.LastFMPlatformID,
-                    username: UserAppAccount.Username,
-                    mediaTypeID: format,
-                    title: currentRowTitle,
-                    artist: currentRowTitle
+                    // Favorite the artist.
+                    // In the DB, I saw that artist name was stored in the MediaPlatformID in lowercase.
+                    // Artist name is also stored as title.
+                    await UserAppAccount.FavoriteMedia(
+                        platformID: UserAppAccount.LastFMPlatformID,
+                        username: UserAppAccount.Username,
+                        mediaTypeID: UserAppAccount.MediaTypeID.Artist,
+                        mediaPlatformID: currentRowArtistName.ToLower(),
+                        title: currentRowArtistName,
+                        artist: currentRowArtistName
                     );
+                }
+                // If current type is Top Track,
+                else if (currentRowTopType == "Top Track")
+                {
+                    // Retrieve the track name.
+                    string currentRowTrackName = (string)lastFmDataGridView.Rows[e.RowIndex].Cells["Top Track"].Value;
 
+                    // Retrieve the track with the same name from the favorite list.
+                    // Ensure that the record is of the Song media type.
+                    var favoriteTrack = _favorites.FirstOrDefault(a => a.Title == currentRowTrackName && a.MediaTypeID == (int)UserAppAccount.MediaTypeID.Song);
+
+                    // If there is no favorite track,
+                    if (favoriteTrack == null)
+                    {
+                        // Fill in the star.
+                        currentButton.Value = "\u2605";
+                    }
+                    // Else,
+                    else
+                    {
+                        // Empty the star.
+                        currentButton.Value = "\u2730";
+                    }
+
+                    // Favorite the track.
+                    await UserAppAccount.FavoriteMedia(
+                        platformID: UserAppAccount.LastFMPlatformID,
+                        username: UserAppAccount.Username,
+                        mediaTypeID: UserAppAccount.MediaTypeID.Song,
+                        title: currentRowTrackName,
+                        artist: currentRowArtistName
+                    );
+                }
             }
             catch (Exception error)
             {
