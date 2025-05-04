@@ -199,19 +199,66 @@ namespace media_tracker_desktop.Forms
 
             // Properties:
             txtSearch.Location = new Point(15, 15);
-            txtSearch.PlaceholderText = "Search";
+            txtSearch.PlaceholderText = "Search for artist or track...";
             txtSearch.Width = 350;
 
             // Add to panel.
             panel.Controls.Add(txtSearch);
 
-            //AddSubmitButton(panel);
+            // Events:
+            txtSearch.KeyDown += txtSearch_KeyDown;
         }
 
-        //private void AddSubmitButton(Panel panel)
-        //{
-        //    //Button btn
-        //}
+        // Event: When user presses a button in the search textbox.
+        private void txtSearch_KeyDown (object sender, KeyEventArgs e)
+        {
+            // If user pressed enter,
+            if (e.KeyCode == Keys.Enter)
+            {
+                TextBox txtSearch = (TextBox)sender;
+
+                // Retrieve search string.
+                string searchString = txtSearch.Text.ToLower();
+
+                // If there's a search string,
+                if (!string.IsNullOrEmpty(searchString))
+                {
+                    // Search for data.
+                    SearchData(searchString);
+                }
+                // Else,
+                else
+                {
+                    // Reset display.
+                    BuildViewGrid(_topArtists, _recentTracks);
+                }
+            }
+        }
+
+        // Method: Search for data.
+        private void SearchData(string text)
+        {
+            text.ToLower();
+
+            // Query options:
+            // Ensure that the search is case insensitive.
+            QueryOptions<LastFM_Artist> optionArtist = new QueryOptions<LastFM_Artist>
+            {
+                Where = a => a.Name.ToLower().Contains(text)
+            };
+
+            QueryOptions<LastFM_Track> optionTrack = new QueryOptions<LastFM_Track>
+            {
+                Where = t => t.Name.ToLower().Contains(text) || t.ArtistName.ToLower().Contains(text)
+            };
+
+            // Retrieve data.
+            List<LastFM_Artist> resultArtist = DataFunctions.Sort(_topArtists, optionArtist) ?? [];
+            List<LastFM_Track> resultTrack = DataFunctions.Sort(_recentTracks, optionTrack) ?? [];
+
+            // Display data.
+            BuildViewGrid(resultArtist, resultTrack);
+        }
 
         // Method: Add filter button.
         private void AddFilterButton(Panel panel)
