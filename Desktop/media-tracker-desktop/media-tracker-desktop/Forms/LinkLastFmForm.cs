@@ -271,7 +271,7 @@ namespace media_tracker_desktop.Forms
             ToolStripMenuItem favoriteFilter = new ToolStripMenuItem("Favorite (asc)");
 
             // Add to button.
-            _filterMenu.Items.AddRange(new ToolStripItem[] { artistFilter, trackFilter });
+            _filterMenu.Items.AddRange(new ToolStripItem[] { artistFilter, trackFilter, favoriteFilter });
 
             // Events:
             _filterMenu.ItemClicked += filterMenu_ItemClicked;
@@ -371,9 +371,111 @@ namespace media_tracker_desktop.Forms
                     // Update the menu item.
                     _filterMenu.Items[1].Text = "Track (asc)";
                 }
+                else if (option == "Favorite (asc)") {
+                    (List<LastFM_Artist> favoriteArtistList, List<LastFM_Track> favoriteTrackList) = RetrieveSortedFavorites("asc");
 
-                // Build based on whether or not the list was updated.
-                BuildViewGrid(sortedTopArtists ?? [], sortedRecentTracks ?? []);
+                    // Update list.
+                    sortedTopArtists = favoriteArtistList;
+                    // Retain list.
+                    sortedRecentTracks = favoriteTrackList;
+
+                    // Update the menu item.
+                    _filterMenu.Items[2].Text = "Favorite (desc)";
+                }
+                else if (option == "Favorite (desc)")
+                {
+                    (List<LastFM_Artist> favoriteArtistList, List<LastFM_Track> favoriteTrackList) = RetrieveSortedFavorites("desc");
+
+                    // Update list.
+                    sortedTopArtists = favoriteArtistList;
+                    // Retain list.
+                    sortedRecentTracks = favoriteTrackList;
+
+                    // Update the menu item.
+                    _filterMenu.Items[2].Text = "Favorite (asc)";
+                }
+
+                    // Build based on whether or not the list was updated.
+                    BuildViewGrid(sortedTopArtists ?? [], sortedRecentTracks ?? []);
+            }
+        }
+
+        // Method: Sorts the favorites.
+        private (List<LastFM_Artist>, List<LastFM_Track>) RetrieveSortedFavorites(string orderByDirection)
+        {
+            // Filter options based on passed orderByDirection.
+            // Also, only songs and artist favorites.
+            QueryOptions<UserFavoriteMedia> options = new QueryOptions<UserFavoriteMedia>
+            {
+                Where = m => m.MediaTypeID == (int)UserAppAccount.MediaTypeID.Song || m.MediaTypeID == (int)UserAppAccount.MediaTypeID.Artist,
+                OrderBy = m => m.MediaID,
+                OrderByDirection = orderByDirection
+            };
+
+            // Retrieve the sorted favorites.
+            List<UserFavoriteMedia> sortedFavorites = DataFunctions.Sort(_favorites, options) ?? [];
+
+            // Initialize lists.
+            List<LastFM_Artist> favoriteArtistList = [];
+            List<LastFM_Artist> unfavoriteArtistList = [];
+            List<LastFM_Track> favoriteTrackList = [];
+            List<LastFM_Track> unfavoriteTrackList = [];
+
+            // Foreach artist that is currently in display,
+            foreach (LastFM_Artist artist in _topArtists)
+            {
+                // If that artist is a favorite,
+                if (_favorites.Any(f => f.Artist == artist.Name))
+                {
+                    // Add it to the favorite list.
+                    favoriteArtistList.Add(artist);
+                }
+                // Else,
+                else
+                {
+                    // Add to the unfavorite list.
+                    unfavoriteArtistList.Add(artist);
+                }
+            }
+
+            // Foreach track that is currently in display,
+            foreach (LastFM_Track track in _recentTracks)
+            {
+                // If that track is a favorite,
+                if (_favorites.Any(f => f.Title == track.Name))
+                {
+                    // Add it to the favorite list.
+                    favoriteTrackList.Add(track);
+                }
+                // Else,
+                else
+                {
+                    // Add to the unfavorite list.
+                    unfavoriteTrackList.Add(track);
+                }
+            }
+
+            // If the order is asc,
+            if (orderByDirection == "asc")
+            {
+                // Add list together so that the favorite is first.
+                favoriteArtistList.AddRange(unfavoriteArtistList);
+                favoriteTrackList.AddRange(unfavoriteTrackList);
+
+                return (favoriteArtistList, favoriteTrackList);
+            }
+            // If the order is desc,
+            else if (orderByDirection == "desc")
+            {
+                // Add list together so that the favorite is last.
+                unfavoriteArtistList.AddRange(favoriteArtistList);
+                unfavoriteTrackList.AddRange(favoriteTrackList);
+
+                return (unfavoriteArtistList, unfavoriteTrackList);
+            }
+            else
+            {
+                return ([], []);
             }
         }
 
