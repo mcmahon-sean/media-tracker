@@ -126,6 +126,18 @@ class AuthNotifier extends StateNotifier<AuthState> {
       clearLastFmUsername: username == null,
     );
   }
+
+  void updateUserInfo({
+    String? firstName,
+    String? lastName,
+    String? email,
+  }) {
+    state = state.copyWith(
+      firstName: firstName ?? state.firstName,
+      lastName: lastName ?? state.lastName,
+      email: email ?? state.email,
+    );
+  }
 }
 
 // Riverpod provider for accessing and modifying the authentication state

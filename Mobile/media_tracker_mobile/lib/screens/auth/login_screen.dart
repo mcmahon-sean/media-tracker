@@ -93,43 +93,54 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Login')),
-      body: Padding(
-        padding: const EdgeInsets.all(50),
-        child: Column(
-          children: [
-            Row(
-              children: [
-                SizedBox(
-                  width: 300,
-                  child: TextField(
-                    controller: usernameController,
-                    maxLength: 50,
-                    decoration: InputDecoration(label: Text('Username')),
+      appBar: AppBar(title: const Text('Login')),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            children: [
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.only(bottom: 24),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildField('Username', usernameController),
+                      _buildField(
+                        'Password',
+                        passwordController,
+                        obscure: true,
+                      ),
+                    ],
                   ),
                 ),
-              ],
-            ),
-            Row(
-              children: [
-                SizedBox(
-                  width: 300,
-                  child: TextField(
-                    controller: passwordController,
-                    maxLength: 50,
-                    obscureText: true,
-                    decoration: InputDecoration(label: Text('Password')),
-                  ),
+              ),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: login,
+                  child: const Text('Login'),
                 ),
-              ],
-            ),
-            Row(
-              children: [
-                ElevatedButton(onPressed: login, child: Text('Login')),
-              ],
-            ),
-          ],
+              ),
+            ],
+          ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildField(
+    String label,
+    TextEditingController controller, {
+    bool obscure = false,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: TextField(
+        controller: controller,
+        obscureText: obscure,
+        maxLength: 50,
+        decoration: InputDecoration(labelText: label),
       ),
     );
   }

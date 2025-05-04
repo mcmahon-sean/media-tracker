@@ -67,7 +67,7 @@ class _LinkAccountCardState extends ConsumerState<LinkAccountCard> {
   Widget build(BuildContext context) {
     print('[${widget.platformName}] linkedValue: ${widget.linkedValue}');
     return SizedBox(
-      width: double.infinity, // Ensures full width
+      width: double.infinity,
       child: Card(
         color: const Color.fromARGB(255, 72, 72, 72),
         margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
@@ -177,7 +177,7 @@ class _LinkAccountCardState extends ConsumerState<LinkAccountCard> {
                             label: const Text('Unlink'),
                             onPressed: () {
                               widget
-                                  .onUnlink(); // properly calls external clear logic
+                                  .onUnlink(); 
                               setState(() {
                                 _showCredential = false;
                                 _editMode = false;
