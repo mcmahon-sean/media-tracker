@@ -16,8 +16,8 @@ namespace media_tracker_desktop.Forms
 
         private void InitializeComponent()
         {
-            DataGridViewCellStyle dataGridViewCellStyle3 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle4 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
             pnlLink = new Panel();
             linkButton = new Button();
             lastFmTextBox = new TextBox();
@@ -64,36 +64,36 @@ namespace media_tracker_desktop.Forms
             // lastFmDataGridView
             // 
             lastFmDataGridView.BackgroundColor = Color.FromArgb(30, 30, 30);
-            dataGridViewCellStyle3.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle3.BackColor = Color.FromArgb(70, 70, 70);
-            dataGridViewCellStyle3.Font = new Font("Segoe UI", 9F);
-            dataGridViewCellStyle3.ForeColor = Color.White;
-            dataGridViewCellStyle3.SelectionBackColor = SystemColors.Highlight;
-            dataGridViewCellStyle3.SelectionForeColor = SystemColors.HighlightText;
-            dataGridViewCellStyle3.WrapMode = DataGridViewTriState.True;
-            lastFmDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle3;
+            dataGridViewCellStyle1.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle1.BackColor = Color.FromArgb(70, 70, 70);
+            dataGridViewCellStyle1.Font = new Font("Segoe UI", 9F);
+            dataGridViewCellStyle1.ForeColor = Color.White;
+            dataGridViewCellStyle1.SelectionBackColor = SystemColors.Highlight;
+            dataGridViewCellStyle1.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle1.WrapMode = DataGridViewTriState.True;
+            lastFmDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
             lastFmDataGridView.ColumnHeadersHeight = 34;
-            dataGridViewCellStyle4.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle4.BackColor = Color.FromArgb(50, 50, 50);
-            dataGridViewCellStyle4.Font = new Font("Segoe UI", 9F);
-            dataGridViewCellStyle4.ForeColor = Color.White;
-            dataGridViewCellStyle4.SelectionBackColor = SystemColors.Highlight;
-            dataGridViewCellStyle4.SelectionForeColor = SystemColors.HighlightText;
-            dataGridViewCellStyle4.WrapMode = DataGridViewTriState.False;
-            lastFmDataGridView.DefaultCellStyle = dataGridViewCellStyle4;
+            dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle2.BackColor = Color.FromArgb(50, 50, 50);
+            dataGridViewCellStyle2.Font = new Font("Segoe UI", 9F);
+            dataGridViewCellStyle2.ForeColor = Color.White;
+            dataGridViewCellStyle2.SelectionBackColor = SystemColors.Highlight;
+            dataGridViewCellStyle2.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle2.WrapMode = DataGridViewTriState.False;
+            lastFmDataGridView.DefaultCellStyle = dataGridViewCellStyle2;
             lastFmDataGridView.Dock = DockStyle.Fill;
             lastFmDataGridView.EnableHeadersVisualStyles = false;
             lastFmDataGridView.GridColor = Color.Gray;
             lastFmDataGridView.Location = new Point(0, 60);
             lastFmDataGridView.Name = "lastFmDataGridView";
             lastFmDataGridView.RowHeadersWidth = 62;
-            lastFmDataGridView.Size = new Size(669, 184);
+            lastFmDataGridView.Size = new Size(669, 299);
             lastFmDataGridView.TabIndex = 0;
             // 
             // LinkLastFmForm
             // 
             BackColor = Color.FromArgb(30, 30, 30);
-            ClientSize = new Size(669, 244);
+            ClientSize = new Size(669, 359);
             Controls.Add(lastFmDataGridView);
             Controls.Add(pnlLink);
             Name = "LinkLastFmForm";
