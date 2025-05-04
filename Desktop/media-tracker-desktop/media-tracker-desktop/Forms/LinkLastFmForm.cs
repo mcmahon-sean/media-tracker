@@ -18,9 +18,9 @@ namespace media_tracker_desktop.Forms
     public partial class LinkLastFmForm : Form
     {
         private List<UserFavoriteMedia> _favorites = [];
-        private ContextMenuStrip _filterMenu;
-        private bool _lastFMFilterVisible = false;
-        private Button _btnFilter;
+        private ContextMenuStrip _sortMenu;
+        private bool _lastFMSortVisible = false;
+        private Button _btnSort;
         private Panel _pnlSearchAndSort = new Panel();
         private DataTable _table;
         private List<LastFM_Artist> _topArtists = [];
@@ -187,9 +187,9 @@ namespace media_tracker_desktop.Forms
             // Add to form.
             this.Controls.Add(_pnlSearchAndSort);
 
-            // Add search bar and filter button.
+            // Add search bar and sort button.
             AddSearchBar(_pnlSearchAndSort);
-            AddFilterButton(_pnlSearchAndSort);
+            AddSortButton(_pnlSearchAndSort);
         }
 
         // Method: Add search bar for the panel.
@@ -260,99 +260,99 @@ namespace media_tracker_desktop.Forms
             BuildViewGrid(resultArtist, resultTrack);
         }
 
-        // Method: Add filter button.
-        private void AddFilterButton(Panel panel)
+        // Method: Add sort button.
+        private void AddSortButton(Panel panel)
         {
-            _btnFilter = new Button();
+            _btnSort = new Button();
 
             // Properties:
-            _btnFilter.Location = new Point(400, 15);
-            _btnFilter.Text = "Filter Menu";
-            _btnFilter.AutoSize = true;
-            _btnFilter.BackColor = Color.White;
+            _btnSort.Location = new Point(400, 15);
+            _btnSort.Text = "Sort Menu";
+            _btnSort.AutoSize = true;
+            _btnSort.BackColor = Color.White;
 
             // Add to panel.
-            panel.Controls.Add(_btnFilter);
+            panel.Controls.Add(_btnSort);
 
             // Events:
-            _btnFilter.Click += btnFilter_Click;
+            _btnSort.Click += btnSort_Click;
 
-            // Add filter menu for the button.
-            AddFilterMenu(_btnFilter);
+            // Add sort menu for the button.
+            AddSortMenu(_btnSort);
         }
 
-        // Event: When filter button is clicked.
-        private void btnFilter_Click(object sender, EventArgs e)
+        // Event: When sort button is clicked.
+        private void btnSort_Click(object sender, EventArgs e)
         {
-            // Retrieve filter button.
-            _btnFilter = (Button)sender;
+            // Retrieve sort button.
+            _btnSort = (Button)sender;
 
             // If the button is clicked to open the menu,
-            if (!_lastFMFilterVisible)
+            if (!_lastFMSortVisible)
             {
                 // Open the menu.
-                _filterMenu.Show(_btnFilter, new Point(0, _btnFilter.Height));
+                _sortMenu.Show(_btnSort, new Point(0, _btnSort.Height));
 
                 // Menu is visible.
-                _lastFMFilterVisible = true;
+                _lastFMSortVisible = true;
             }
             // If the button is clicked to close the menu,
             else
             {
                 // Close the menu.
-                _filterMenu.Close();
+                _sortMenu.Close();
 
                 // Menu is not visible.
-                _lastFMFilterVisible = false;
+                _lastFMSortVisible = false;
             }
         }
 
         // Method: Adds a context menu strip to button.
-        private void AddFilterMenu(Button button)
+        private void AddSortMenu(Button button)
         {
-            _filterMenu = new ContextMenuStrip();
+            _sortMenu = new ContextMenuStrip();
 
             // Options:
-            ToolStripMenuItem artistFilter = new ToolStripMenuItem("Artist (asc)");
-            ToolStripMenuItem trackFilter = new ToolStripMenuItem("Track (asc)");
-            ToolStripMenuItem favoriteFilter = new ToolStripMenuItem("Favorite (asc)");
+            ToolStripMenuItem artistSort = new ToolStripMenuItem("Artist (asc)");
+            ToolStripMenuItem trackSort = new ToolStripMenuItem("Track (asc)");
+            ToolStripMenuItem favoriteSort = new ToolStripMenuItem("Favorite (asc)");
 
             // Add to button.
-            _filterMenu.Items.AddRange(new ToolStripItem[] { artistFilter, trackFilter, favoriteFilter });
+            _sortMenu.Items.AddRange(new ToolStripItem[] { artistSort, trackSort, favoriteSort });
 
             // Events:
-            _filterMenu.ItemClicked += filterMenu_ItemClicked;
+            _sortMenu.ItemClicked += sortMenu_ItemClicked;
         }
 
-        // Event: When a filter item is clicked in the filter menu,
-        private void filterMenu_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
+        // Event: When a sort item is clicked in the sort menu,
+        private void sortMenu_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
         {
-            // Retrieve the filter item.
+            // Retrieve the sort item.
             string? option = e.ClickedItem?.Text;
 
             // If there is an item,
             if (option != null)
             {
-                // Update the button to show the filter item selected.
-                _btnFilter.Text = option;
+                // Update the button to show the sort item selected.
+                _btnSort.Text = option;
 
-                // Filter lastFM display.
-                FilterData(option);
+                // Sort lastFM display.
+                SortData(option);
             }
         }
 
-        // Method: Filters the data based on filter option.
-        private void FilterData(string option)
+        // Method: Sorts the data based on sort option.
+        private void SortData(string option)
         {
             List<LastFM_Artist>? sortedTopArtists = [];
             List<LastFM_Track>? sortedRecentTracks = [];
 
-            // If there is data to be filtered,
+            // If there is data to be sorted,
             if (_topArtists != null && _recentTracks != null)
             {
                 if (option == "Artist (asc)")
                 {
-                    // Filter options.
+                    // Sort options.
                     QueryOptions<LastFM_Artist> options = new QueryOptions<LastFM_Artist>
                     {
                         OrderBy = a => a.Name,
@@ -365,11 +365,11 @@ namespace media_tracker_desktop.Forms
                     sortedRecentTracks = _recentTracks;
 
                     // Update the menu item.
-                    _filterMenu.Items[0].Text = "Artist (desc)";
+                    _sortMenu.Items[0].Text = "Artist (desc)";
                 }
                 else if (option == "Artist (desc)")
                 {
-                    // Filter options.
+                    // Sort options.
                     QueryOptions<LastFM_Artist> options = new QueryOptions<LastFM_Artist>
                     {
                         OrderBy = a => a.Name,
@@ -382,11 +382,11 @@ namespace media_tracker_desktop.Forms
                     sortedRecentTracks = _recentTracks;
 
                     // Update the menu item.
-                    _filterMenu.Items[0].Text = "Artist (asc)";
+                    _sortMenu.Items[0].Text = "Artist (asc)";
                 }
                 else if (option == "Track (asc)")
                 {
-                    // Filter options.
+                    // Sort options.
                     QueryOptions<LastFM_Track> options = new QueryOptions<LastFM_Track>
                     {
                         OrderBy = t => t.Name,
@@ -399,11 +399,11 @@ namespace media_tracker_desktop.Forms
                     sortedRecentTracks = DataFunctions.Sort(_recentTracks, options);
 
                     // Update the menu item.
-                    _filterMenu.Items[1].Text = "Track (desc)";
+                    _sortMenu.Items[1].Text = "Track (desc)";
                 }
                 else if (option == "Track (desc)")
                 {
-                    // Filter options.
+                    // Sort options.
                     QueryOptions<LastFM_Track> options = new QueryOptions<LastFM_Track>
                     {
                         OrderBy = t => t.Name,
@@ -416,7 +416,7 @@ namespace media_tracker_desktop.Forms
                     sortedRecentTracks = DataFunctions.Sort(_recentTracks, options);
 
                     // Update the menu item.
-                    _filterMenu.Items[1].Text = "Track (asc)";
+                    _sortMenu.Items[1].Text = "Track (asc)";
                 }
                 else if (option == "Favorite (asc)") {
                     (List<LastFM_Artist> favoriteArtistList, List<LastFM_Track> favoriteTrackList) = RetrieveSortedFavorites("asc");
@@ -427,7 +427,7 @@ namespace media_tracker_desktop.Forms
                     sortedRecentTracks = favoriteTrackList;
 
                     // Update the menu item.
-                    _filterMenu.Items[2].Text = "Favorite (desc)";
+                    _sortMenu.Items[2].Text = "Favorite (desc)";
                 }
                 else if (option == "Favorite (desc)")
                 {
@@ -439,7 +439,7 @@ namespace media_tracker_desktop.Forms
                     sortedRecentTracks = favoriteTrackList;
 
                     // Update the menu item.
-                    _filterMenu.Items[2].Text = "Favorite (asc)";
+                    _sortMenu.Items[2].Text = "Favorite (asc)";
                 }
 
                     // Build based on whether or not the list was updated.
@@ -450,7 +450,7 @@ namespace media_tracker_desktop.Forms
         // Method: Sorts the favorites.
         private (List<LastFM_Artist>, List<LastFM_Track>) RetrieveSortedFavorites(string orderByDirection)
         {
-            // Filter options based on passed orderByDirection.
+            // Sort options based on passed orderByDirection.
             // Also, only songs and artist favorites.
             QueryOptions<UserFavoriteMedia> options = new QueryOptions<UserFavoriteMedia>
             {
