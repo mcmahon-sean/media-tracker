@@ -115,49 +115,70 @@ class FavoritesScreen extends ConsumerWidget {
           style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 8),
-        SizedBox(
-          height: 240,
-          child: ListView.separated(
-            scrollDirection: Axis.horizontal,
-            itemCount: items.length,
-            separatorBuilder: (_, __) => const SizedBox(width: 12),
-            itemBuilder: (context, index) {
-              final item = items[index];
-              String title = '';
-              String? subtitle;
-              String? imageUrl;
+        if (items.isEmpty)
+          Container(
+            height: 160,
+            alignment: Alignment.center,
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            decoration: BoxDecoration(
+              color: Colors.grey[850],
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: const [
+                Icon(Icons.star_border, color: Colors.grey),
+                SizedBox(width: 8),
+                Text('No favorites yet', style: TextStyle(color: Colors.grey)),
+              ],
+            ),
+          )
+        else
+          SizedBox(
+            height: 240,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              itemCount: items.length,
+              separatorBuilder: (_, __) => const SizedBox(width: 12),
+              itemBuilder: (context, index) {
+                final item = items[index];
+                String title = '';
+                String? subtitle;
+                String? imageUrl;
 
-              if (item is SteamGame) {
-                title = item.name;
-                subtitle = _formatPlaytime(item.playtimeForever);
-                imageUrl = safeImageUrl(item.headerImage);
-              } else if (item is TMDBMovie) {
-                title = item.title;
-                subtitle = _formatDate(item.releaseDate);
-                imageUrl = 'https://image.tmdb.org/t/p/w500${item.posterPath}';
-              } else if (item is TMDBTvShow) {
-                title = item.title;
-                subtitle = _formatDate(item.releaseDate);
-                imageUrl = 'https://image.tmdb.org/t/p/w500${item.posterPath}';
-              } else if (item is TopArtist) {
-                title = item.name;
-                subtitle = 'Play Count: ${item.playCount}';
-                imageUrl = safeImageUrl(item.topAlbumImageUrl);
-              }
+                if (item is SteamGame) {
+                  title = item.name;
+                  subtitle = _formatPlaytime(item.playtimeForever);
+                  imageUrl = safeImageUrl(item.headerImage);
+                } else if (item is TMDBMovie) {
+                  title = item.title;
+                  subtitle = _formatDate(item.releaseDate);
+                  imageUrl =
+                      'https://image.tmdb.org/t/p/w500${item.posterPath}';
+                } else if (item is TMDBTvShow) {
+                  title = item.title;
+                  subtitle = _formatDate(item.releaseDate);
+                  imageUrl =
+                      'https://image.tmdb.org/t/p/w500${item.posterPath}';
+                } else if (item is TopArtist) {
+                  title = item.name;
+                  subtitle = 'Play Count: ${item.playCount}';
+                  imageUrl = safeImageUrl(item.topAlbumImageUrl);
+                }
 
-              return SizedBox(
-                width: 150,
-                child: _FavoriteMediaCard(
-                  title: title,
-                  subtitle: subtitle,
-                  imageUrl: imageUrl,
-                  platform: platform,
-                  onTap: () {},
-                ),
-              );
-            },
+                return SizedBox(
+                  width: 150,
+                  child: _FavoriteMediaCard(
+                    title: title,
+                    subtitle: subtitle,
+                    imageUrl: imageUrl,
+                    platform: platform,
+                    onTap: () {},
+                  ),
+                );
+              },
+            ),
           ),
-        ),
         const SizedBox(height: 24),
       ],
     );

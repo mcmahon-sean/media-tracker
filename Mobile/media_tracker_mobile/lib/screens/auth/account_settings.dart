@@ -100,6 +100,54 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettings> {
     }
   }
 
+  void _confirmDeleteUser() {
+    showDialog(
+      context: context,
+      builder:
+          (context) => AlertDialog(
+            title: const Text('Confirm Deletion'),
+            content: const Text(
+              'Are you sure you want to delete your account? This action is irreversible.',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('Cancel'),
+              ),
+              TextButton(
+                onPressed: () async {
+                  Navigator.of(context).pop(); // Close dialog
+                  final username = _usernameController.text.trim();
+
+                  final deleted = await UserAccountServices().deleteUser(
+                    username,
+                  );
+                  if (deleted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Account deleted.')),
+                    );
+
+                    // Log out and redirect
+                    ref.read(authProvider.notifier).logout();
+                    Navigator.of(context).popUntil((route) => route.isFirst);
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Failed to delete account.'),
+                      ),
+                    );
+                  }
+                },
+                child: const Text(
+                  'Delete',
+                  style: TextStyle(color: Colors.red),
+                ),
+              ),
+            ],
+          ),
+    );
+  }
+
   Widget _buildTextField({
     required TextEditingController controller,
     required String label,
@@ -151,18 +199,34 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettings> {
                           isRequired: true,
                           enabled: _isUsernameEditable,
                         ),
-                        TextButton(
-                          onPressed: () {
-                            setState(() {
-                              _isUsernameEditable = !_isUsernameEditable;
-                            });
-                          },
-                          child: Text(
-                            _isUsernameEditable
-                                ? 'Cancel Change Username'
-                                : 'Change Username',
-                          ),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: TextButton(
+                                onPressed: () {
+                                  setState(() {
+                                    _isUsernameEditable = !_isUsernameEditable;
+                                  });
+                                },
+                                child: Text(
+                                  _isUsernameEditable
+                                      ? 'Cancel Change Username'
+                                      : 'Change Username',
+                                ),
+                              ),
+                            ),
+                            Expanded(
+                              child: TextButton(
+                                onPressed: () => _confirmDeleteUser(),
+                                child: const Text(
+                                  'Delete Account',
+                                  style: TextStyle(color: Colors.red),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
+
                         const SizedBox(height: 16),
                         _buildTextField(
                           controller: _firstNameController,

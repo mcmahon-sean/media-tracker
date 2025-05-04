@@ -69,7 +69,6 @@ class _RegisterScreen extends ConsumerState<RegisterScreen> {
               title: Text('Invalid Input'),
               content: Text(
                 validationMessage,
-                style: TextStyle(color: Colors.black),
               ),
               actions: [
                 TextButton(
