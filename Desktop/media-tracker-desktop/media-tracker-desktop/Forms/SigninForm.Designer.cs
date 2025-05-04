@@ -112,6 +112,7 @@ namespace media_tracker_desktop.Forms
             // 
             // SigninForm
             // 
+            AcceptButton = btnSignIn;
             BackColor = Color.FromArgb(45, 45, 48);
             ClientSize = new Size(430, 211);
             Controls.Add(panel1);
