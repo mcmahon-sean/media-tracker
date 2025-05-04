@@ -17,15 +17,19 @@ namespace media_tracker_desktop.Forms
 {
     public partial class LinkLastFmForm : Form
     {
-        private List<UserFavoriteMedia> _favorites = [];
-        private ContextMenuStrip _sortMenu;
-        private bool _lastFMSortVisible = false;
-        private Button _btnSort;
+        private readonly string[] SORT_OPTIONS_ASC = ["Artist (asc)", "Track (asc)", "Favorite (asc)"];
+        private readonly string[] SORT_OPTIONS_DESC = ["Artist (desc)", "Track (desc)", "Favorite (desc)"];
+
+        private DataTable _tableData = new DataTable();
         private Panel _pnlSearchAndSort = new Panel();
-        private DataTable _table;
+        private TextBox _txtSearch = new TextBox();
+        private Button _btnSort = new Button();
+        private ContextMenuStrip _sortMenu = new ContextMenuStrip();
+
+        private bool _lastFMSortVisible = false;
+        private List<UserFavoriteMedia> _favorites = [];
         private List<LastFM_Artist> _topArtists = [];
         private List<LastFM_Track> _recentTracks = [];
-        private TextBox _txtSearch;
 
         public LinkLastFmForm()
         {
@@ -58,10 +62,11 @@ namespace media_tracker_desktop.Forms
                         (bool success2, List<LastFM_Track>? recentTracks) = await LastFMApi.GetUserRecentTracks();
 
                         // Store, important for sorting.
-                        this._topArtists = topArtists;
-                        this._recentTracks = recentTracks;
+                        _topArtists = topArtists ?? [];
+                        _recentTracks = recentTracks ?? [];
 
-                        BuildViewGrid(topArtists, recentTracks);
+                        BuildViewGrid(topArtists ?? [], recentTracks ?? []);
+
                         BuildSearchAndSortPanel();
 
                         // Subscribe to event handlers:
@@ -76,7 +81,6 @@ namespace media_tracker_desktop.Forms
                     }
                     else if (user == null)
                     {
-                        MessageBox.Show("LastFM account not found.");
                         pnlLink.Visible = true;
                     }
                 }
@@ -93,25 +97,25 @@ namespace media_tracker_desktop.Forms
             }
         }
 
-        public async void BuildViewGrid(List<LastFM_Artist> topArtists, List<LastFM_Track> recentTracks)
+        public void BuildViewGrid(List<LastFM_Artist> topArtists, List<LastFM_Track> recentTracks)
         {
-            _table = new DataTable();
+            _tableData = new DataTable();
 
-            _table.Columns.Add("ID");//probably won't need this
-            _table.Columns.Add("Top Type");
-            _table.Columns.Add("Artist Name");
-            _table.Columns.Add("Top Track");
+            _tableData.Columns.Add("ID");//probably won't need this
+            _tableData.Columns.Add("Top Type");
+            _tableData.Columns.Add("Artist Name");
+            _tableData.Columns.Add("Top Track");
 
             foreach (LastFM_Artist artist in topArtists)
             {
-                _table.Rows.Add(artist.Mbid, "Top Artist",artist.Name, null);
+                _tableData.Rows.Add(artist.Mbid, "Top Artist",artist.Name, null);
             }
             foreach (LastFM_Track track in recentTracks)
             {
-                _table.Rows.Add("", "Top Track", track.ArtistName, track.Name);
+                _tableData.Rows.Add("", "Top Track", track.ArtistName, track.Name);
             }
 
-            lastFmDataGridView.DataSource = _table;
+            lastFmDataGridView.DataSource = _tableData;
 
             lastFmDataGridView.Columns["ID"].Visible = false;
             lastFmDataGridView.RowHeadersVisible = false;
@@ -125,18 +129,7 @@ namespace media_tracker_desktop.Forms
 
         private async void BuildFavoriteButtonColumn()
         {
-            DataGridViewButtonColumn favoriteButtons = new DataGridViewButtonColumn();
-            // Add the button properties.
-            favoriteButtons.Name = "btnFavorite";
-            // Header text is displayed as the column title.
-            favoriteButtons.HeaderText = " ";
-            favoriteButtons.FlatStyle = FlatStyle.Popup;
-
-            // Add the button column to the data grid.
-            if (!lastFmDataGridView.Columns.Contains("btnFavorite"))
-            {
-                lastFmDataGridView.Columns.Add(favoriteButtons);
-            }
+            AppElement.AddFavoriteButtonColumn(lastFmDataGridView);
 
             // Retrieve the list of user's favorite media.
             _favorites = await UserAppAccount.GetFavoriteMediaList();
@@ -187,350 +180,7 @@ namespace media_tracker_desktop.Forms
             }
         }
 
-        // Method: Build the search and sort panel.
-        private void BuildSearchAndSortPanel()
-        {
-            _pnlSearchAndSort = new Panel();
-
-            // Properties:
-            _pnlSearchAndSort.Dock = DockStyle.Top;
-            _pnlSearchAndSort.Size = new Size(669, 60);
-            _pnlSearchAndSort.BackColor = Color.FromArgb(45, 45, 48);
-
-            // Add to form.
-            this.Controls.Add(_pnlSearchAndSort);
-
-            // Add search bar and sort button.
-            AddSearchBar(_pnlSearchAndSort);
-            AddSortButton(_pnlSearchAndSort);
-        }
-
-        // Method: Add search bar for the panel.
-        private void AddSearchBar(Panel panel)
-        {
-            _txtSearch = new TextBox();
-
-            // Properties:
-            _txtSearch.Location = new Point(15, 15);
-            _txtSearch.PlaceholderText = "Search for artist or track...";
-            _txtSearch.Width = 350;
-
-            // Add to panel.
-            panel.Controls.Add(_txtSearch);
-        }
-
-        // Event: When user presses a button in the search textbox.
-        private void txtSearch_KeyDown (object sender, KeyEventArgs e)
-        {
-            // If user pressed enter,
-            if (e.KeyCode == Keys.Enter)
-            {
-                TextBox txtSearch = (TextBox)sender;
-
-                // Retrieve search string.
-                string searchString = txtSearch.Text.ToLower();
-
-                // If there's a search string,
-                if (!string.IsNullOrEmpty(searchString))
-                {
-                    // Search for data.
-                    SearchData(searchString);
-                }
-                // Else,
-                else
-                {
-                    // Reset display.
-                    BuildViewGrid(_topArtists, _recentTracks);
-                }
-            }
-        }
-
-        // Method: Search for data.
-        private void SearchData(string text)
-        {
-            text.ToLower();
-
-            // Query options:
-            // Ensure that the search is case insensitive.
-            QueryOptions<LastFM_Artist> optionArtist = new QueryOptions<LastFM_Artist>
-            {
-                Where = a => a.Name.ToLower().Contains(text)
-            };
-
-            QueryOptions<LastFM_Track> optionTrack = new QueryOptions<LastFM_Track>
-            {
-                Where = t => t.Name.ToLower().Contains(text) || t.ArtistName.ToLower().Contains(text)
-            };
-
-            // Retrieve data.
-            List<LastFM_Artist> resultArtist = DataFunctions.Sort(_topArtists, optionArtist) ?? [];
-            List<LastFM_Track> resultTrack = DataFunctions.Sort(_recentTracks, optionTrack) ?? [];
-
-            // Display data.
-            BuildViewGrid(resultArtist, resultTrack);
-        }
-
-        // Method: Add sort button.
-        private void AddSortButton(Panel panel)
-        {
-            _btnSort = new Button();
-
-            // Properties:
-            _btnSort.Location = new Point(400, 15);
-            _btnSort.Text = "Sort Menu";
-            _btnSort.AutoSize = true;
-            _btnSort.BackColor = Color.White;
-
-            // Add to panel.
-            panel.Controls.Add(_btnSort);
-
-            // Add sort menu for the button.
-            AddSortMenu(_btnSort);
-        }
-
-        // Event: When sort button is clicked.
-        private void btnSort_Click(object sender, EventArgs e)
-        {
-            // Retrieve sort button.
-            _btnSort = (Button)sender;
-
-            // If the button is clicked to open the menu,
-            if (!_lastFMSortVisible)
-            {
-                // Open the menu.
-                _sortMenu.Show(_btnSort, new Point(0, _btnSort.Height));
-
-                // Menu is visible.
-                _lastFMSortVisible = true;
-            }
-            // If the button is clicked to close the menu,
-            else
-            {
-                // Close the menu.
-                _sortMenu.Close();
-
-                // Menu is not visible.
-                _lastFMSortVisible = false;
-            }
-        }
-
-        // Method: Adds a context menu strip to button.
-        private void AddSortMenu(Button button)
-        {
-            _sortMenu = new ContextMenuStrip();
-
-            // Options:
-            ToolStripMenuItem artistSort = new ToolStripMenuItem("Artist (asc)");
-            ToolStripMenuItem trackSort = new ToolStripMenuItem("Track (asc)");
-            ToolStripMenuItem favoriteSort = new ToolStripMenuItem("Favorite (asc)");
-
-            // Add to button.
-            _sortMenu.Items.AddRange(new ToolStripItem[] { artistSort, trackSort, favoriteSort });
-        }
-
-        // Event: When a sort item is clicked in the sort menu,
-        private void sortMenu_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
-        {
-            // Retrieve the sort item.
-            string? option = e.ClickedItem?.Text;
-
-            // If there is an item,
-            if (option != null)
-            {
-                // Update the button to show the sort item selected.
-                _btnSort.Text = option;
-
-                // Sort lastFM display.
-                SortData(option);
-            }
-        }
-
-        // Method: Sorts the data based on sort option.
-        private void SortData(string option)
-        {
-            List<LastFM_Artist>? sortedTopArtists = [];
-            List<LastFM_Track>? sortedRecentTracks = [];
-
-            // If there is data to be sorted,
-            if (_topArtists != null && _recentTracks != null)
-            {
-                if (option == "Artist (asc)")
-                {
-                    // Sort options.
-                    QueryOptions<LastFM_Artist> options = new QueryOptions<LastFM_Artist>
-                    {
-                        OrderBy = a => a.Name,
-                        OrderByDirection = "asc"
-                    };
-
-                    // Update list.
-                    sortedTopArtists = DataFunctions.Sort(_topArtists, options);
-                    // Retain list.
-                    sortedRecentTracks = _recentTracks;
-
-                    // Update the menu item.
-                    _sortMenu.Items[0].Text = "Artist (desc)";
-                }
-                else if (option == "Artist (desc)")
-                {
-                    // Sort options.
-                    QueryOptions<LastFM_Artist> options = new QueryOptions<LastFM_Artist>
-                    {
-                        OrderBy = a => a.Name,
-                        OrderByDirection = "desc"
-                    };
-
-                    // Update list.
-                    sortedTopArtists = DataFunctions.Sort(_topArtists, options);
-                    // Retain list.
-                    sortedRecentTracks = _recentTracks;
-
-                    // Update the menu item.
-                    _sortMenu.Items[0].Text = "Artist (asc)";
-                }
-                else if (option == "Track (asc)")
-                {
-                    // Sort options.
-                    QueryOptions<LastFM_Track> options = new QueryOptions<LastFM_Track>
-                    {
-                        OrderBy = t => t.Name,
-                        OrderByDirection = "asc"
-                    };
-
-                    // Update list.
-                    sortedTopArtists = _topArtists;
-                    // Retain list.
-                    sortedRecentTracks = DataFunctions.Sort(_recentTracks, options);
-
-                    // Update the menu item.
-                    _sortMenu.Items[1].Text = "Track (desc)";
-                }
-                else if (option == "Track (desc)")
-                {
-                    // Sort options.
-                    QueryOptions<LastFM_Track> options = new QueryOptions<LastFM_Track>
-                    {
-                        OrderBy = t => t.Name,
-                        OrderByDirection = "desc"
-                    };
-
-                    // Update list.
-                    sortedTopArtists = _topArtists;
-                    // Retain list.
-                    sortedRecentTracks = DataFunctions.Sort(_recentTracks, options);
-
-                    // Update the menu item.
-                    _sortMenu.Items[1].Text = "Track (asc)";
-                }
-                else if (option == "Favorite (asc)") {
-                    (List<LastFM_Artist> favoriteArtistList, List<LastFM_Track> favoriteTrackList) = RetrieveSortedFavorites("asc");
-
-                    // Update list.
-                    sortedTopArtists = favoriteArtistList;
-                    // Retain list.
-                    sortedRecentTracks = favoriteTrackList;
-
-                    // Update the menu item.
-                    _sortMenu.Items[2].Text = "Favorite (desc)";
-                }
-                else if (option == "Favorite (desc)")
-                {
-                    (List<LastFM_Artist> favoriteArtistList, List<LastFM_Track> favoriteTrackList) = RetrieveSortedFavorites("desc");
-
-                    // Update list.
-                    sortedTopArtists = favoriteArtistList;
-                    // Retain list.
-                    sortedRecentTracks = favoriteTrackList;
-
-                    // Update the menu item.
-                    _sortMenu.Items[2].Text = "Favorite (asc)";
-                }
-
-                    // Build based on whether or not the list was updated.
-                    BuildViewGrid(sortedTopArtists ?? [], sortedRecentTracks ?? []);
-            }
-        }
-
-        // Method: Sorts the favorites.
-        private (List<LastFM_Artist>, List<LastFM_Track>) RetrieveSortedFavorites(string orderByDirection)
-        {
-            // Sort options based on passed orderByDirection.
-            // Also, only songs and artist favorites.
-            QueryOptions<UserFavoriteMedia> options = new QueryOptions<UserFavoriteMedia>
-            {
-                Where = m => m.MediaTypeID == (int)UserAppAccount.MediaTypeID.Song || m.MediaTypeID == (int)UserAppAccount.MediaTypeID.Artist,
-                OrderBy = m => m.MediaID,
-                OrderByDirection = orderByDirection
-            };
-
-            // Retrieve the sorted favorites.
-            List<UserFavoriteMedia> sortedFavorites = DataFunctions.Sort(_favorites, options) ?? [];
-
-            // Initialize lists.
-            List<LastFM_Artist> favoriteArtistList = [];
-            List<LastFM_Artist> unfavoriteArtistList = [];
-            List<LastFM_Track> favoriteTrackList = [];
-            List<LastFM_Track> unfavoriteTrackList = [];
-
-            // Foreach artist that is currently in display,
-            foreach (LastFM_Artist artist in _topArtists)
-            {
-                // If that artist is a favorite,
-                if (_favorites.Any(f => f.Artist == artist.Name))
-                {
-                    // Add it to the favorite list.
-                    favoriteArtistList.Add(artist);
-                }
-                // Else,
-                else
-                {
-                    // Add to the unfavorite list.
-                    unfavoriteArtistList.Add(artist);
-                }
-            }
-
-            // Foreach track that is currently in display,
-            foreach (LastFM_Track track in _recentTracks)
-            {
-                // If that track is a favorite,
-                if (_favorites.Any(f => f.Title == track.Name))
-                {
-                    // Add it to the favorite list.
-                    favoriteTrackList.Add(track);
-                }
-                // Else,
-                else
-                {
-                    // Add to the unfavorite list.
-                    unfavoriteTrackList.Add(track);
-                }
-            }
-
-            // If the order is asc,
-            if (orderByDirection == "asc")
-            {
-                // Add list together so that the favorite is first.
-                favoriteArtistList.AddRange(unfavoriteArtistList);
-                favoriteTrackList.AddRange(unfavoriteTrackList);
-
-                return (favoriteArtistList, favoriteTrackList);
-            }
-            // If the order is desc,
-            else if (orderByDirection == "desc")
-            {
-                // Add list together so that the favorite is last.
-                unfavoriteArtistList.AddRange(favoriteArtistList);
-                unfavoriteTrackList.AddRange(favoriteTrackList);
-
-                return (unfavoriteArtistList, unfavoriteTrackList);
-            }
-            else
-            {
-                return ([], []);
-            }
-        }
-
-
+        // Event: When a favorite button is clicked.
         private async void btnFavorite_CellClick(object sender, DataGridViewCellEventArgs e)
         {
             try
@@ -538,6 +188,7 @@ namespace media_tracker_desktop.Forms
                 // Ignore clicks that are not the favorite buttons.
                 if (e.RowIndex < 0 || e.ColumnIndex != lastFmDataGridView.Columns["btnFavorite"].Index)
                 {
+                    // Build favorite column after sorting using column header.
                     if (e.RowIndex == -1)
                     {
                         BuildFavoriteButtonColumn();
@@ -626,6 +277,350 @@ namespace media_tracker_desktop.Forms
             catch (Exception error)
             {
                 MessageBox.Show($"Error: {error.Message}");
+            }
+        }
+
+        // Method: Build the search and sort panel.
+        private void BuildSearchAndSortPanel()
+        {
+            _pnlSearchAndSort = AppElement.GetSearchAndSortPanel();
+
+            // Add to form.
+            this.Controls.Add(_pnlSearchAndSort);
+
+            _txtSearch = (TextBox)_pnlSearchAndSort.Controls["txtSearch"]!;
+            _txtSearch.PlaceholderText = "Search for artist or track...";
+
+            _btnSort = (Button)_pnlSearchAndSort.Controls["btnSort"]!;
+
+            _sortMenu = AppElement.GetSortMenu(SORT_OPTIONS_ASC);
+        }
+
+        // Method: Add search bar for the panel.
+        private void AddSearchBar(Panel panel)
+        {
+            _txtSearch = new TextBox();
+
+            // Properties:
+            _txtSearch.Location = new Point(15, 15);
+            _txtSearch.PlaceholderText = "Search for artist or track...";
+            _txtSearch.Width = 350;
+
+            // Add to panel.
+            panel.Controls.Add(_txtSearch);
+        }
+
+        // Event: When user presses a button in the search textbox.
+        private void txtSearch_KeyDown (object sender, KeyEventArgs e)
+        {
+            // If user pressed enter,
+            if (e.KeyCode == Keys.Enter)
+            {
+                TextBox txtSearch = (TextBox)sender;
+
+                // Retrieve search string.
+                string searchString = txtSearch.Text.ToLower();
+
+                // If there's a search string,
+                if (!string.IsNullOrEmpty(searchString))
+                {
+                    // Search for data.
+                    SearchData(searchString);
+                }
+                // Else,
+                else
+                {
+                    // Reset display.
+                    BuildViewGrid(_topArtists, _recentTracks);
+                }
+            }
+        }
+
+        // Method: Search for data.
+        private void SearchData(string text)
+        {
+            text.ToLower();
+
+            // Query options:
+            // Ensure that the search is case insensitive.
+            QueryOptions<LastFM_Artist> optionArtist = new QueryOptions<LastFM_Artist>
+            {
+                Where = a => a.Name.ToLower().Contains(text)
+            };
+
+            QueryOptions<LastFM_Track> optionTrack = new QueryOptions<LastFM_Track>
+            {
+                Where = t => t.Name.ToLower().Contains(text) || t.ArtistName.ToLower().Contains(text)
+            };
+
+            // Retrieve data.
+            List<LastFM_Artist> resultArtists = DataFunctions.Sort(_topArtists, optionArtist) ?? [];
+            List<LastFM_Track> resultTracks = DataFunctions.Sort(_recentTracks, optionTrack) ?? [];
+
+            // Display data.
+            BuildViewGrid(resultArtists, resultTracks);
+        }
+
+        // Method: Add sort button.
+        private void AddSortButton(Panel panel)
+        {
+            _btnSort = new Button();
+
+            // Properties:
+            _btnSort.Location = new Point(400, 15);
+            _btnSort.Text = "Sort Menu";
+            _btnSort.AutoSize = true;
+            _btnSort.BackColor = Color.White;
+
+            // Add to panel.
+            panel.Controls.Add(_btnSort);
+
+            // Add sort menu.
+            //AddSortMenu();
+        }
+
+        // Event: When sort button is clicked.
+        private void btnSort_Click(object sender, EventArgs e)
+        {
+            // Retrieve sort button.
+            _btnSort = (Button)sender;
+
+            // If the button is clicked to open the menu,
+            if (!_lastFMSortVisible)
+            {
+                // Open the menu.
+                _sortMenu.Show(_btnSort, new Point(0, _btnSort.Height));
+
+                // Menu is visible.
+                _lastFMSortVisible = true;
+            }
+            // If the button is clicked to close the menu,
+            else
+            {
+                // Close the menu.
+                _sortMenu.Close();
+
+                // Menu is not visible.
+                _lastFMSortVisible = false;
+            }
+        }
+
+        // Method: Adds a context menu strip to button.
+        private void AddSortMenu()
+        {
+            _sortMenu = new ContextMenuStrip();
+
+            // Options:
+            ToolStripMenuItem artistSort = new ToolStripMenuItem("Artist (asc)");
+            ToolStripMenuItem trackSort = new ToolStripMenuItem("Track (asc)");
+            ToolStripMenuItem favoriteSort = new ToolStripMenuItem("Favorite (asc)");
+
+            // Add to button.
+            _sortMenu.Items.AddRange(new ToolStripItem[] { artistSort, trackSort, favoriteSort });
+        }
+
+        // Event: When a sort item is clicked in the sort menu,
+        private void sortMenu_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
+        {
+            // Retrieve the sort item.
+            string? option = e.ClickedItem?.Text;
+
+            // If there is an item,
+            if (option != null)
+            {
+                // Update the button to show the sort item selected.
+                _btnSort.Text = option;
+
+                // Sort lastFM display.
+                SortData(option);
+            }
+        }
+
+        // Method: Sorts the data based on sort option.
+        private void SortData(string option)
+        {
+            List<LastFM_Artist>? sortedTopArtists = [];
+            List<LastFM_Track>? sortedRecentTracks = [];
+
+            // If there is data to be sorted,
+            if (_topArtists != null && _recentTracks != null)
+            {
+                // First Sorting Option
+                if (option == SORT_OPTIONS_ASC[0])
+                {
+                    // Sort options.
+                    QueryOptions<LastFM_Artist> options = new QueryOptions<LastFM_Artist>
+                    {
+                        OrderBy = a => a.Name,
+                        OrderByDirection = "asc"
+                    };
+
+                    // Update list.
+                    sortedTopArtists = DataFunctions.Sort(_topArtists, options);
+                    // Retain list.
+                    sortedRecentTracks = _recentTracks;
+
+                    // Update the menu item.
+                    _sortMenu.Items[0].Text = SORT_OPTIONS_DESC[0];
+                }
+                else if (option == SORT_OPTIONS_DESC[0])
+                {
+                    // Sort options.
+                    QueryOptions<LastFM_Artist> options = new QueryOptions<LastFM_Artist>
+                    {
+                        OrderBy = a => a.Name,
+                        OrderByDirection = "desc"
+                    };
+
+                    // Update list.
+                    sortedTopArtists = DataFunctions.Sort(_topArtists, options);
+                    // Retain list.
+                    sortedRecentTracks = _recentTracks;
+
+                    // Update the menu item.
+                    _sortMenu.Items[0].Text = SORT_OPTIONS_ASC[0];
+                }
+                // Second Sorting Option
+                else if (option == SORT_OPTIONS_ASC[1])
+                {
+                    // Sort options.
+                    QueryOptions<LastFM_Track> options = new QueryOptions<LastFM_Track>
+                    {
+                        OrderBy = t => t.Name,
+                        OrderByDirection = "asc"
+                    };
+
+                    // Update list.
+                    sortedTopArtists = _topArtists;
+                    // Retain list.
+                    sortedRecentTracks = DataFunctions.Sort(_recentTracks, options);
+
+                    // Update the menu item.
+                    _sortMenu.Items[1].Text = SORT_OPTIONS_DESC[1];
+                }
+                else if (option == SORT_OPTIONS_DESC[1])
+                {
+                    // Sort options.
+                    QueryOptions<LastFM_Track> options = new QueryOptions<LastFM_Track>
+                    {
+                        OrderBy = t => t.Name,
+                        OrderByDirection = "desc"
+                    };
+
+                    // Update list.
+                    sortedTopArtists = _topArtists;
+                    // Retain list.
+                    sortedRecentTracks = DataFunctions.Sort(_recentTracks, options);
+
+                    // Update the menu item.
+                    _sortMenu.Items[1].Text = SORT_OPTIONS_ASC[1];
+                }
+                // Third Sorting Option
+                else if (option == SORT_OPTIONS_ASC[2]) {
+                    (List<LastFM_Artist> favoriteArtistList, List<LastFM_Track> favoriteTrackList) = RetrieveSortedFavorites("asc");
+
+                    // Update list.
+                    sortedTopArtists = favoriteArtistList;
+                    // Retain list.
+                    sortedRecentTracks = favoriteTrackList;
+
+                    // Update the menu item.
+                    _sortMenu.Items[2].Text = SORT_OPTIONS_DESC[2];
+                }
+                else if (option == SORT_OPTIONS_DESC[2])
+                {
+                    (List<LastFM_Artist> favoriteArtistList, List<LastFM_Track> favoriteTrackList) = RetrieveSortedFavorites("desc");
+
+                    // Update list.
+                    sortedTopArtists = favoriteArtistList;
+                    // Retain list.
+                    sortedRecentTracks = favoriteTrackList;
+
+                    // Update the menu item.
+                    _sortMenu.Items[2].Text = SORT_OPTIONS_ASC[2];
+                }
+
+                // Build based on whether or not the list was updated.
+                BuildViewGrid(sortedTopArtists ?? [], sortedRecentTracks ?? []);
+            }
+        }
+
+        // Method: Sorts the favorites.
+        private (List<LastFM_Artist>, List<LastFM_Track>) RetrieveSortedFavorites(string orderByDirection)
+        {
+            // Sort options based on passed orderByDirection.
+            // Also, only songs and artist favorites.
+            QueryOptions<UserFavoriteMedia> options = new QueryOptions<UserFavoriteMedia>
+            {
+                Where = m => m.MediaTypeID == (int)UserAppAccount.MediaTypeID.Song || m.MediaTypeID == (int)UserAppAccount.MediaTypeID.Artist,
+                OrderBy = m => m.MediaID,
+                OrderByDirection = orderByDirection
+            };
+
+            // Retrieve the sorted favorites.
+            List<UserFavoriteMedia> sortedFavorites = DataFunctions.Sort(_favorites, options) ?? [];
+
+            // Initialize lists.
+            List<LastFM_Artist> favoriteArtistList = [];
+            List<LastFM_Artist> unfavoriteArtistList = [];
+            List<LastFM_Track> favoriteTrackList = [];
+            List<LastFM_Track> unfavoriteTrackList = [];
+
+            // Foreach artist that is currently in display,
+            foreach (LastFM_Artist artist in _topArtists)
+            {
+                // If that artist is a favorite,
+                if (_favorites.Any(f => f.Artist == artist.Name))
+                {
+                    // Add it to the favorite list.
+                    favoriteArtistList.Add(artist);
+                }
+                // Else,
+                else
+                {
+                    // Add to the unfavorite list.
+                    unfavoriteArtistList.Add(artist);
+                }
+            }
+
+            // Foreach track that is currently in display,
+            foreach (LastFM_Track track in _recentTracks)
+            {
+                // If that track is a favorite,
+                if (_favorites.Any(f => f.Title == track.Name))
+                {
+                    // Add it to the favorite list.
+                    favoriteTrackList.Add(track);
+                }
+                // Else,
+                else
+                {
+                    // Add to the unfavorite list.
+                    unfavoriteTrackList.Add(track);
+                }
+            }
+
+            // If the order is asc,
+            if (orderByDirection == "asc")
+            {
+                // Add list together so that the favorite is first.
+                favoriteArtistList.AddRange(unfavoriteArtistList);
+                favoriteTrackList.AddRange(unfavoriteTrackList);
+
+                return (favoriteArtistList, favoriteTrackList);
+            }
+            // If the order is desc,
+            else if (orderByDirection == "desc")
+            {
+                // Add list together so that the favorite is last.
+                unfavoriteArtistList.AddRange(favoriteArtistList);
+                unfavoriteTrackList.AddRange(favoriteTrackList);
+
+                return (unfavoriteArtistList, unfavoriteTrackList);
+            }
+            else
+            {
+                return ([], []);
             }
         }
 
