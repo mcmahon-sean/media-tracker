@@ -1,18 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:media_tracker_test/models/lastfm/lastfm_top_artist.dart';
+import 'package:media_tracker_test/models/steam/steam_model.dart';
 import 'package:media_tracker_test/models/theme.dart';
+import 'package:media_tracker_test/models/tmdb/tmdb_movie.dart';
+import 'package:media_tracker_test/models/tmdb/tmdb_tv_show.dart';
 import 'package:media_tracker_test/providers/auth_provider.dart';
 import 'package:media_tracker_test/screens/auth/account_settings.dart';
+import 'package:media_tracker_test/screens/favorites_screen.dart';
 import 'package:media_tracker_test/screens/home_screen.dart';
 
 class DrawerMenu extends ConsumerWidget {
   final String firstName;
   final Function(int) onSectionSelected;
+  final List<SteamGame> steamGames;
+  final List<TMDBMovie> tmdbMovies;
+  final List<TMDBTvShow> tmdbTvShows;
+  final List<TopArtist> topArtists;
 
   const DrawerMenu({
     super.key,
     required this.firstName,
     required this.onSectionSelected,
+    required this.steamGames,
+    required this.tmdbMovies,
+    required this.tmdbTvShows,
+    required this.topArtists,
   });
 
   @override
@@ -56,8 +69,19 @@ class DrawerMenu extends ConsumerWidget {
                       Navigator.pushNamed(context, '/linkAccounts');
                     }),
                     _drawerItem('Favorite Media', () {
-                      onSectionSelected(0);
-                      Navigator.pop(context);
+                      Navigator.pop(context); // Close the drawer first
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder:
+                              (_) => FavoritesScreen(
+                                steamGames: steamGames,
+                                tmdbMovies: tmdbMovies,
+                                tmdbTvShows: tmdbTvShows,
+                                topArtists: topArtists,
+                              ),
+                        ),
+                      );
                     }),
                     _drawerItem('Account Settings', () {
                       Navigator.pop(context);

@@ -10,6 +10,7 @@ class SteamGame {
   final int playtimeDeck;
   final int rtimeLastPlayed;
   final int playtimeDisconnected;
+  final String? headerImage;
   bool isFavorite;
 
   SteamGame({
@@ -24,6 +25,7 @@ class SteamGame {
     required this.playtimeDeck,
     required this.rtimeLastPlayed,
     required this.playtimeDisconnected,
+    this.headerImage,
     this.isFavorite = false,
   });
 
@@ -40,6 +42,7 @@ class SteamGame {
       playtimeDeck: json['playtime_deck_forever'] ?? 0,
       rtimeLastPlayed: json['rtime_last_played'] ?? 0,
       playtimeDisconnected: json['playtime_disconnected'] ?? 0,
+      headerImage: null,
       isFavorite: false,
     );
   }
@@ -56,6 +59,7 @@ class SteamGame {
     int? playtimeDeck,
     int? rtimeLastPlayed,
     int? playtimeDisconnected,
+    String? headerImage,
     bool? isFavorite,
   }) {
     return SteamGame(
@@ -70,6 +74,7 @@ class SteamGame {
       playtimeDeck: playtimeDeck ?? this.playtimeDeck,
       rtimeLastPlayed: rtimeLastPlayed ?? this.rtimeLastPlayed,
       playtimeDisconnected: playtimeDisconnected ?? this.playtimeDisconnected,
+      headerImage: headerImage ?? this.headerImage,
       isFavorite: isFavorite ?? this.isFavorite,
     );
   }
