@@ -55,9 +55,9 @@ namespace media_tracker_desktop.Forms
             dataGridViewCellStyle1.Alignment = DataGridViewContentAlignment.MiddleLeft;
             dataGridViewCellStyle1.BackColor = Color.FromArgb(70, 70, 70);
             dataGridViewCellStyle1.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            dataGridViewCellStyle1.ForeColor = Color.OldLace;
+            dataGridViewCellStyle1.ForeColor = Color.White;
             dataGridViewCellStyle1.SelectionBackColor = SystemColors.ControlText;
-            dataGridViewCellStyle1.SelectionForeColor = Color.OldLace;
+            dataGridViewCellStyle1.SelectionForeColor = Color.White;
             dataGridViewCellStyle1.WrapMode = DataGridViewTriState.True;
             steamDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
             steamDataGridView.ColumnHeadersHeight = 34;

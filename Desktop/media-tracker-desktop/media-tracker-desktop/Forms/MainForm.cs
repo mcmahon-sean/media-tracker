@@ -263,13 +263,6 @@ namespace media_tracker_desktop.Forms
                 Location = new System.Drawing.Point(20, 100),
                 AutoSize = true
             };
-            //var txtTmdb = new TextBox
-            //{
-            //    Name = "txtTmdb",
-            //    Text = UserAppAccount.UserTmdbAccountID ?? "",
-            //    Location = new System.Drawing.Point(200, 98),
-            //    Width = 200
-            //};
             var btnTmdb = new Button
             {
                 Name = "btnTmdb",
@@ -294,10 +287,6 @@ namespace media_tracker_desktop.Forms
             };
             btnSave.Click += (s, e) =>
             {
-                //UserAppAccount.UserSteamID = txtSteam.Text.Trim();
-                //UserAppAccount.UserLastFmID = txtLastFm.Text.Trim();
-                //UserAppAccount.UserTmdbAccountID = txtTmdb.Text.Trim();
-
                 string newSteamID = txtSteam.Text.Trim();
                 string newLastFmID = txtLastFm.Text.Trim();
                 string? newTmdbID = _newSessionIDFromTMDBEditButton;
@@ -343,31 +332,16 @@ namespace media_tracker_desktop.Forms
             if (!string.IsNullOrEmpty(newSteamID))
             {
                 (bool success, string message) = await UserAppAccount.UpdateUserPlatformID(UserAppAccount.SteamPlatformID, newSteamID);
-
-                //if (!success)
-                //{
-                //    MessageBox.Show(message);
-                //}
             }
 
             if (!string.IsNullOrEmpty(newLastFmID))
             {
                 (bool success, string message) = await UserAppAccount.UpdateUserPlatformID(UserAppAccount.LastFMPlatformID, newLastFmID);
-
-                //if (!success)
-                //{
-                //    MessageBox.Show(message);
-                //}
             }
 
             if (!string.IsNullOrEmpty(newTmdbID))
             {
                 (bool success, string message) = await UserAppAccount.UpdateUserPlatformID(UserAppAccount.TMDBPlatformID, newTmdbID);
-
-                //if (!success)
-                //{
-                //    MessageBox.Show(message);
-                //}
             }
         }
 

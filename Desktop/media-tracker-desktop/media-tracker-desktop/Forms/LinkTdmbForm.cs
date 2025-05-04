@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using media_tracker_desktop.Services;
 using media_tracker_desktop.Models.TMDB;
 using Supabase;
 using media_tracker_desktop.Models;
@@ -18,7 +17,6 @@ namespace media_tracker_desktop.Forms
 {
     public partial class LinkTmdbForm : Form
     {
-        private readonly TmdbService _tmdbSvc = new TmdbService();
         private List<UserFavoriteMedia> _favorites = [];
 
         public LinkTmdbForm()
@@ -51,7 +49,7 @@ namespace media_tracker_desktop.Forms
                         (bool isTVSuccess, List<TMDB_TV_Show> shows) = await TmdbApi.GetUserFavoriteTV();
                         (bool isMovieSuccess, List<TMDB_Movie> movies) = await TmdbApi.GetUserFavoriteMovies();
                         BuildViewGrid(shows ?? [], movies ?? []);
-                    }                    
+                    }
                 }
                 // If user doesn't have TMDB account linked,
                 else
@@ -74,7 +72,7 @@ namespace media_tracker_desktop.Forms
             table.Columns.Add("Title");
             table.Columns.Add("Format");
 
-            foreach (TMDB_TV_Show show in shows) 
+            foreach (TMDB_TV_Show show in shows)
             {
                 table.Rows.Add(show.ID, show.Name, "TV Show");
             }

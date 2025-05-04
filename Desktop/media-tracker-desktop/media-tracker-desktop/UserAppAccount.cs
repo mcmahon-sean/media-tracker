@@ -88,7 +88,6 @@ namespace media_tracker_desktop
             get { return _email; }
         }
 
-        //Getter Methods for the Platform Ids because I didnt want to memorize them :P
         public static int SteamPlatformID
         {
             get { return STEAM_PLATFORM_ID; }
@@ -105,22 +104,16 @@ namespace media_tracker_desktop
         public static string UserSteamID
         {
             get { return _userSteamID; }
-            // No setter, reason outlined in the beginning of this section.
-            //set { _userSteamID = value; } 
         }
 
         public static string UserLastFmID
         {
             get { return _userLastFmID; }
-            // No setter, reason outlined in the beginning of this section.
-            //set { _userLastFmID = value; }
         }
 
         public static string UserTmdbAccountID
         {
             get { return _userTmdbAccountID; }
-            // No setter, reason outlined in the beginning of this section.
-            //set { _userTmdbAccountID = value; }
         }
 
         public static string UserTmdbSessionID
