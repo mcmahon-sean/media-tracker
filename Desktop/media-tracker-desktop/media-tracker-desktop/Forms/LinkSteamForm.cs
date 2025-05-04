@@ -42,6 +42,9 @@ namespace media_tracker_desktop.Forms
                     if (success)
                     {
                         await DisplayGames(games ?? []);
+
+                        // Subscribe to event handler that specifies what happens when any of the favorite buttons are clicked.
+                        steamDataGridView.CellClick += btnFavorite_CellClick;
                     }
                     else
                     {
@@ -100,6 +103,11 @@ namespace media_tracker_desktop.Forms
             //set width for title column
             steamDataGridView.Columns["Title"].Width = 500;
 
+            BuildFavoriteButtonColumn();
+        }
+
+        private async void BuildFavoriteButtonColumn()
+        {
             // Create a data grid button column.
             DataGridViewButtonColumn favoriteButtons = new DataGridViewButtonColumn();
 
@@ -109,9 +117,11 @@ namespace media_tracker_desktop.Forms
             favoriteButtons.HeaderText = " ";
             favoriteButtons.FlatStyle = FlatStyle.Popup;
 
-
             // Add the button column to the data grid.
-            steamDataGridView.Columns.Add(favoriteButtons);
+            if (!steamDataGridView.Columns.Contains("btnFavorite"))
+            {
+                steamDataGridView.Columns.Add(favoriteButtons);
+            }
 
             // Retrieve the list of user's favorite media.
             _favorites = await UserAppAccount.GetFavoriteMediaList();
@@ -135,9 +145,6 @@ namespace media_tracker_desktop.Forms
                     row.Cells["btnFavorite"].Value = "\u2605";
                 }
             }
-
-            // Subscribe to event handler that specifies what happens when any of the favorite buttons are clicked.
-            steamDataGridView.CellClick += btnFavorite_CellClick;
         }
 
         // Event Handler for Favorite Buttons in the Button Column of the data grid view.
@@ -148,6 +155,10 @@ namespace media_tracker_desktop.Forms
                 // Ignore clicks that are not the favorite buttons.
                 if (e.RowIndex < 0 || e.ColumnIndex != steamDataGridView.Columns["btnFavorite"].Index)
                 {
+                    if (e.RowIndex == -1)
+                    {
+                        BuildFavoriteButtonColumn();
+                    }
                     return;
                 }
 

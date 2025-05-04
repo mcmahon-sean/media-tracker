@@ -49,6 +49,9 @@ namespace media_tracker_desktop.Forms
                         (bool isTVSuccess, List<TMDB_TV_Show> shows) = await TmdbApi.GetUserFavoriteTV();
                         (bool isMovieSuccess, List<TMDB_Movie> movies) = await TmdbApi.GetUserFavoriteMovies();
                         BuildViewGrid(shows ?? [], movies ?? []);
+
+                        // Subscribe to event handler that specifies what happens when any of the favorite buttons are clicked.
+                        tmdbDataGridView.CellClick += btnFavorite_CellClick;
                     }
                 }
                 // If user doesn't have TMDB account linked,
@@ -89,6 +92,11 @@ namespace media_tracker_desktop.Forms
 
             tmdbDataGridView.Columns["Title"].Width = 200;
 
+            BuildFavoriteButtonColumn();
+        }
+
+        private async void BuildFavoriteButtonColumn()
+        {
             DataGridViewButtonColumn favoriteButtons = new DataGridViewButtonColumn();
             // Add the button properties.
             favoriteButtons.Name = "btnFavorite";
@@ -97,7 +105,10 @@ namespace media_tracker_desktop.Forms
             favoriteButtons.FlatStyle = FlatStyle.Popup;
 
             // Add the button column to the data grid.
-            tmdbDataGridView.Columns.Add(favoriteButtons);
+            if (!tmdbDataGridView.Columns.Contains("btnFavorite"))
+            {
+                tmdbDataGridView.Columns.Add(favoriteButtons);
+            }
 
             // Retrieve the list of user's favorite media.
             _favorites = await UserAppAccount.GetFavoriteMediaList();
@@ -121,9 +132,6 @@ namespace media_tracker_desktop.Forms
                     row.Cells["btnFavorite"].Value = "\u2605";
                 }
             }
-
-            // Subscribe to event handler that specifies what happens when any of the favorite buttons are clicked.
-            tmdbDataGridView.CellClick += btnFavorite_CellClick;
         }
 
         private async void btnFavorite_CellClick(object sender, DataGridViewCellEventArgs e)
@@ -133,6 +141,10 @@ namespace media_tracker_desktop.Forms
                 // Ignore clicks that are not the favorite buttons.
                 if (e.RowIndex < 0 || e.ColumnIndex != tmdbDataGridView.Columns["btnFavorite"].Index)
                 {
+                    if (e.RowIndex == -1)
+                    {
+                        BuildFavoriteButtonColumn();
+                    }
                     return;
                 }
 
