@@ -25,6 +25,7 @@ namespace media_tracker_desktop.Forms
         private DataTable _table;
         private List<LastFM_Artist> _topArtists = [];
         private List<LastFM_Track> _recentTracks = [];
+        private TextBox _txtSearch;
 
         public LinkLastFmForm()
         {
@@ -62,6 +63,16 @@ namespace media_tracker_desktop.Forms
 
                         BuildViewGrid(topArtists, recentTracks);
                         BuildSearchAndSortPanel();
+
+                        // Subscribe to event handlers:
+                        // When any of the favorite buttons are clicked.
+                        lastFmDataGridView.CellClick += btnFavorite_CellClick!;
+                        // When any sort items in the sort menu are clicked.
+                        _sortMenu.ItemClicked += sortMenu_ItemClicked!;
+                        // When the sort menu button is clicked.
+                        _btnSort.Click += btnSort_Click!;
+                        // When user presses a button in search bar.
+                        _txtSearch.KeyDown += txtSearch_KeyDown!;
                     }
                     else if (user == null)
                     {
@@ -109,6 +120,11 @@ namespace media_tracker_desktop.Forms
             lastFmDataGridView.Columns["Artist Name"].Width = 200;
             lastFmDataGridView.Columns["Top Track"].Width = 200;
 
+            BuildFavoriteButtonColumn();
+        }
+
+        private async void BuildFavoriteButtonColumn()
+        {
             DataGridViewButtonColumn favoriteButtons = new DataGridViewButtonColumn();
             // Add the button properties.
             favoriteButtons.Name = "btnFavorite";
@@ -169,9 +185,6 @@ namespace media_tracker_desktop.Forms
                     }
                 }
             }
-
-            // Subscribe to event handler that specifies what happens when any of the favorite buttons are clicked.
-            lastFmDataGridView.CellClick += btnFavorite_CellClick;
         }
 
         // Method: Build the search and sort panel.
@@ -195,18 +208,15 @@ namespace media_tracker_desktop.Forms
         // Method: Add search bar for the panel.
         private void AddSearchBar(Panel panel)
         {
-            TextBox txtSearch = new TextBox();
+            _txtSearch = new TextBox();
 
             // Properties:
-            txtSearch.Location = new Point(15, 15);
-            txtSearch.PlaceholderText = "Search for artist or track...";
-            txtSearch.Width = 350;
+            _txtSearch.Location = new Point(15, 15);
+            _txtSearch.PlaceholderText = "Search for artist or track...";
+            _txtSearch.Width = 350;
 
             // Add to panel.
-            panel.Controls.Add(txtSearch);
-
-            // Events:
-            txtSearch.KeyDown += txtSearch_KeyDown;
+            panel.Controls.Add(_txtSearch);
         }
 
         // Event: When user presses a button in the search textbox.
@@ -274,9 +284,6 @@ namespace media_tracker_desktop.Forms
             // Add to panel.
             panel.Controls.Add(_btnSort);
 
-            // Events:
-            _btnSort.Click += btnSort_Click;
-
             // Add sort menu for the button.
             AddSortMenu(_btnSort);
         }
@@ -319,9 +326,6 @@ namespace media_tracker_desktop.Forms
 
             // Add to button.
             _sortMenu.Items.AddRange(new ToolStripItem[] { artistSort, trackSort, favoriteSort });
-
-            // Events:
-            _sortMenu.ItemClicked += sortMenu_ItemClicked;
         }
 
         // Event: When a sort item is clicked in the sort menu,
@@ -531,14 +535,19 @@ namespace media_tracker_desktop.Forms
         {
             try
             {
-                // Retrieve the clicked button.
-                var currentButton = lastFmDataGridView.Rows[e.RowIndex].Cells[e.ColumnIndex];
-
                 // Ignore clicks that are not the favorite buttons.
                 if (e.RowIndex < 0 || e.ColumnIndex != lastFmDataGridView.Columns["btnFavorite"].Index)
                 {
+                    if (e.RowIndex == -1)
+                    {
+                        BuildFavoriteButtonColumn();
+                    }
+
                     return;
                 }
+
+                // Retrieve the clicked button.
+                var currentButton = lastFmDataGridView.Rows[e.RowIndex].Cells[e.ColumnIndex];
 
                 // Retrieve the current type (Top Artist or Top Track).
                 string currentRowTopType = (string)lastFmDataGridView.Rows[e.RowIndex].Cells["Top Type"].Value;

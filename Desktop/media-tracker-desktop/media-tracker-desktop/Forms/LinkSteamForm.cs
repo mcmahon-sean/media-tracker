@@ -145,13 +145,13 @@ namespace media_tracker_desktop.Forms
         {
             try
             {
-                var currentButton = steamDataGridView.Rows[e.RowIndex].Cells[e.ColumnIndex];
-
                 // Ignore clicks that are not the favorite buttons.
                 if (e.RowIndex < 0 || e.ColumnIndex != steamDataGridView.Columns["btnFavorite"].Index)
                 {
                     return;
                 }
+
+                var currentButton = steamDataGridView.Rows[e.RowIndex].Cells[e.ColumnIndex];
 
                 // Retrieve the current game ID.
                 string currentRowAppID = (string)steamDataGridView.Rows[e.RowIndex].Cells["AppID"].Value;

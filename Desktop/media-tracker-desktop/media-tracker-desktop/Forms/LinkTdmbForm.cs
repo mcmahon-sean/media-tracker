@@ -130,13 +130,13 @@ namespace media_tracker_desktop.Forms
         {
             try
             {
-                var currentButton = tmdbDataGridView.Rows[e.RowIndex].Cells[e.ColumnIndex];
-
                 // Ignore clicks that are not the favorite buttons.
                 if (e.RowIndex < 0 || e.ColumnIndex != tmdbDataGridView.Columns["btnFavorite"].Index)
                 {
                     return;
                 }
+
+                var currentButton = tmdbDataGridView.Rows[e.RowIndex].Cells[e.ColumnIndex];
 
                 // Retrieve the current tmdb ID.
                 string currentRowAppID = (string)tmdbDataGridView.Rows[e.RowIndex].Cells["ID"].Value;
