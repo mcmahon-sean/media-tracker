@@ -161,6 +161,7 @@
                                 <?php if (count($loved_tracks_filt) > 0): ?>
                                     <?php foreach ($loved_tracks_filt as $track): ?>
                                         <tr>
+                                        
                                             <td><?php echo htmlspecialchars($track->name); ?></td>
                                             <td><?php echo htmlspecialchars($track->artist); ?></td>
                                             <td><?php echo htmlspecialchars($track->getFormattedDate()); ?></td>
