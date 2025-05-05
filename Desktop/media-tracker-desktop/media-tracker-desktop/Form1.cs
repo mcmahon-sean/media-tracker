@@ -135,7 +135,7 @@ namespace media_tracker_desktop
             // Sort example, the where is sorting by field
             QueryOptions<Media> options = new QueryOptions<Media>
             {
-                Where = m => m.PlatformID == 2,
+                Where = m => m.PlatformID == 3,
                 OrderBy = m => m.MediaID,
                 OrderByDirection = "desc"
             };

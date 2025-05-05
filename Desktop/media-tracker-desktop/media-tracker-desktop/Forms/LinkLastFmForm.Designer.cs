@@ -16,8 +16,8 @@ namespace media_tracker_desktop.Forms
 
         private void InitializeComponent()
         {
-            DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle17 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle18 = new DataGridViewCellStyle();
             pnlLink = new Panel();
             linkButton = new Button();
             lastFmTextBox = new TextBox();
@@ -34,16 +34,15 @@ namespace media_tracker_desktop.Forms
             pnlLink.Dock = DockStyle.Top;
             pnlLink.Location = new Point(0, 0);
             pnlLink.Name = "pnlLink";
-            pnlLink.Size = new Size(669, 60);
+            pnlLink.Size = new Size(782, 60);
             pnlLink.TabIndex = 1;
             // 
             // linkButton
             // 
-            linkButton.BackColor = Color.FromArgb(80, 80, 80);
-            linkButton.FlatStyle = FlatStyle.Flat;
+            linkButton.BackColor = SystemColors.Window;
             linkButton.Font = new Font("Segoe UI", 10F);
-            linkButton.ForeColor = Color.White;
-            linkButton.Location = new Point(270, 13);
+            linkButton.ForeColor = SystemColors.ControlText;
+            linkButton.Location = new Point(452, 14);
             linkButton.Name = "linkButton";
             linkButton.Size = new Size(149, 36);
             linkButton.TabIndex = 0;
@@ -53,47 +52,47 @@ namespace media_tracker_desktop.Forms
             // 
             // lastFmTextBox
             // 
-            lastFmTextBox.BackColor = Color.FromArgb(64, 64, 64);
+            lastFmTextBox.BackColor = SystemColors.Window;
             lastFmTextBox.Font = new Font("Segoe UI", 10F);
-            lastFmTextBox.ForeColor = Color.White;
+            lastFmTextBox.ForeColor = SystemColors.WindowText;
             lastFmTextBox.Location = new Point(10, 15);
             lastFmTextBox.Name = "lastFmTextBox";
-            lastFmTextBox.Size = new Size(250, 34);
+            lastFmTextBox.Size = new Size(427, 34);
             lastFmTextBox.TabIndex = 1;
             // 
             // lastFmDataGridView
             // 
             lastFmDataGridView.BackgroundColor = Color.FromArgb(30, 30, 30);
-            dataGridViewCellStyle1.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle1.BackColor = Color.FromArgb(70, 70, 70);
-            dataGridViewCellStyle1.Font = new Font("Segoe UI", 9F);
-            dataGridViewCellStyle1.ForeColor = Color.White;
-            dataGridViewCellStyle1.SelectionBackColor = SystemColors.Highlight;
-            dataGridViewCellStyle1.SelectionForeColor = SystemColors.HighlightText;
-            dataGridViewCellStyle1.WrapMode = DataGridViewTriState.True;
-            lastFmDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle17.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle17.BackColor = Color.FromArgb(70, 70, 70);
+            dataGridViewCellStyle17.Font = new Font("Segoe UI", 9F);
+            dataGridViewCellStyle17.ForeColor = Color.White;
+            dataGridViewCellStyle17.SelectionBackColor = SystemColors.Highlight;
+            dataGridViewCellStyle17.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle17.WrapMode = DataGridViewTriState.True;
+            lastFmDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle17;
             lastFmDataGridView.ColumnHeadersHeight = 34;
-            dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle2.BackColor = Color.FromArgb(50, 50, 50);
-            dataGridViewCellStyle2.Font = new Font("Segoe UI", 9F);
-            dataGridViewCellStyle2.ForeColor = Color.White;
-            dataGridViewCellStyle2.SelectionBackColor = SystemColors.Highlight;
-            dataGridViewCellStyle2.SelectionForeColor = SystemColors.HighlightText;
-            dataGridViewCellStyle2.WrapMode = DataGridViewTriState.False;
-            lastFmDataGridView.DefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewCellStyle18.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle18.BackColor = Color.FromArgb(50, 50, 50);
+            dataGridViewCellStyle18.Font = new Font("Segoe UI", 9F);
+            dataGridViewCellStyle18.ForeColor = Color.White;
+            dataGridViewCellStyle18.SelectionBackColor = SystemColors.Highlight;
+            dataGridViewCellStyle18.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle18.WrapMode = DataGridViewTriState.False;
+            lastFmDataGridView.DefaultCellStyle = dataGridViewCellStyle18;
             lastFmDataGridView.Dock = DockStyle.Fill;
             lastFmDataGridView.EnableHeadersVisualStyles = false;
             lastFmDataGridView.GridColor = Color.Gray;
             lastFmDataGridView.Location = new Point(0, 60);
             lastFmDataGridView.Name = "lastFmDataGridView";
             lastFmDataGridView.RowHeadersWidth = 62;
-            lastFmDataGridView.Size = new Size(669, 299);
+            lastFmDataGridView.Size = new Size(782, 436);
             lastFmDataGridView.TabIndex = 0;
             // 
             // LinkLastFmForm
             // 
             BackColor = Color.FromArgb(30, 30, 30);
-            ClientSize = new Size(669, 359);
+            ClientSize = new Size(782, 496);
             Controls.Add(lastFmDataGridView);
             Controls.Add(pnlLink);
             Name = "LinkLastFmForm";

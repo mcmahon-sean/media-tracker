@@ -17,12 +17,17 @@ namespace media_tracker_desktop.Forms
 {
     public partial class LinkLastFmForm : Form
     {
-        private List<UserFavoriteMedia> _favorites = [];
-        private ContextMenuStrip _sortMenu;
-        private bool _lastFMSortVisible = false;
-        private Button _btnSort;
+        private readonly string[] SORT_OPTIONS_ASC = ["Artist (asc)", "Track (asc)", "Favorite (asc)"];
+        private readonly string[] SORT_OPTIONS_DESC = ["Artist (desc)", "Track (desc)", "Favorite (desc)"];
+
+        private DataTable _tableData = new DataTable();
         private Panel _pnlSearchAndSort = new Panel();
-        private DataTable _table;
+        private TextBox _txtSearch = new TextBox();
+        private Button _btnSort = new Button();
+        private ContextMenuStrip _sortMenu = new ContextMenuStrip();
+
+        private bool _lastFMSortVisible = false;
+        private List<UserFavoriteMedia> _favorites = [];
         private List<LastFM_Artist> _topArtists = [];
         private List<LastFM_Track> _recentTracks = [];
 
@@ -57,15 +62,25 @@ namespace media_tracker_desktop.Forms
                         (bool success2, List<LastFM_Track>? recentTracks) = await LastFMApi.GetUserRecentTracks();
 
                         // Store, important for sorting.
-                        this._topArtists = topArtists;
-                        this._recentTracks = recentTracks;
+                        _topArtists = topArtists ?? [];
+                        _recentTracks = recentTracks ?? [];
 
-                        BuildViewGrid(topArtists, recentTracks);
+                        BuildViewGrid(topArtists ?? [], recentTracks ?? []);
+
                         BuildSearchAndSortPanel();
+
+                        // Subscribe to event handlers:
+                        // When any of the favorite buttons are clicked.
+                        lastFmDataGridView.CellClick += btnFavorite_CellClick!;
+                        // When any sort items in the sort menu are clicked.
+                        _sortMenu.ItemClicked += sortMenu_ItemClicked!;
+                        // When the sort menu button is clicked.
+                        _btnSort.Click += btnSort_Click!;
+                        // When user presses a button in search bar.
+                        _txtSearch.KeyDown += txtSearch_KeyDown!;
                     }
                     else if (user == null)
                     {
-                        MessageBox.Show("LastFM account not found.");
                         pnlLink.Visible = true;
                     }
                 }
@@ -82,25 +97,25 @@ namespace media_tracker_desktop.Forms
             }
         }
 
-        public async void BuildViewGrid(List<LastFM_Artist> topArtists, List<LastFM_Track> recentTracks)
+        public void BuildViewGrid(List<LastFM_Artist> topArtists, List<LastFM_Track> recentTracks)
         {
-            _table = new DataTable();
+            _tableData = new DataTable();
 
-            _table.Columns.Add("ID");//probably won't need this
-            _table.Columns.Add("Top Type");
-            _table.Columns.Add("Artist Name");
-            _table.Columns.Add("Top Track");
+            _tableData.Columns.Add("ID");//probably won't need this
+            _tableData.Columns.Add("Top Type");
+            _tableData.Columns.Add("Artist Name");
+            _tableData.Columns.Add("Top Track");
 
             foreach (LastFM_Artist artist in topArtists)
             {
-                _table.Rows.Add(artist.Mbid, "Top Artist",artist.Name, null);
+                _tableData.Rows.Add(artist.Mbid, "Top Artist",artist.Name, null);
             }
             foreach (LastFM_Track track in recentTracks)
             {
-                _table.Rows.Add("", "Top Track", track.ArtistName, track.Name);
+                _tableData.Rows.Add("", "Top Track", track.ArtistName, track.Name);
             }
 
-            lastFmDataGridView.DataSource = _table;
+            lastFmDataGridView.DataSource = _tableData;
 
             lastFmDataGridView.Columns["ID"].Visible = false;
             lastFmDataGridView.RowHeadersVisible = false;
@@ -109,18 +124,12 @@ namespace media_tracker_desktop.Forms
             lastFmDataGridView.Columns["Artist Name"].Width = 200;
             lastFmDataGridView.Columns["Top Track"].Width = 200;
 
-            DataGridViewButtonColumn favoriteButtons = new DataGridViewButtonColumn();
-            // Add the button properties.
-            favoriteButtons.Name = "btnFavorite";
-            // Header text is displayed as the column title.
-            favoriteButtons.HeaderText = " ";
-            favoriteButtons.FlatStyle = FlatStyle.Popup;
+            BuildFavoriteButtonColumn();
+        }
 
-            // Add the button column to the data grid.
-            if (!lastFmDataGridView.Columns.Contains("btnFavorite"))
-            {
-                lastFmDataGridView.Columns.Add(favoriteButtons);
-            }
+        private async void BuildFavoriteButtonColumn()
+        {
+            AppElement.AddFavoriteButtonColumn(lastFmDataGridView);
 
             // Retrieve the list of user's favorite media.
             _favorites = await UserAppAccount.GetFavoriteMediaList();
@@ -169,44 +178,136 @@ namespace media_tracker_desktop.Forms
                     }
                 }
             }
+        }
 
-            // Subscribe to event handler that specifies what happens when any of the favorite buttons are clicked.
-            lastFmDataGridView.CellClick += btnFavorite_CellClick;
+        // Event: When a favorite button is clicked.
+        private async void btnFavorite_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            try
+            {
+                // Ignore clicks that are not the favorite buttons.
+                if (e.RowIndex < 0 || e.ColumnIndex != lastFmDataGridView.Columns["btnFavorite"].Index)
+                {
+                    // Build favorite column after sorting using column header.
+                    if (e.RowIndex == -1)
+                    {
+                        BuildFavoriteButtonColumn();
+                    }
+
+                    return;
+                }
+
+                // Retrieve the clicked button.
+                var currentButton = lastFmDataGridView.Rows[e.RowIndex].Cells[e.ColumnIndex];
+
+                // Retrieve the current type (Top Artist or Top Track).
+                string currentRowTopType = (string)lastFmDataGridView.Rows[e.RowIndex].Cells["Top Type"].Value;
+
+                // Retrieve the artist name, which matters for both favoriting the artist and the track.
+                string currentRowArtistName = (string)lastFmDataGridView.Rows[e.RowIndex].Cells["Artist Name"].Value;
+
+                // Update the list of user's favorite media.
+                _favorites = await UserAppAccount.GetFavoriteMediaList();
+
+                // If current type is Top Artist,
+                if (currentRowTopType == "Top Artist")
+                {
+                    // Retrieve the artist with the same name from the favorite list.
+                    // Ensure that the record is of the Artist media type.
+                    var favoriteArtist = _favorites.FirstOrDefault(a => a.Artist == currentRowArtistName && a.MediaTypeID == (int)UserAppAccount.MediaTypeID.Artist);
+
+                    // If there is no favorite artist,
+                    if (favoriteArtist == null)
+                    {
+                        // Fill in the star.
+                        currentButton.Value = "\u2605";
+                    }
+                    // Else,
+                    else
+                    {
+                        // Empty the star.
+                        currentButton.Value = "\u2730";
+                    }
+
+                    // Favorite the artist.
+                    // In the DB, I saw that artist name was stored in the MediaPlatformID in lowercase.
+                    // Artist name is also stored as title.
+                    await UserAppAccount.FavoriteMedia(
+                        platformID: UserAppAccount.LastFMPlatformID,
+                        username: UserAppAccount.Username,
+                        mediaTypeID: UserAppAccount.MediaTypeID.Artist,
+                        mediaPlatformID: currentRowArtistName.ToLower(),
+                        title: currentRowArtistName,
+                        artist: currentRowArtistName
+                    );
+                }
+                // If current type is Top Track,
+                else if (currentRowTopType == "Top Track")
+                {
+                    // Retrieve the track name.
+                    string currentRowTrackName = (string)lastFmDataGridView.Rows[e.RowIndex].Cells["Top Track"].Value;
+
+                    // Retrieve the track with the same name from the favorite list.
+                    // Ensure that the record is of the Song media type.
+                    var favoriteTrack = _favorites.FirstOrDefault(a => a.Title == currentRowTrackName && a.MediaTypeID == (int)UserAppAccount.MediaTypeID.Song);
+
+                    // If there is no favorite track,
+                    if (favoriteTrack == null)
+                    {
+                        // Fill in the star.
+                        currentButton.Value = "\u2605";
+                    }
+                    // Else,
+                    else
+                    {
+                        // Empty the star.
+                        currentButton.Value = "\u2730";
+                    }
+
+                    // Favorite the track.
+                    await UserAppAccount.FavoriteMedia(
+                        platformID: UserAppAccount.LastFMPlatformID,
+                        username: UserAppAccount.Username,
+                        mediaTypeID: UserAppAccount.MediaTypeID.Song,
+                        title: currentRowTrackName,
+                        artist: currentRowArtistName
+                    );
+                }
+            }
+            catch (Exception error)
+            {
+                MessageBox.Show($"Error: {error.Message}");
+            }
         }
 
         // Method: Build the search and sort panel.
         private void BuildSearchAndSortPanel()
         {
-            _pnlSearchAndSort = new Panel();
-
-            // Properties:
-            _pnlSearchAndSort.Dock = DockStyle.Top;
-            _pnlSearchAndSort.Size = new Size(669, 60);
-            _pnlSearchAndSort.BackColor = Color.FromArgb(45, 45, 48);
+            _pnlSearchAndSort = AppElement.GetSearchAndSortPanel();
 
             // Add to form.
             this.Controls.Add(_pnlSearchAndSort);
 
-            // Add search bar and sort button.
-            AddSearchBar(_pnlSearchAndSort);
-            AddSortButton(_pnlSearchAndSort);
+            _txtSearch = (TextBox)_pnlSearchAndSort.Controls["txtSearch"]!;
+            _txtSearch.PlaceholderText = "Search for artist or track...";
+
+            _btnSort = (Button)_pnlSearchAndSort.Controls["btnSort"]!;
+
+            _sortMenu = AppElement.GetSortMenu(SORT_OPTIONS_ASC);
         }
 
         // Method: Add search bar for the panel.
         private void AddSearchBar(Panel panel)
         {
-            TextBox txtSearch = new TextBox();
+            _txtSearch = new TextBox();
 
             // Properties:
-            txtSearch.Location = new Point(15, 15);
-            txtSearch.PlaceholderText = "Search for artist or track...";
-            txtSearch.Width = 350;
+            _txtSearch.Location = new Point(15, 15);
+            _txtSearch.PlaceholderText = "Search for artist or track...";
+            _txtSearch.Width = 350;
 
             // Add to panel.
-            panel.Controls.Add(txtSearch);
-
-            // Events:
-            txtSearch.KeyDown += txtSearch_KeyDown;
+            panel.Controls.Add(_txtSearch);
         }
 
         // Event: When user presses a button in the search textbox.
@@ -253,11 +354,11 @@ namespace media_tracker_desktop.Forms
             };
 
             // Retrieve data.
-            List<LastFM_Artist> resultArtist = DataFunctions.Sort(_topArtists, optionArtist) ?? [];
-            List<LastFM_Track> resultTrack = DataFunctions.Sort(_recentTracks, optionTrack) ?? [];
+            List<LastFM_Artist> resultArtists = DataFunctions.Sort(_topArtists, optionArtist) ?? [];
+            List<LastFM_Track> resultTracks = DataFunctions.Sort(_recentTracks, optionTrack) ?? [];
 
             // Display data.
-            BuildViewGrid(resultArtist, resultTrack);
+            BuildViewGrid(resultArtists, resultTracks);
         }
 
         // Method: Add sort button.
@@ -274,11 +375,8 @@ namespace media_tracker_desktop.Forms
             // Add to panel.
             panel.Controls.Add(_btnSort);
 
-            // Events:
-            _btnSort.Click += btnSort_Click;
-
-            // Add sort menu for the button.
-            AddSortMenu(_btnSort);
+            // Add sort menu.
+            //AddSortMenu();
         }
 
         // Event: When sort button is clicked.
@@ -308,7 +406,7 @@ namespace media_tracker_desktop.Forms
         }
 
         // Method: Adds a context menu strip to button.
-        private void AddSortMenu(Button button)
+        private void AddSortMenu()
         {
             _sortMenu = new ContextMenuStrip();
 
@@ -319,9 +417,6 @@ namespace media_tracker_desktop.Forms
 
             // Add to button.
             _sortMenu.Items.AddRange(new ToolStripItem[] { artistSort, trackSort, favoriteSort });
-
-            // Events:
-            _sortMenu.ItemClicked += sortMenu_ItemClicked;
         }
 
         // Event: When a sort item is clicked in the sort menu,
@@ -350,7 +445,8 @@ namespace media_tracker_desktop.Forms
             // If there is data to be sorted,
             if (_topArtists != null && _recentTracks != null)
             {
-                if (option == "Artist (asc)")
+                // First Sorting Option
+                if (option == SORT_OPTIONS_ASC[0])
                 {
                     // Sort options.
                     QueryOptions<LastFM_Artist> options = new QueryOptions<LastFM_Artist>
@@ -365,9 +461,9 @@ namespace media_tracker_desktop.Forms
                     sortedRecentTracks = _recentTracks;
 
                     // Update the menu item.
-                    _sortMenu.Items[0].Text = "Artist (desc)";
+                    _sortMenu.Items[0].Text = SORT_OPTIONS_DESC[0];
                 }
-                else if (option == "Artist (desc)")
+                else if (option == SORT_OPTIONS_DESC[0])
                 {
                     // Sort options.
                     QueryOptions<LastFM_Artist> options = new QueryOptions<LastFM_Artist>
@@ -382,9 +478,10 @@ namespace media_tracker_desktop.Forms
                     sortedRecentTracks = _recentTracks;
 
                     // Update the menu item.
-                    _sortMenu.Items[0].Text = "Artist (asc)";
+                    _sortMenu.Items[0].Text = SORT_OPTIONS_ASC[0];
                 }
-                else if (option == "Track (asc)")
+                // Second Sorting Option
+                else if (option == SORT_OPTIONS_ASC[1])
                 {
                     // Sort options.
                     QueryOptions<LastFM_Track> options = new QueryOptions<LastFM_Track>
@@ -399,9 +496,9 @@ namespace media_tracker_desktop.Forms
                     sortedRecentTracks = DataFunctions.Sort(_recentTracks, options);
 
                     // Update the menu item.
-                    _sortMenu.Items[1].Text = "Track (desc)";
+                    _sortMenu.Items[1].Text = SORT_OPTIONS_DESC[1];
                 }
-                else if (option == "Track (desc)")
+                else if (option == SORT_OPTIONS_DESC[1])
                 {
                     // Sort options.
                     QueryOptions<LastFM_Track> options = new QueryOptions<LastFM_Track>
@@ -416,9 +513,10 @@ namespace media_tracker_desktop.Forms
                     sortedRecentTracks = DataFunctions.Sort(_recentTracks, options);
 
                     // Update the menu item.
-                    _sortMenu.Items[1].Text = "Track (asc)";
+                    _sortMenu.Items[1].Text = SORT_OPTIONS_ASC[1];
                 }
-                else if (option == "Favorite (asc)") {
+                // Third Sorting Option
+                else if (option == SORT_OPTIONS_ASC[2]) {
                     (List<LastFM_Artist> favoriteArtistList, List<LastFM_Track> favoriteTrackList) = RetrieveSortedFavorites("asc");
 
                     // Update list.
@@ -427,9 +525,9 @@ namespace media_tracker_desktop.Forms
                     sortedRecentTracks = favoriteTrackList;
 
                     // Update the menu item.
-                    _sortMenu.Items[2].Text = "Favorite (desc)";
+                    _sortMenu.Items[2].Text = SORT_OPTIONS_DESC[2];
                 }
-                else if (option == "Favorite (desc)")
+                else if (option == SORT_OPTIONS_DESC[2])
                 {
                     (List<LastFM_Artist> favoriteArtistList, List<LastFM_Track> favoriteTrackList) = RetrieveSortedFavorites("desc");
 
@@ -439,11 +537,11 @@ namespace media_tracker_desktop.Forms
                     sortedRecentTracks = favoriteTrackList;
 
                     // Update the menu item.
-                    _sortMenu.Items[2].Text = "Favorite (asc)";
+                    _sortMenu.Items[2].Text = SORT_OPTIONS_ASC[2];
                 }
 
-                    // Build based on whether or not the list was updated.
-                    BuildViewGrid(sortedTopArtists ?? [], sortedRecentTracks ?? []);
+                // Build based on whether or not the list was updated.
+                BuildViewGrid(sortedTopArtists ?? [], sortedRecentTracks ?? []);
             }
         }
 
@@ -523,100 +621,6 @@ namespace media_tracker_desktop.Forms
             else
             {
                 return ([], []);
-            }
-        }
-
-
-        private async void btnFavorite_CellClick(object sender, DataGridViewCellEventArgs e)
-        {
-            try
-            {
-                // Retrieve the clicked button.
-                var currentButton = lastFmDataGridView.Rows[e.RowIndex].Cells[e.ColumnIndex];
-
-                // Ignore clicks that are not the favorite buttons.
-                if (e.RowIndex < 0 || e.ColumnIndex != lastFmDataGridView.Columns["btnFavorite"].Index)
-                {
-                    return;
-                }
-
-                // Retrieve the current type (Top Artist or Top Track).
-                string currentRowTopType = (string)lastFmDataGridView.Rows[e.RowIndex].Cells["Top Type"].Value;
-
-                // Retrieve the artist name, which matters for both favoriting the artist and the track.
-                string currentRowArtistName = (string)lastFmDataGridView.Rows[e.RowIndex].Cells["Artist Name"].Value;
-
-                // Update the list of user's favorite media.
-                _favorites = await UserAppAccount.GetFavoriteMediaList();
-
-                // If current type is Top Artist,
-                if (currentRowTopType == "Top Artist")
-                {
-                    // Retrieve the artist with the same name from the favorite list.
-                    // Ensure that the record is of the Artist media type.
-                    var favoriteArtist = _favorites.FirstOrDefault(a => a.Artist == currentRowArtistName && a.MediaTypeID == (int)UserAppAccount.MediaTypeID.Artist);
-
-                    // If there is no favorite artist,
-                    if (favoriteArtist == null)
-                    {
-                        // Fill in the star.
-                        currentButton.Value = "\u2605";
-                    }
-                    // Else,
-                    else
-                    {
-                        // Empty the star.
-                        currentButton.Value = "\u2730";
-                    }
-
-                    // Favorite the artist.
-                    // In the DB, I saw that artist name was stored in the MediaPlatformID in lowercase.
-                    // Artist name is also stored as title.
-                    await UserAppAccount.FavoriteMedia(
-                        platformID: UserAppAccount.LastFMPlatformID,
-                        username: UserAppAccount.Username,
-                        mediaTypeID: UserAppAccount.MediaTypeID.Artist,
-                        mediaPlatformID: currentRowArtistName.ToLower(),
-                        title: currentRowArtistName,
-                        artist: currentRowArtistName
-                    );
-                }
-                // If current type is Top Track,
-                else if (currentRowTopType == "Top Track")
-                {
-                    // Retrieve the track name.
-                    string currentRowTrackName = (string)lastFmDataGridView.Rows[e.RowIndex].Cells["Top Track"].Value;
-
-                    // Retrieve the track with the same name from the favorite list.
-                    // Ensure that the record is of the Song media type.
-                    var favoriteTrack = _favorites.FirstOrDefault(a => a.Title == currentRowTrackName && a.MediaTypeID == (int)UserAppAccount.MediaTypeID.Song);
-
-                    // If there is no favorite track,
-                    if (favoriteTrack == null)
-                    {
-                        // Fill in the star.
-                        currentButton.Value = "\u2605";
-                    }
-                    // Else,
-                    else
-                    {
-                        // Empty the star.
-                        currentButton.Value = "\u2730";
-                    }
-
-                    // Favorite the track.
-                    await UserAppAccount.FavoriteMedia(
-                        platformID: UserAppAccount.LastFMPlatformID,
-                        username: UserAppAccount.Username,
-                        mediaTypeID: UserAppAccount.MediaTypeID.Song,
-                        title: currentRowTrackName,
-                        artist: currentRowArtistName
-                    );
-                }
-            }
-            catch (Exception error)
-            {
-                MessageBox.Show($"Error: {error.Message}");
             }
         }
 

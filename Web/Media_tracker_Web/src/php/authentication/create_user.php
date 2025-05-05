@@ -1,6 +1,6 @@
 <?php
     require '../db.php';
-
+    
     try{
         if (isset($_POST['username']) &&
         isset($_POST['first_name']) &&

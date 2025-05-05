@@ -5,6 +5,25 @@
 
     // Required
     require_once '../media/Steam/get_owned_games.php';
+    require_once '../filter_functions.php';
+
+    $has_filter = isset($_GET["searchString"]) && $_GET["searchString"] != "";
+    // Grab the input string and selected category for searching from the post array
+    $filter_string = $_GET["searchString"] ?? "";
+
+    $filtUrl = $has_filter ? "searchString=$filter_string" : "";
+
+    // Get sort options from URL
+    if (isset($_GET["sort"])){
+        $split = explode('_', $_GET["sort"]);
+        $sort_field = $split[0];
+        $sort_dir = $split[1];
+    } else {
+        $sort_field = "name";
+        $sort_dir = "asc";
+    }
+
+    $owned_games_filt = sortBy(filter($ownedGames, "name", $filter_string), $sort_field, $sort_dir);
 
 ?>
 
@@ -13,7 +32,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Top Artists</title>
+    <title>Owned Games</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../../../styles.css"> 
 </head>
@@ -71,44 +90,84 @@
             
             <main class="col-md-10 ms-sm-auto px-4">
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                    <h2>Media Tracker</h2>
+                    <h2 class="display-6">
+                        Media Tracker
+                        <small class="text-title-secondary">
+                            Owned Games
+                        </small>
+                    </h2>
                 </div>
 
+                <!-- Search Bar -->
                 <div class="card bg-dark text-light mb-4">
-                    <div class="card-body">
-                        <input type="text" class="form-control" placeholder="Search Titles...">
+                    <div class="card-body <?php echo ($has_filter) ? 'pb-2' : '' ?>">
+                        <form method="get" class="row pe-3 ps-0 mb-0">
+                            <?php if (isset($_GET["sort"])): ?>
+                                <input type="hidden" name="sort" value="<?php echo $_GET["sort"] ?>" />
+                            <?php endif; ?>
+                            <div class="col-9 col-md-10">
+                                <div class="input-group">
+                                    <input name="searchString" type="text" class="form-control" placeholder="Search..." 
+                                        <?php echo ($filter_string != "") ? 'value="'.$filter_string.'"' : "" ?>
+                                    />
+                                    <span class="input-group-text search-select pe-3">Titles</span>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn bg-dark-secondary text-white col-3 col-md-2">Search</button>
+                        </form>
+                        <?php if($has_filter): ?>
+                            <form method="get" class="row mt-2 ms-1 filter-label">
+                                <?php if (isset($_GET["sort"])): ?>
+                                    <input type="hidden" name="sort" value="<?php echo $_GET["sort"] ?>" />
+                                <?php endif; ?>
+                                <div>
+                                    <p>Searching for "<?php echo $filter_string ?>"</p>
+                                </div>
+                                <button type="submit" class="btn bg-dark-secondary text-white">Clear Filter</button>
+                            </form>
+                        <?php endif; ?>
                     </div>
                 </div>
-                <h3>Owned Games</h3>
+
                 <div class="table-responsive">
+                    <h3>Owned Games</h3>
                     <?php if (isset($error)): ?>
                         <p><?php echo $error; ?></p>
                     <?php else: ?>
                         <table class="table table-dark table-hover">
                             <thead>
                                 <tr>
-                                    <th>Game Title</th>
-                                    <th>Minutes Played</th>
-                                    <th>URL</th>
+                                    <th><a class="sort-link"<?php echo sortLink($sort_field, $sort_dir, "name", $filtUrl) ?>>
+                                        Game Title
+                                    </a></th>
+                                    <th><a class="sort-link"<?php echo sortLink($sort_field, $sort_dir, "playtime", $filtUrl) ?>>
+                                        Minutes Played
+                                    </a></th>
+                                    <th></th>
                                 </tr>
                             </thead>
                             <tbody>
-                            <?php foreach ($ownedGames as $game): ?>
-                                <tr>
-                                    <td>
-                                        <strong><?php echo htmlspecialchars($game->name); ?></strong><br>
-                                        <img 
-                                            src="https://media.steampowered.com/steamcommunity/public/images/apps/<?php echo $game->appId; ?>/<?php echo $game->imgIconUrl; ?>.jpg" 
-                                            alt="Icon for <?php echo htmlspecialchars($game->name); ?>" 
-                                            style="height:32px;">
-                                    </td>
-                                    <td><?php echo $game->playtimeForever; ?> mins</td>
-                                    <td>
-                                        <a href="https://store.steampowered.com/app/<?php echo $game->appId; ?>" target="_blank">View In Store</a>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-
+                                <?php if (count($owned_games_filt) > 0): ?>
+                                    <?php foreach ($owned_games_filt as $game): ?>
+                                        <tr>
+                                            <td>
+                                                <img 
+                                                    src="https://media.steampowered.com/steamcommunity/public/images/apps/<?php echo $game->appId; ?>/<?php echo $game->imgIconUrl; ?>.jpg" 
+                                                    alt="Icon for <?php echo htmlspecialchars($game->name); ?>" 
+                                                    class="game-icon" />
+                                                <strong><?php echo htmlspecialchars($game->name); ?></strong>
+                                            </td>
+                                            <td><?php echo $game->playtimeForever; ?> mins</td>
+                                            <td>
+                                                <a href="https://store.steampowered.com/app/<?php echo $game->appId; ?>" target="_blank">View In Store</a>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                <?php else: ?>
+                                    <tr>
+                                        <td colspan="3" class="lead text-center">No items match the filter</td>
+                                    </tr>
+                                <?php endif; ?>
                             </tbody>
                         </table>
                     <?php endif; ?>

@@ -175,9 +175,6 @@ class UserAccountServices {
           'password_input': password,
         },
       );
-      print('Successfully updated user information.'); // DEBUGGING
-      final userData = await fetchUserProfile(username); // DEBUGGING
-      print('Updated user data: $userData'); // DEBUGGING
       return true;
     } catch (e) {
       print('Exception during updateUserProfile: $e');
@@ -185,20 +182,17 @@ class UserAccountServices {
     }
   }
 
-  // FOR TESTING UPDATING USERS
-  Future<Map<String, dynamic>?> fetchUserProfile(String username) async {
+  // Function to delete a user
+  Future<bool> deleteUser(String username) async {
     try {
-      final response =
-          await supabase
-              .from('users')
-              .select()
-              .eq('username', username)
-              .single();
-
-      return response;
+      final result = await supabase.rpc(
+        'delete_user',
+        params: {'username_input': username},
+      );
+      return result != null;
     } catch (e) {
-      print('Error fetching user profile: $e');
-      return null;
+      print('Error deleting user: $e');
+      return false;
     }
   }
 }
