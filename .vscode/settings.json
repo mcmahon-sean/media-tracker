@@ -9,7 +9,9 @@
         "firstnamevar",
         "lastnamevar",
         "passwordvar",
+        "playcount",
         "prefs",
+        "recenttracks",
         "useraccounts",
         "userfavorites",
         "usernamevar"

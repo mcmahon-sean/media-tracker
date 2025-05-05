@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:media_tracker_test/providers/favorites_provider.dart';
 import 'package:media_tracker_test/services/auth_service.dart';
 import 'package:media_tracker_test/services/media_api/tmdb_service.dart';
 import 'package:media_tracker_test/services/user_account_services.dart';
@@ -68,6 +69,11 @@ class AccountLinkingScreen extends ConsumerWidget {
 
                 if (success) {
                   notifier.updateSteamId(null);
+                  ref.read(favoritesProvider.notifier).state =
+                      ref
+                          .read(favoritesProvider)
+                          .where((fav) => fav['media']['platform_id'] != 1)
+                          .toList();
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
@@ -120,6 +126,11 @@ class AccountLinkingScreen extends ConsumerWidget {
 
                 if (success) {
                   notifier.updateLastFmUsername(null);
+                  ref.read(favoritesProvider.notifier).state =
+                      ref
+                          .read(favoritesProvider)
+                          .where((fav) => fav['media']['platform_id'] != 2)
+                          .toList();
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
@@ -219,6 +230,11 @@ class AccountLinkingScreen extends ConsumerWidget {
 
                 if (success) {
                   notifier.updateTmdbSessionId(null);
+                  ref.read(favoritesProvider.notifier).state =
+                      ref
+                          .read(favoritesProvider)
+                          .where((fav) => fav['media']['platform_id'] != 3)
+                          .toList();
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
