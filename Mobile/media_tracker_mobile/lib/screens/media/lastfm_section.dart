@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:media_tracker_test/models/lastfm/lastfm_album.dart';
 import 'package:media_tracker_test/models/sort_options.dart';
 import 'package:media_tracker_test/providers/auth_provider.dart';
 import 'package:media_tracker_test/providers/favorites_provider.dart';
@@ -31,20 +32,77 @@ class LastFmSection extends ConsumerStatefulWidget {
 }
 
 class _LastFmSectionState extends ConsumerState<LastFmSection> {
+  List<LastFmTrack> _lovedTracks = [];
+  List<LastFmTrack> _topTracks = [];
+  List<LastFmAlbum> _topAlbums = [];
+  bool _isLoadingLoved = true;
+  bool _isLoadingTopTracks = true;
+  bool _isLoadingTopAlbums = true;
+
   @override
   void initState() {
     super.initState();
+    _loadLovedTracks();
+    _loadTopTracks();
+    _loadTopAlbums();
+  }
+
+  Future<void> _loadLovedTracks() async {
+    try {
+      final tracks = await fetchLastFmLovedTracks();
+      setState(() {
+        _lovedTracks = tracks;
+        _isLoadingLoved = false;
+      });
+    } catch (e) {
+      print('Error loading loved tracks: $e');
+      setState(() => _isLoadingLoved = false);
+    }
+  }
+
+  Future<void> _loadTopTracks() async {
+    try {
+      final tracks = await fetchLastFmTopTracks();
+      setState(() {
+        _topTracks = tracks;
+        _isLoadingTopTracks = false;
+      });
+    } catch (e) {
+      print('Error loading top tracks: $e');
+      setState(() => _isLoadingTopTracks = false);
+    }
+  }
+
+  Future<void> _loadTopAlbums() async {
+    try {
+      final albums = await fetchLastFmTopAlbums();
+      setState(() {
+        _topAlbums = albums;
+        _isLoadingTopAlbums = false;
+      });
+    } catch (e) {
+      print('Error loading top albums: $e');
+      setState(() => _isLoadingTopAlbums = false);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 2,
+      length: 5,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const TabBar(
-            tabs: [Tab(text: 'Top Artists'), Tab(text: 'Recent Tracks')],
+            isScrollable: true,
+            tabAlignment: TabAlignment.start,
+            tabs: [
+              Tab(text: 'Top Artists'),
+              Tab(text: 'Recent Tracks'),
+              Tab(text: 'Loved Tracks'),
+              Tab(text: 'Top Songs'),
+              Tab(text: 'Top Albums'),
+            ],
             indicatorColor: Colors.grey,
             labelColor: Colors.white,
             unselectedLabelColor: Colors.grey,
@@ -54,6 +112,9 @@ class _LastFmSectionState extends ConsumerState<LastFmSection> {
               children: [
                 _buildTopArtistsList(context),
                 _buildRecentTracksList(),
+                _buildLovedTracksList(),
+                _buildTopTracksList(),
+                _buildTopAlbumsList(),
               ],
             ),
           ),
@@ -113,7 +174,6 @@ class _LastFmSectionState extends ConsumerState<LastFmSection> {
               color: isFavorite ? Colors.yellow : Colors.grey,
             ),
             onPressed: () async {
-              //print('Favorite icon clicked for index $index: ${artist.name}'); // DEBUGGING
               final success = await UserAccountServices().toggleFavoriteMedia(
                 platformId: 2, // Steam, TMDB. last.fm
                 mediaTypeId:
@@ -194,7 +254,7 @@ class _LastFmSectionState extends ConsumerState<LastFmSection> {
 
               // Fetch full album info
               final albumDetails = await fetchFullAlbumDetails(
-                track.artist,
+                albumBasic['albumArtist'] ?? track.artist,
                 albumBasic['albumName'],
               );
 
@@ -203,7 +263,7 @@ class _LastFmSectionState extends ConsumerState<LastFmSection> {
                 MaterialPageRoute(
                   builder:
                       (_) => MediaDetailsScreen(
-                        appId: '', // Not needed
+                        appId: '', 
                         title: albumDetails['albumName'],
                         subtitle: 'Album by ${track.artist}',
                         mediaType: MediaType.lastfmAlbum,
@@ -221,6 +281,158 @@ class _LastFmSectionState extends ConsumerState<LastFmSection> {
               print('Failed to load album from track tap: $e');
             }
           },
+        );
+      },
+    );
+  }
+
+  Widget _buildLovedTracksList() {
+    if (_isLoadingLoved) {
+      return const Center(child: CircularProgressIndicator());
+    }
+    if (_lovedTracks.isEmpty) {
+      return const Center(child: Text("No loved tracks found."));
+    }
+
+    final sortedLoved = applySorting(
+      list: _lovedTracks,
+      option: widget.sortOption,
+      direction: widget.sortDirection,
+      getField:
+          (track) =>
+              widget.sortOption == SortOption.name
+                  ? track.name.toLowerCase()
+                  : track.playCount ?? 0,
+    );
+
+    return ListView.builder(
+      itemCount: sortedLoved.length,
+      itemBuilder: (context, index) {
+        final track = sortedLoved[index];
+        return ListTile(
+          title: Text(track.name),
+          subtitle: Text("By: ${track.artist}"),
+          trailing: Text(track.formattedDate ?? ""),
+          onTap: () async {
+            try {
+              final albumBasic = await fetchAlbumDetail(
+                track.artist,
+                track.name,
+              );
+              if (albumBasic['albumName'] == null) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text("No album information for '${track.name}'"),
+                  ),
+                );
+                return;
+              }
+              final albumDetails = await fetchFullAlbumDetails(
+                track.artist,
+                albumBasic['albumName'],
+              );
+
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder:
+                      (_) => MediaDetailsScreen(
+                        appId: '',
+                        title: albumDetails['albumName'],
+                        subtitle: 'Album by ${track.artist}',
+                        mediaType: MediaType.lastfmAlbum,
+                        posterPath: albumDetails['albumImageUrl'],
+                        artistName: track.artist,
+                      ),
+                ),
+              );
+            } catch (e) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Failed to load album details')),
+              );
+            }
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildTopTracksList() {
+    if (_isLoadingTopTracks) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (_topTracks.isEmpty) {
+      return const Center(child: Text("No top tracks found."));
+    }
+
+    final sortedTopTracks = applySorting(
+      list: _topTracks,
+      option: widget.sortOption,
+      direction: widget.sortDirection,
+      getField:
+          (track) =>
+              widget.sortOption == SortOption.name
+                  ? track.name.toLowerCase()
+                  : track.playCount ?? 0,
+    );
+
+    return ListView.builder(
+      itemCount: sortedTopTracks.length,
+      itemBuilder: (context, index) {
+        final track = sortedTopTracks[index];
+        return ListTile(
+          title: Text(track.name),
+          subtitle: Text('By: ${track.artist}'),
+          trailing: Text(
+            '${track.playCount} plays',
+            style: const TextStyle(color: Colors.grey, fontSize: 12),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildTopAlbumsList() {
+    if (_isLoadingTopAlbums) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (_topAlbums.isEmpty) {
+      return const Center(child: Text("No top albums found."));
+    }
+
+    final sortedAlbums = applySorting(
+      list: _topAlbums,
+      option: widget.sortOption,
+      direction: widget.sortDirection,
+      getField:
+          (album) =>
+              widget.sortOption == SortOption.name
+                  ? album.name.toLowerCase()
+                  : album.playCount ?? 0,
+    );
+
+    return ListView.builder(
+      itemCount: sortedAlbums.length,
+      itemBuilder: (context, index) {
+        final album = sortedAlbums[index];
+        return ListTile(
+          title: Text(album.name),
+          subtitle: Text('By: ${album.artist}'),
+          leading:
+              album.imageUrl != null
+                  ? Image.network(
+                    album.imageUrl!,
+                    width: 50,
+                    height: 50,
+                    fit: BoxFit.cover,
+                  )
+                  : const Icon(Icons.album),
+          trailing: Text(
+            '${album.playCount} plays',
+            style: const TextStyle(color: Colors.grey, fontSize: 12),
+          ),
         );
       },
     );

@@ -13,6 +13,8 @@ namespace media_tracker_desktop.Forms
             this.Load += MainForm_Load;
         }
 
+        private string? _newSessionIDFromTMDBEditButton = string.Empty;
+
         private void MainForm_Load(object sender, EventArgs e)
         {
             InitializeApp();
@@ -261,13 +263,17 @@ namespace media_tracker_desktop.Forms
                 Location = new System.Drawing.Point(20, 100),
                 AutoSize = true
             };
-            var txtTmdb = new TextBox
+            var btnTmdb = new Button
             {
-                Name = "txtTmdb",
-                Text = UserAppAccount.UserTmdbAccountID ?? "",
+                Name = "btnTmdb",
+                Text = "Update TMDB",
                 Location = new System.Drawing.Point(200, 98),
-                Width = 200
+                Width = 200,
+                BackColor = Color.White,
+                AutoSize = true
             };
+
+            btnTmdb.Click += btnTmdb_Click;
 
             // Save button
             var btnSave = new Button
@@ -281,9 +287,11 @@ namespace media_tracker_desktop.Forms
             };
             btnSave.Click += (s, e) =>
             {
-                //UserAppAccount.UserSteamID = txtSteam.Text.Trim();
-                //UserAppAccount.UserLastFmID = txtLastFm.Text.Trim();
-                //UserAppAccount.UserTmdbAccountID = txtTmdb.Text.Trim();
+                string newSteamID = txtSteam.Text.Trim();
+                string newLastFmID = txtLastFm.Text.Trim();
+                string? newTmdbID = _newSessionIDFromTMDBEditButton;
+
+                UpdateUserPlatformIDs(newSteamID, newLastFmID, newTmdbID!);
 
                 MessageBox.Show("Platform info updated!", "Saved", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 ShowDashboard();
@@ -307,18 +315,41 @@ namespace media_tracker_desktop.Forms
             editPanel.Controls.Add(lblLastFm);
             editPanel.Controls.Add(txtLastFm);
             editPanel.Controls.Add(lblTmdb);
-            editPanel.Controls.Add(txtTmdb);
+            editPanel.Controls.Add(btnTmdb);
             editPanel.Controls.Add(btnSave);
             editPanel.Controls.Add(btnCancel);
 
             pnlContent.Controls.Add(editPanel);
         }
 
+        private async void btnTmdb_Click(object sender, EventArgs e)
+        {
+            _newSessionIDFromTMDBEditButton = await TmdbApi.RetrieveSessionID();
+        }
+
+        private async void UpdateUserPlatformIDs(string newSteamID, string newLastFmID, string newTmdbID)
+        {
+            if (!string.IsNullOrEmpty(newSteamID))
+            {
+                (bool success, string message) = await UserAppAccount.UpdateUserPlatformID(UserAppAccount.SteamPlatformID, newSteamID);
+            }
+
+            if (!string.IsNullOrEmpty(newLastFmID))
+            {
+                (bool success, string message) = await UserAppAccount.UpdateUserPlatformID(UserAppAccount.LastFMPlatformID, newLastFmID);
+            }
+
+            if (!string.IsNullOrEmpty(newTmdbID))
+            {
+                (bool success, string message) = await UserAppAccount.UpdateUserPlatformID(UserAppAccount.TMDBPlatformID, newTmdbID);
+            }
+        }
+
         private void btnHome_Click(object sender, EventArgs e) => ShowHome();
 
         private void btnLinkSteam_Click(object sender, EventArgs e)
         {
-            var f = new LinkSteamForm { TopLevel = false, FormBorderStyle = FormBorderStyle.None, Dock = DockStyle.Fill };
+            var f = new LinkSteamForm() { TopLevel = false, FormBorderStyle = FormBorderStyle.None, Dock = DockStyle.Fill };
             pnlContent.Controls.Clear(); pnlContent.Controls.Add(f); f.Show(); lblTitle.Text = "Steam";
         }
         private void btnLinkLastFM_Click(object sender, EventArgs e)

@@ -68,7 +68,7 @@ class _SteamSectionState extends ConsumerState<SteamSection> {
         final game = sortedGames[index];
         return ListTile(
           title: Text(game.name),
-          subtitle: Text('Played: ${game.playtimeForever} mins'),
+          subtitle: Text('Played: ${formatPlaytime(game.playtimeForever)}'),
           trailing: IconButton(
             icon: Icon(
               game.isFavorite ? Icons.star : Icons.star_border,
@@ -113,5 +113,19 @@ class _SteamSectionState extends ConsumerState<SteamSection> {
         );
       },
     );
+  }
+
+  // Helper method to convert playtime to something more readable
+  String formatPlaytime(int minutes) {
+    final hours = minutes ~/ 60;
+    final remainingMinutes = minutes % 60;
+
+    if (hours > 0 && remainingMinutes > 0) {
+      return '$hours hrs $remainingMinutes min';
+    } else if (hours > 0) {
+      return '$hours hrs';
+    } else {
+      return '$remainingMinutes min';
+    }
   }
 }

@@ -139,6 +139,12 @@ namespace media_tracker_desktop.Models.ApiModels
                 // Retrieve the games property of the json object and convert it back to a json string.
                 var gamesJson = responseJson.Root["response"]["games"];
 
+                // Return an empty array, if the user doesn't own games.
+                if (gamesJson == null)
+                {
+                    return (false, []);
+                }
+
                 // Deserialize
                 List<Steam_Game>? games = JsonConvert.DeserializeObject<List<Steam_Game>>(gamesJson.ToString());
 

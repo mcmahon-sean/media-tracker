@@ -11,11 +11,11 @@ if(isset($_SESSION['signed_in']) && $_SESSION['signed_in'] === true) {
     $username = $_SESSION['user_platform_ids']['lastfm'];
 
     // URLs for the API requests
-    $lovedTracksUrl = "https://ws.audioscrobbler.com/2.0/?method=user.getlovedtracks&user=$username&api_key=$apiKey&format=json&limit=5";
-    $recentTracksUrl = "https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=$username&api_key=$apiKey&format=json&limit=5";
-    $topAlbumsUrl = "https://ws.audioscrobbler.com/2.0/?method=user.gettopalbums&user=$username&api_key=$apiKey&format=json&limit=5";
-    $topArtistsUrl = "https://ws.audioscrobbler.com/2.0/?method=user.gettopartists&user=$username&api_key=$apiKey&format=json&limit=5";
-    $topTracksUrl = "https://ws.audioscrobbler.com/2.0/?method=user.gettoptracks&user=$username&api_key=$apiKey&format=json&limit=5";
+    $lovedTracksUrl = "https://ws.audioscrobbler.com/2.0/?method=user.getlovedtracks&user=$username&api_key=$apiKey&format=json&limit=10";
+    $recentTracksUrl = "https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=$username&api_key=$apiKey&format=json&limit=10";
+    $topAlbumsUrl = "https://ws.audioscrobbler.com/2.0/?method=user.gettopalbums&user=$username&api_key=$apiKey&format=json&limit=10";
+    $topArtistsUrl = "https://ws.audioscrobbler.com/2.0/?method=user.gettopartists&user=$username&api_key=$apiKey&limit=10&format=json";
+    $topTracksUrl = "https://ws.audioscrobbler.com/2.0/?method=user.gettoptracks&user=$username&api_key=$apiKey&format=json&limit=10";
 
     // Initialize variables
     $recentTracks = [];

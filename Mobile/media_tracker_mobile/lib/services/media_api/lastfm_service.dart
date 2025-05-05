@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:media_tracker_test/models/lastfm/lastfm_album.dart';
 import 'package:media_tracker_test/models/lastfm/lastfm_top_artist.dart';
 import '../../models/lastfm/lastfm_user.dart';
 import '../../models/lastfm/lastfm_artist.dart';
@@ -71,7 +72,6 @@ Future<LastFmArtist> fetchArtistDetail(String artistName) async {
 
   if (response.statusCode == 200) {
     final data = jsonDecode(utf8.decode(response.bodyBytes));
-    print(jsonEncode(data));
     return LastFmArtist.fromJson(data);
   } else {
     throw Exception('Failed to fetch artist\'s detail.');
@@ -92,7 +92,6 @@ Future<List<Map<String, dynamic>>> fetchArtistTopTracks(
 
   if (response.statusCode == 200) {
     final data = jsonDecode(utf8.decode(response.bodyBytes));
-    print(jsonEncode(data)); // DEBUGGING
 
     final tracks =
         (data['toptracks']['track'] as List)
@@ -125,7 +124,6 @@ Future<List<Map<String, dynamic>>> fetchArtistTopAlbums(
 
   if (response.statusCode == 200) {
     final data = jsonDecode(utf8.decode(response.bodyBytes));
-    print(jsonEncode(data)); // DEBUGGING
 
     final albums =
         (data['topalbums']['album'] as List)
@@ -161,7 +159,6 @@ Future<List<Map<String, dynamic>>> fetchSimilarArtists(
 
   if (response.statusCode == 200) {
     final data = jsonDecode(utf8.decode(response.bodyBytes));
-    print(jsonEncode(data)); // DEBUGGING
 
     final artists =
         (data['similarartists']['artist'] as List)
@@ -199,16 +196,22 @@ Future<Map<String, dynamic>> fetchAlbumDetail(
 
   if (response.statusCode == 200) {
     final data = jsonDecode(utf8.decode(response.bodyBytes));
-    print(jsonEncode(data)); // DEBUGGING
 
-    final albumData = data['track']?['album'];
-    if (albumData == null) throw Exception('Album info not found for track.');
+    if (data['track'] == null) {
+      throw Exception('Track data not found');
+    }
+
+    final albumData = data['track']['album'];
+    if (albumData == null) {
+      throw Exception('Album info not found for track.');
+    }
 
     return {
       'albumName': albumData['title'],
+      'albumArtist': albumData['artist'],
       'albumImageUrl':
           albumData['image'] != null && albumData['image'].length > 2
-              ? albumData['image'][2]['#text'] // medium size
+              ? albumData['image'][2]['#text']
               : null,
     };
   } else {
@@ -217,7 +220,10 @@ Future<Map<String, dynamic>> fetchAlbumDetail(
 }
 
 // Fetch full album details from the album name
-Future<Map<String, dynamic>> fetchFullAlbumDetails(String artistName, String albumName) async {
+Future<Map<String, dynamic>> fetchFullAlbumDetails(
+  String artistName,
+  String albumName,
+) async {
   final url =
       'http://ws.audioscrobbler.com/2.0/?method=album.getinfo'
       '&artist=${Uri.encodeComponent(artistName)}'
@@ -236,33 +242,87 @@ Future<Map<String, dynamic>> fetchFullAlbumDetails(String artistName, String alb
     List<Map<String, dynamic>> tracks = [];
 
     if (rawTracks is List) {
-      // Normal multiple tracks
-      tracks = rawTracks.map<Map<String, dynamic>>((track) {
-        return {
-          'name': track['name'],
-          'duration': int.tryParse('${track['duration'] ?? '0'}') ?? 0,
-          'playcount': '${track['playcount'] ?? 'Unknown'}',
-        };
-      }).toList();
+      tracks =
+          rawTracks.map<Map<String, dynamic>>((track) {
+            return {
+              'name': track['name'],
+              'duration': int.tryParse('${track['duration'] ?? '0'}') ?? 0,
+              'playcount': '${track['playcount'] ?? 'Unknown'}',
+            };
+          }).toList();
     } else if (rawTracks is Map) {
-      // Only one track (special case)
       tracks = [
         {
           'name': rawTracks['name'],
           'duration': int.tryParse('${rawTracks['duration'] ?? '0'}') ?? 0,
           'playcount': '${rawTracks['playcount'] ?? 'Unknown'}',
-        }
+        },
       ];
     }
 
     return {
       'albumName': album['name'],
-      'albumImageUrl': album['image'] != null && album['image'].length > 2
-          ? album['image'][2]['#text']
-          : null,
+      'albumImageUrl':
+          album['image'] != null && album['image'].length > 2
+              ? album['image'][2]['#text']
+              : null,
       'tracks': tracks,
     };
   } else {
     throw Exception('Failed to fetch full album info.');
+  }
+}
+
+// Get the user's loved tracks
+Future<List<LastFmTrack>> fetchLastFmLovedTracks() async {
+  final url =
+      '${ApiServices.lastFmBaseUrl}?method=user.getlovedtracks'
+      '&user=${ApiServices.lastFmUsername}'
+      '&api_key=${ApiServices.lastFmApiKey}'
+      '&format=json';
+
+  final response = await http.get(Uri.parse(url));
+  if (response.statusCode == 200) {
+    final data = jsonDecode(utf8.decode(response.bodyBytes));
+    final tracks = data['lovedtracks']['track'] as List<dynamic>;
+    return tracks.map((json) => LastFmTrack.fromJson(json)).toList();
+  } else {
+    throw Exception('Failed to fetch loved tracks');
+  }
+}
+
+// Fetch the user's top tracks
+Future<List<LastFmTrack>> fetchLastFmTopTracks() async {
+  final url =
+      '${ApiServices.lastFmBaseUrl}?method=user.gettoptracks'
+      '&user=${ApiServices.lastFmUsername}'
+      '&api_key=${ApiServices.lastFmApiKey}'
+      '&format=json';
+
+  final response = await http.get(Uri.parse(url));
+  if (response.statusCode == 200) {
+    final data = jsonDecode(utf8.decode(response.bodyBytes));
+    final tracks = data['toptracks']['track'] as List<dynamic>;
+    return tracks.map((json) => LastFmTrack.fromJson(json)).toList();
+  } else {
+    throw Exception('Failed to fetch top tracks');
+  }
+}
+
+// Fetch the user's top albums
+Future<List<LastFmAlbum>> fetchLastFmTopAlbums() async {
+  final url =
+      '${ApiServices.lastFmBaseUrl}?method=user.gettopalbums'
+      '&user=${ApiServices.lastFmUsername}'
+      '&api_key=${ApiServices.lastFmApiKey}'
+      '&format=json';
+
+  final response = await http.get(Uri.parse(url));
+  if (response.statusCode == 200) {
+    final data = jsonDecode(utf8.decode(response.bodyBytes));
+    final albums = data['topalbums']['album'] as List<dynamic>;
+    return albums.map((json) => LastFmAlbum.fromJson(json)).toList();
+  } else {
+    throw Exception('Failed to fetch top albums');
   }
 }

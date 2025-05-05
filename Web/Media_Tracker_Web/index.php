@@ -131,49 +131,51 @@ require_once 'src/php/config.php';
           <div
             class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom"
           >
-            <h2>Media Tracker</h2>
+            <h2 class="display-6">
+              Media Tracker
+              <small class="text-title-secondary">
+                Home
+              </small>
+            </h2>
           </div>
 
-          <div class="card bg-dark text-light mb-4">
-            <div class="card-body">
-              <input
-                type="text"
-                class="form-control"
-                placeholder="Search Titles..."
-              />
-            </div>
-          </div>
+          
           <?php if (isset($_SESSION['session_id']) && !empty($_SESSION['session_id'])): ?>
               <p>SESSION ID: <strong><?= htmlspecialchars($_SESSION['session_id']) ?></strong></p>
           <?php endif; ?>
+
           <?php if (isset($_SESSION['signed_in'])): ?>
+
             <p>Hello, <strong><?= htmlspecialchars($_SESSION['username']) ?></strong>!</p>
-            <p>Steam ID: 
-                <strong>
-                    <?= isset($_SESSION['user_platform_ids']['steam']) && $_SESSION['user_platform_ids']['steam'] !== '' 
-                        ? htmlspecialchars($_SESSION['user_platform_ids']['steam']) 
-                        : 'No account linked' ?>
-                </strong>
-            </p>
-            <p>Last.fm ID: 
-                <strong>
-                    <?= isset($_SESSION['user_platform_ids']['lastfm']) && $_SESSION['user_platform_ids']['lastfm'] !== '' 
-                        ? htmlspecialchars($_SESSION['user_platform_ids']['lastfm']) 
-                        : 'No account linked' ?>
-                </strong>
-            </p>
-            <p>TMDB ID: 
-                <strong>
-                    <?= isset($_SESSION['user_platform_ids']['tmdb']) && $_SESSION['user_platform_ids']['tmdb'] !== '' 
-                        ? htmlspecialchars($_SESSION['user_platform_ids']['tmdb']) 
-                        : 'No account linked' ?>
-                </strong>
-            </p>
+
+            <!--Check to see if user has added a Steam account. If not, display message telling user to add an account-->
+            <?php if (isset($_SESSION['user_platform_ids']['steam'])): ?>
+              <p>Steam ID: <strong><?= htmlspecialchars($_SESSION['user_platform_ids']['steam']) ?></strong></p>
+            <?php else: ?>
+              <p>Please add your Steam account</p>
+            <?php endif; ?>
+
+            <!--Check to see if user has added a Last.fm account. If not, display message telling user to add an account-->
+            <?php if (isset($_SESSION['user_platform_ids']['lastfm'])): ?>
+              <p>Last.fm ID: <strong><?= htmlspecialchars($_SESSION['user_platform_ids']['lastfm']) ?></strong></p>
+            <?php else: ?>
+              <p>Last.fm ID: Please add your Last.fm account</p>
+            <?php endif; ?>
+
+            <!--Check to see if user has added a TMDB account. If not, display message telling user to add an account-->
+            <?php if (isset($_SESSION['user_platform_ids']['tmdb'])): ?>
+              <p>TMDB ID: <strong><?= htmlspecialchars($_SESSION['user_platform_ids']['tmdb']) ?></strong></p>
+            <?php else: ?>
+              <p>TMDB ID: Please add your TMDB account</p>
+            <?php endif; ?>
+
             <button onclick="window.location.href='src/php/views/add_edit_3rd_party.php'">Add/Edit Platforms</button>
             <button onclick="window.location.href='src/php/authentication/logout.php'">Logout</button>
           <?php else: ?>
-            <button onclick="window.location.href='src/php/views/user_login.php'">Login</button>
-            <button onclick="window.location.href='src/php/views/user_signup.php'">Sign Up</button>
+            <h3>Not signed in!</h3>
+            <p class="lead">Sign in to use the Media Tracker</p>
+            <button class="btn bg-dark-secondary text-white" onclick="window.location.href='src/php/views/user_login.php'">Login</button>
+            <button class="btn bg-dark-secondary text-white" onclick="window.location.href='src/php/views/user_signup.php'">Sign Up</button>
           <?php endif; ?>
         </main>
       </div>

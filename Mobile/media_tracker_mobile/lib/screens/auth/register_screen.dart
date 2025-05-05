@@ -13,9 +13,21 @@ class RegisterScreen extends ConsumerStatefulWidget {
 class _RegisterScreen extends ConsumerState<RegisterScreen> {
   final usernameController = TextEditingController();
   final passwordController = TextEditingController();
+  final confirmPasswordController = TextEditingController();
   final emailController = TextEditingController();
   final firstNameController = TextEditingController();
   final lastNameController = TextEditingController();
+
+  @override
+  void dispose() {
+    usernameController.dispose();
+    passwordController.dispose();
+    emailController.dispose();
+    firstNameController.dispose();
+    lastNameController.dispose();
+    confirmPasswordController.dispose();
+    super.dispose();
+  }
 
   void register() async {
     final authService = ref.read(authServiceProvider);
@@ -24,19 +36,29 @@ class _RegisterScreen extends ConsumerState<RegisterScreen> {
       usernameController: "Please enter a username.",
       passwordController: "Please enter a password.",
       emailController: "Please enter a valid email address.",
-      firstNameController: "Please enter your first name."
+      firstNameController: "Please enter your first name.",
     };
-    
-    RegExp emailPattern = RegExp(r'.+@.+'); // Simple Regex pattern for validating email address
+
+    RegExp emailPattern = RegExp(
+      r'.+@.+',
+    ); // Simple Regex pattern for validating email address
 
     String validationMessage = "";
 
     // Iterates through all controllers in the fieldInputMessages map and adds their error message if empty
-    fieldInputMessages.forEach((k, v) => validationMessage += k.text.trim().isEmpty ? "$v\n" : "" );
+    fieldInputMessages.forEach(
+      (k, v) => validationMessage += k.text.trim().isEmpty ? "$v\n" : "",
+    );
 
     // Adds a validation message if emailController isn't empty and doesn't match the Regex pattern.
-    if (emailController.text.trim().isNotEmpty && !emailPattern.hasMatch(emailController.text.trim())) {
+    if (emailController.text.trim().isNotEmpty &&
+        !emailPattern.hasMatch(emailController.text.trim())) {
       validationMessage += "Please enter a valid email address.";
+    }
+
+    if (passwordController.text.trim() !=
+        confirmPasswordController.text.trim()) {
+      validationMessage += "Passwords do not match.\n";
     }
 
     if (validationMessage != "") {
@@ -45,7 +67,9 @@ class _RegisterScreen extends ConsumerState<RegisterScreen> {
         builder:
             (_) => AlertDialog(
               title: Text('Invalid Input'),
-              content: Text(validationMessage, style: TextStyle(color: Colors.black)),
+              content: Text(
+                validationMessage,
+              ),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(context),
@@ -103,82 +127,64 @@ class _RegisterScreen extends ConsumerState<RegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return (Scaffold(
-      appBar: AppBar(title: Text('Sign Up')),
-      body: SingleChildScrollView(
-        // Padding(
-        padding: const EdgeInsets.all(50),
-        child: Column(
-          children: [
-            Row(
-              children: [
-                SizedBox(
-                  width: 300,
-                  child: TextField(
-                    controller: usernameController,
-                    maxLength: 50,
-                    decoration: InputDecoration(label: Text('Username')),
+    return Scaffold(
+      appBar: AppBar(title: const Text('Sign Up')),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            children: [
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.only(bottom: 24),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildField('Username', usernameController),
+                      _buildField('First Name', firstNameController),
+                      _buildField('Last Name', lastNameController),
+                      _buildField('Email', emailController),
+                      _buildField(
+                        'Password',
+                        passwordController,
+                        obscure: true,
+                      ),
+                      _buildField(
+                        'Confirm Password',
+                        confirmPasswordController,
+                        obscure: true,
+                      ),
+                    ],
                   ),
                 ),
-              ],
-            ),
-            Row(
-              children: [
-                SizedBox(
-                  width: 300,
-                  child: TextField(
-                    controller: firstNameController,
-                    maxLength: 50,
-                    decoration: InputDecoration(label: Text('First Name')),
-                  ),
+              ),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: register,
+                  child: const Text('Sign Up'),
                 ),
-              ],
-            ),
-            Row(
-              children: [
-                SizedBox(
-                  width: 300,
-                  child: TextField(
-                    controller: lastNameController,
-                    maxLength: 50,
-                    decoration: InputDecoration(label: Text('Last Name')),
-                  ),
-                ),
-              ],
-            ),
-            Row(
-              children: [
-                SizedBox(
-                  width: 300,
-                  child: TextField(
-                    controller: emailController,
-                    maxLength: 50,
-                    decoration: InputDecoration(label: Text('Email')),
-                  ),
-                ),
-              ],
-            ),
-            Row(
-              children: [
-                SizedBox(
-                  width: 300,
-                  child: TextField(
-                    controller: passwordController,
-                    maxLength: 50,
-                    decoration: InputDecoration(label: Text('Password')),
-                  ),
-                ),
-              ],
-            ),
-            Row(
-              children: [
-                ElevatedButton(onPressed: register, child: Text('Sign Up')),
-              ],
-            ),
-          ],
-          // ),
+              ),
+            ],
+          ),
         ),
       ),
-    ));
+    );
+  }
+
+  Widget _buildField(
+    String label,
+    TextEditingController controller, {
+    bool obscure = false,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: TextField(
+        controller: controller,
+        maxLength: 50,
+        obscureText: obscure,
+        decoration: InputDecoration(labelText: label),
+      ),
+    );
   }
 }

@@ -118,6 +118,11 @@ class AuthService {
       },
     );
 
+    // If creation succeeded, auto-login the user to populate the auth state
+    if (result == true) {
+      return await login(username, password);
+    }
+
     return result == true;
   }
 }
