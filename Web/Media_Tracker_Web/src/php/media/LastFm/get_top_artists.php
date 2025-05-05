@@ -12,8 +12,7 @@ if(isset($_SESSION['signed_in']) && $_SESSION['signed_in'] === true) {
     $username = $_SESSION['user_platform_ids']['lastfm'];
 
     // URL for the API request
-    $url = "https://ws.audioscrobbler.com/2.0/?method=user.gettopartists&user=$username&api_key=$apiKey&format=json";
-
+    $url = "https://ws.audioscrobbler.com/2.0/?method=user.gettopartists&user=$username&api_key=$apiKey&limit=10&format=json";
     // Fetch the data from the API
     $response = @file_get_contents($url);
 
