@@ -10,7 +10,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Top Artists</title>
+    <title>Login</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../../../styles.css"> 
 </head>
@@ -68,26 +68,38 @@
 
             <main class="col-md-10 ms-sm-auto px-4">
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                    <h2>Media Tracker</h2>
+                    <h2 class="display-6">
+                        Media Tracker
+                        <small class="text-title-secondary">
+                            Login
+                        </small>
+                    </h2>
                 </div>
 
-                <div class="card bg-dark text-light mb-4">
-                    <div class="card-body">
-                        <input type="text" class="form-control" placeholder="Search Titles...">
-                    </div>
-                </div>
-                <h3>Login</h3>
                 <div class="table-responsive">
                     <?php if (isset($error)): ?>
                         <p><?php echo $error; ?></p>
                     <?php else: ?>
                         <div class="form-container">
                             <form id="loginForm" action="../authentication/login.php" method="post">
-                                <label>Username:</label><br>
-                                <input type="text" name="username" required><br>
-                                <label>Password:</label><br>
-                                <input type="password" name="password" required><br><br>
-                                <input type="submit" value="Login">
+                            <h3 class="mb-4">Login</h3>
+                                <div class="row mb-3 mx-1">
+                                    <label class="form-label col-xl-1 col-lg-2 col-md-3 lead" for="username">
+                                        Username:
+                                    </label>
+                                    <div class="col-xl-5 col-lg-8 col-md">
+                                        <input class="form-control" type="text" name="username" required>
+                                    </div>
+                                </div>
+                                <div class="row mb-3 mx-1">
+                                    <label class="form-label col-xl-1 col-lg-2 col-md-3 lead" for="password">
+                                        Password:
+                                    </label>
+                                    <div class="col-xl-5 col-lg-8 col-md">
+                                        <input class="form-control" type="password" name="password" required>
+                                    </div>
+                                </div>
+                                <input class="btn bg-dark-secondary text-white" type="submit" value="Login">
                             </form>
                         </div>
                     <?php endif; ?>

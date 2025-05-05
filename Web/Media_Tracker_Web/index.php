@@ -131,23 +131,21 @@ require_once 'src/php/config.php';
           <div
             class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom"
           >
-            <h2>Media Tracker</h2>
+            <h2 class="display-6">
+              Media Tracker
+              <small class="text-title-secondary">
+                Home
+              </small>
+            </h2>
           </div>
 
-          <div class="card bg-dark text-light mb-4">
-            <div class="card-body">
-              <input
-                type="text"
-                class="form-control"
-                placeholder="Search Titles..."
-              />
-            </div>
-          </div>
+          
           <?php if (isset($_SESSION['session_id']) && !empty($_SESSION['session_id'])): ?>
               <p>SESSION ID: <strong><?= htmlspecialchars($_SESSION['session_id']) ?></strong></p>
           <?php endif; ?>
 
           <?php if (isset($_SESSION['signed_in'])): ?>
+
             <p>Hello, <strong><?= htmlspecialchars($_SESSION['username']) ?></strong>!</p>
 
             <!--Check to see if user has added a Steam account. If not, display message telling user to add an account-->
@@ -174,8 +172,10 @@ require_once 'src/php/config.php';
             <button onclick="window.location.href='src/php/views/add_edit_3rd_party.php'">Add/Edit Platforms</button>
             <button onclick="window.location.href='src/php/authentication/logout.php'">Logout</button>
           <?php else: ?>
-            <button onclick="window.location.href='src/php/views/user_login.php'">Login</button>
-            <button onclick="window.location.href='src/php/views/user_signup.php'">Sign Up</button>
+            <h3>Not signed in!</h3>
+            <p class="lead">Sign in to use the Media Tracker</p>
+            <button class="btn bg-dark-secondary text-white" onclick="window.location.href='src/php/views/user_login.php'">Login</button>
+            <button class="btn bg-dark-secondary text-white" onclick="window.location.href='src/php/views/user_signup.php'">Sign Up</button>
           <?php endif; ?>
         </main>
       </div>
