@@ -9,8 +9,10 @@ using Newtonsoft.Json.Linq;
 using RestSharp;
 using Supabase;
 using System.Configuration;
+using System.Data.Common;
 using System.Diagnostics;
 using System.Security.Policy;
+using System.Security.Principal;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using static System.Net.WebRequestMethods;
@@ -65,18 +67,110 @@ namespace media_tracker_desktop
             //}
 
             //MessageBox.Show(displayString);
+            //------------
+
+            //displayString = "";
+
+            //var tmdbAccounts = records.Where(a => a.PlatformID == 3).ToList();
+
+            //foreach (var account in tmdbAccounts)
+            //{
+            //    displayString += $"{account.UserPlatID} - {account.Username} - {account.PlatformID}\n\n";
+            //}
+
+            //MessageBox.Show(displayString);
+
+            //displayString = "";
+
+            //-------------
+            //var mediaTypeRecords = await SupabaseConnection.GetTableRecord<MediaType>(connection);
+
+            //displayString = "";
+
+            //foreach (var mediaType in mediaTypeRecords)
+            //{
+            //    displayString += $"{mediaType.MediaTypeID} - {mediaType.MediaTypeName}\n\n";
+            //}
+            //MessageBox.Show(displayString);
+            //------------
+            //displayString = "";
+
+            //var mediaRecords = await SupabaseConnection.GetTableRecord<Media>(connection);
+
+            //foreach (var media in mediaRecords)
+            //{
+            //    displayString += $"{media.MediaID} - {media.PlatformID} - {media.MediaTypeID} - {media.MediaPlatID} - {media.Title} - {media.Album} - {media.Artist}\n\n";
+            //}
+
+            //MessageBox.Show(displayString);
+            //-------
+            //displayString = "";
+
+            //var userFavorite = await SupabaseConnection.GetTableRecord<UserFavorite>(connection);
+
+            //foreach (var favorite in userFavorite)
+            //{
+            //    displayString += $"{favorite.Username} - {favorite.MediaID} - {favorite.Favorite}\n\n";
+            //}
+
+            //MessageBox.Show(displayString);
+
+            //----------
 
             displayString = "";
 
-            var tmdbAccounts = records.Where(a => a.PlatformID == 3).ToList();
+            var mediaRecords = await SupabaseConnection.GetTableRecord<Media>(connection);
 
-            foreach (var account in tmdbAccounts)
+            foreach (var media in mediaRecords)
             {
-                displayString += $"{account.UserPlatID} - {account.Username} - {account.PlatformID}\n\n";
+                displayString += $"{media.MediaID} - {media.PlatformID} - {media.MediaTypeID} - {media.MediaPlatID} - {media.Title} - {media.Album} - {media.Artist}\n\n";
             }
 
             MessageBox.Show(displayString);
 
+
+            //-- To sort
+            displayString = "";
+
+            // Sort example, the where is sorting by field
+            QueryOptions<Media> options = new QueryOptions<Media>
+            {
+                Where = m => m.PlatformID == 3,
+                OrderBy = m => m.MediaID,
+                OrderByDirection = "desc"
+            };
+
+            var sorted = DataFunctions.Sort(mediaRecords, options);
+
+            foreach (var smedia in sorted)
+            {
+                displayString += $"{smedia.MediaID} - {smedia.PlatformID} - {smedia.MediaTypeID} - {smedia.MediaPlatID} - {smedia.Title} - {smedia.Album} - {smedia.Artist}\n\n";
+            }
+
+            MessageBox.Show(displayString);
+
+            //-- to search
+            displayString = "";
+
+            QueryOptions<Media> options2 = new QueryOptions<Media>
+            {
+                // Search condition
+                // Important: make sure to include !string.IsNullOrEmpty(m.Field) because it can lead to errors that isn't even properly resolved with a try catch.
+                Where = m => !string.IsNullOrEmpty(m.Artist) && m.Artist.Contains("Post"),
+                OrderBy = m => m.Artist
+            };
+
+            var sorted2 = DataFunctions.Sort(mediaRecords, options2);
+
+            if (sorted2 != null)
+            {
+                foreach (var smedia2 in sorted2)
+                {
+                    displayString += $"{smedia2.MediaID} - {smedia2.PlatformID} - {smedia2.MediaTypeID} - {smedia2.MediaPlatID} - {smedia2.Title} - {smedia2.Album} - {smedia2.Artist}\n\n";
+                }
+            }
+
+            MessageBox.Show(displayString);
 
             // Initializing connection.
             UserAppAccount.ConnectToDB(connection);
@@ -84,6 +178,8 @@ namespace media_tracker_desktop
             LastFMApi.Initialize();
             SteamApi.Initialize();
             TmdbApi.Initialize();
+
+            //UserAppAccount.FavoriteMedia();
         }
 
         // Testing user create. Normally should be done in a separate form.

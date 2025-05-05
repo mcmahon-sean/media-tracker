@@ -18,11 +18,13 @@ $apiUrl = "https://api.steampowered.com/IPlayerService/GetOwnedGames/v1/?" . htt
 ]);
 
 // Make the API call
-$response = file_get_contents($apiUrl);
+$curl_handle = curl_init();
+curl_setopt($curl_handle, CURLOPT_URL, $apiUrl);
+$response = curl_exec($curl_handle);
 $data = json_decode($response, true);
 
 // Array to hold SteamGame objects
-$steamGames = [];
+$ownedGames = [];
 
 if (isset($data['response']['games'])) {
     foreach ($data['response']['games'] as $gameData) {

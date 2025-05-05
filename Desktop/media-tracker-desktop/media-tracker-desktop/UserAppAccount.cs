@@ -30,6 +30,8 @@ namespace media_tracker_desktop
         private const int LASTFM_PLATFORM_ID = 2;
         private const int TMDB_PLATFORM_ID = 3;
 
+        private const string INITIAL_MEDIA_FAV_SP_NAME = "initial_media_fav";
+
         private static Client _connection;
 
         private static bool _userLoggedIn = false;
@@ -43,6 +45,16 @@ namespace media_tracker_desktop
         private static string _userSteamID = string.Empty;
         private static string _userTmdbSessionID = string.Empty;
         private static string _userTmdbAccountID = string.Empty;
+
+        public enum MediaTypeID
+        {
+            Game = 1,
+            TV_Show = 2,
+            Film = 3,
+            Song = 4,
+            Album = 5,
+            Artist = 6
+        }
 
         // ----- Getter Methods -----
         // Method: Returns bool if a user is logged in.
@@ -76,7 +88,6 @@ namespace media_tracker_desktop
             get { return _email; }
         }
 
-        //Getter Methods for the Platform Ids because I didnt want to memorize them :P
         public static int SteamPlatformID
         {
             get { return STEAM_PLATFORM_ID; }
@@ -93,22 +104,16 @@ namespace media_tracker_desktop
         public static string UserSteamID
         {
             get { return _userSteamID; }
-            // No setter, reason outlined in the beginning of this section.
-            //set { _userSteamID = value; } 
         }
 
         public static string UserLastFmID
         {
             get { return _userLastFmID; }
-            // No setter, reason outlined in the beginning of this section.
-            //set { _userLastFmID = value; }
         }
 
         public static string UserTmdbAccountID
         {
             get { return _userTmdbAccountID; }
-            // No setter, reason outlined in the beginning of this section.
-            //set { _userTmdbAccountID = value; }
         }
 
         public static string UserTmdbSessionID
@@ -460,18 +465,28 @@ namespace media_tracker_desktop
             }
         }
 
-        // Note: make method for updating api id.
-
+        /// <summary>
+        /// Update the user's platform ID. Used when the user is allowed to update their api IDs (lastFM username, steamID, tmdb session ID).
+        /// </summary>
+        /// <param name="platformID">The ID for the platform (lastFM, steam, tmdb).</param>
+        /// <param name="newUserPlatformID">The user's platform ID (lastFM username, steam ID, tmdb session ID)</param>
+        /// <returns>(bool, string) bool to indicate success and string for the message (error/success).</returns>
         public static async Task<(bool, string)> UpdateUserPlatformID(int platformID, string newUserPlatformID)
         {
+            // Retrieve the platform name, for display purposes.
             string platformName = GetPlatformName(platformID);
 
+            // If there is no new user platform ID,
             if (string.IsNullOrEmpty(newUserPlatformID))
             {
+                // Return false.
                 return (false, $"New User {platformName} ID is null.");
             }
+            // Else,
             else
             {
+                // Update the user's platform ID.
+                // The SP updates/adds the user's platform ID.
                 (bool updateSuccess, string message) = await AddThirdPartyId(platformID, newUserPlatformID);
                 
                 if (updateSuccess)
@@ -485,6 +500,7 @@ namespace media_tracker_desktop
             }
         }
 
+        // Method: Retrieve the platform name based on the ID.
         private static string GetPlatformName(int platformID)
         {
             string platformName = string.Empty;
@@ -505,6 +521,85 @@ namespace media_tracker_desktop
             }
 
             return platformName;
+        }
+
+        /// <summary>
+        /// Favorites a media. Used for buttons that when clicked, favorites or unfavorites the media. The SP used, favorites/unfavorites the media.
+        /// </summary>
+        /// <param name="platformID">The ID of the platform (lastFM, steam, tmdb).</param>
+        /// <param name="username">The username of the current logged in user.</param>
+        /// <param name="mediaTypeID">The type of media (Game, Tv Show, Movie, etc.)</param>
+        /// <param name="mediaPlatformID">The ID of that media in their corresponding platform. (Ex: app ID for steam games)</param>
+        /// <param name="title">The title of the media.</param>
+        /// <param name="album">If the media is music, the album.</param>
+        /// <param name="artist">If the media is music, the artist.</param>
+        /// <returns>(bool, string) bool indicates success and string is the message.</returns>
+        public static async Task<(bool, string)> FavoriteMedia(int platformID, string username, MediaTypeID mediaTypeID, string mediaPlatformID = "", string title = "", string album = "", string artist = "")
+        {
+            // Ensure the username is not null or empty.
+            if (string.IsNullOrEmpty(username))
+            {
+                return (false, "Username is null or empty.");
+            }
+
+            try
+            {
+                // Parameters for the SP.
+                var parameters = new
+                {
+                    platform_id_input = platformID,
+                    media_type_id_input = (int)mediaTypeID,
+                    media_plat_id_input = mediaPlatformID,
+                    title_input = title,
+                    album_input = album,
+                    artist_input = artist,
+                    username_input = username
+                };
+
+                // Use SP to favorite/unfavorite media.
+                var response = await _connection.Rpc(INITIAL_MEDIA_FAV_SP_NAME, parameters);
+
+                var spResponse = response.Content;
+
+                return (true, spResponse ?? "No message returned by the SP.");
+            }
+            catch (Exception error)
+            {
+                return (false, error.Message);
+            }
+        }
+
+        /// <summary>
+        /// Retrieve the list of favorites. Sorts the list to ensure that it only returns the list of favorites that the current logged in user has favorited and that the favorite field is not false.
+        /// </summary>
+        /// <returns>The list of media favorites. All types of media, not just games, etc.</returns>
+        public static async Task<List<UserFavoriteMedia>> GetFavoriteMediaList()
+        {
+            // Favorites of all users.
+            List<UserFavorite> userFavorites = await SupabaseConnection.GetTableRecord<UserFavorite>(_connection);
+
+            // All media.
+            List<Media> mediaList = await SupabaseConnection.GetTableRecord<Media>(_connection);
+
+            // Create a new list where it only contains media that the current logged in user has favorited and that the favorite field is currently set to true.
+            List<UserFavoriteMedia> result = (from media in mediaList
+                                             join favorite in userFavorites
+                                                on media.MediaID equals favorite.MediaID
+                                             where favorite.Username == _username && favorite.Favorite
+                                             select new UserFavoriteMedia
+                                             {
+                                                 MediaID = media.MediaID,
+                                                 PlatformID = media.PlatformID,
+                                                 MediaTypeID = media.MediaTypeID,
+                                                 MediaPlatID = media.MediaPlatID,
+                                                 Title = media.Title,
+                                                 Album = media.Album,
+                                                 Artist = media.Artist,
+                                                 Username = favorite.Username,
+                                                 IsFavorite = favorite.Favorite
+                                             }).ToList();
+
+            return result;
         }
     }
 }

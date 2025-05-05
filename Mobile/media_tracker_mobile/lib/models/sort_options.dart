@@ -23,14 +23,17 @@ List<T> applySorting<T>({
   final sorted = List<T>.from(list);
 
   if (option == SortOption.favorite && isFavorite != null) {
-    // Sort favorites to the top
+    // Sort favorites based on ordering direction
     sorted.sort((a, b) {
       final aFav = isFavorite(a); 
       final bFav = isFavorite(b); 
 
-      if (aFav && !bFav) return -1; // a is favorite, b is not
-      if (!aFav && bFav) return 1; // b is favorite, a is not
-      return 0; // Both are favorites or both are not, leave unchanged
+      if (aFav == bFav) return 0;
+      if (direction == SortDirection.asc) {
+        return aFav ? 1 : -1; // Non-favorites first
+      } else {
+        return aFav ? -1 : 1; // Favorites first
+      }
     });
   } else {
     // Sort by field (name, playtime, etc.)

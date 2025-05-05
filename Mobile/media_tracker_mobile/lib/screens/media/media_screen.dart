@@ -62,7 +62,9 @@ class _MediaScreenState extends ConsumerState<MediaScreen> {
   @override
   void initState() {
     super.initState();
-    _loadPlatformData(_selectedIndex);
+    _loadSteamGames();
+    _loadLastFmData();
+    _loadTmdbData();
   }
 
   // Load the data for the selected platform based on index
@@ -105,23 +107,29 @@ class _MediaScreenState extends ConsumerState<MediaScreen> {
       games.sort(
         (a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()),
       ); // Sort the games alphabetically
+
       final favorites = ref.read(favoritesProvider);
 
-      // First make sure both are strings for a clean compare
-      for (var game in games) {
-        if (favorites.any(
-          (fav) =>
-              fav['media']['platform_id'] == 1 &&
-              fav['media']['media_plat_id'] == game.name.toString() &&
-              fav['favorites'] == true,
-        )) {
-          game.isFavorite = true;
-        }
-      }
+      // Apply favorite flag and fetch headerImage
+      final enrichedGames = await Future.wait(
+        games.map((game) async {
+          final isFav = favorites.any(
+            (fav) =>
+                fav['media']['platform_id'] == 1 &&
+                fav['media']['media_plat_id'] == game.name &&
+                fav['favorites'] == true,
+          );
+
+          final details = await fetchSteamAppDetails(game.appId.toString());
+          final headerImage = details?['header_image'] as String?;
+
+          return game.copyWith(isFavorite: isFav, headerImage: headerImage);
+        }),
+      );
 
       setState(() {
-        _steamGames = games;
-        _filteredSteamGames = games; // Filter steam games
+        _steamGames = enrichedGames;
+        _filteredSteamGames = enrichedGames; // Filter steam games
       }); // Set game list
     } catch (e, stackTrace) {
       print('Steam load error: $e');
@@ -142,16 +150,29 @@ class _MediaScreenState extends ConsumerState<MediaScreen> {
     setState(() => _isLoadingLastFm = true);
     try {
       final user = await fetchLastFmUser();
-      final artists = await fetchLastFmTopArtists();
+      final rawArtists = await fetchLastFmTopArtists();
       final tracks = await fetchLastFmRecentTracks();
 
+      // Enrich each TopArtist with their top album image
+      final enrichedArtists = await Future.wait(
+        rawArtists.map((artist) async {
+          try {
+            final albums = await fetchArtistTopAlbums(artist.name);
+            final imageUrl = albums.isNotEmpty ? albums[0]['imageUrl'] : null;
+            return artist.copyWith(topAlbumImageUrl: imageUrl);
+          } catch (_) {
+            return artist; // fallback to artist without album art
+          }
+        }),
+      );
+
       setState(() {
-        _lastFmUser = user; // Get user profile
-        _topArtists = artists; // Get top artists
-        _recentTracks = tracks; // Get recent tracks
-        _filteredTopArtists = artists; // Filter top artists
-        _filteredRecentTracks = tracks; // Filter recent tracks
-        _isLoadingLastFm = false; // Stop loading
+        _lastFmUser = user;
+        _topArtists = enrichedArtists;
+        _filteredTopArtists = enrichedArtists;
+        _recentTracks = tracks;
+        _filteredRecentTracks = tracks;
+        _isLoadingLastFm = false;
       });
     } catch (e) {
       print('Last.fm load error: $e');
@@ -216,6 +237,10 @@ class _MediaScreenState extends ConsumerState<MediaScreen> {
           });
           _loadPlatformData(index);
         },
+        steamGames: _steamGames,
+        tmdbMovies: _ratedMovies,
+        tmdbTvShows: _favoriteTvShows,
+        topArtists: _topArtists,
       ),
       body: _buildBody(),
       bottomNavigationBar: BottomNavigationBar(

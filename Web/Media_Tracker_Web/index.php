@@ -143,13 +143,34 @@ require_once 'src/php/config.php';
           <?php if (isset($_SESSION['session_id']) && !empty($_SESSION['session_id'])): ?>
               <p>SESSION ID: <strong><?= htmlspecialchars($_SESSION['session_id']) ?></strong></p>
           <?php endif; ?>
+
           <?php if (isset($_SESSION['signed_in'])): ?>
-            <h4 class="mb-3">Hello, <strong><?= htmlspecialchars($_SESSION['username']) ?></strong>!</h4>
-            <p class="lead">Steam ID: <strong><?= htmlspecialchars($_SESSION['user_platform_ids']['steam']) ?></strong></p>
-            <p class="lead">Last.fm ID: <strong><?= htmlspecialchars($_SESSION['user_platform_ids']['lastfm']) ?></strong></p>
-            <p class="lead">TMDB ID: <strong><?= htmlspecialchars($_SESSION['user_platform_ids']['tmdb']) ?></strong></p>
-            <button class="btn bg-dark-secondary text-white" onclick="window.location.href='src/php/views/add_edit_3rd_party.php'">Add/Edit Platforms</button>
-            <button class="btn bg-dark-secondary text-white" onclick="window.location.href='src/php/authentication/logout.php'">Logout</button>
+
+            <p>Hello, <strong><?= htmlspecialchars($_SESSION['username']) ?></strong>!</p>
+
+            <!--Check to see if user has added a Steam account. If not, display message telling user to add an account-->
+            <?php if (isset($_SESSION['user_platform_ids']['steam'])): ?>
+              <p>Steam ID: <strong><?= htmlspecialchars($_SESSION['user_platform_ids']['steam']) ?></strong></p>
+            <?php else: ?>
+              <p>Please add your Steam account</p>
+            <?php endif; ?>
+
+            <!--Check to see if user has added a Last.fm account. If not, display message telling user to add an account-->
+            <?php if (isset($_SESSION['user_platform_ids']['lastfm'])): ?>
+              <p>Last.fm ID: <strong><?= htmlspecialchars($_SESSION['user_platform_ids']['lastfm']) ?></strong></p>
+            <?php else: ?>
+              <p>Last.fm ID: Please add your Last.fm account</p>
+            <?php endif; ?>
+
+            <!--Check to see if user has added a TMDB account. If not, display message telling user to add an account-->
+            <?php if (isset($_SESSION['user_platform_ids']['tmdb'])): ?>
+              <p>TMDB ID: <strong><?= htmlspecialchars($_SESSION['user_platform_ids']['tmdb']) ?></strong></p>
+            <?php else: ?>
+              <p>TMDB ID: Please add your TMDB account</p>
+            <?php endif; ?>
+
+            <button onclick="window.location.href='src/php/views/add_edit_3rd_party.php'">Add/Edit Platforms</button>
+            <button onclick="window.location.href='src/php/authentication/logout.php'">Logout</button>
           <?php else: ?>
             <h3>Not signed in!</h3>
             <p class="lead">Sign in to use the Media Tracker</p>

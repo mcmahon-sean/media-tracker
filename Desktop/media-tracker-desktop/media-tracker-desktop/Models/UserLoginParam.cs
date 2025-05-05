@@ -29,7 +29,7 @@ namespace media_tracker_desktop.Models
         {
             if (string.IsNullOrEmpty(fieldValue))
             {
-                throw new ArgumentNullException($"{fieldName} must not be null or empty.");
+                throw new Exception($"Please enter a value for {fieldName}.");
             }
 
             return fieldValue;

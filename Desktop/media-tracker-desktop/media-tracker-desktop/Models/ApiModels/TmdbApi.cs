@@ -364,6 +364,54 @@ namespace media_tracker_desktop.Models.ApiModels
             }
         }
 
+        public static async Task<(bool, List<TMDB_Movie>?)> GetUserFavoriteMovies()
+        {
+            // Check necessary properties.
+            (bool isValid, string message) propertyCheck = CheckRequiredProperties(checkRequestTokenUrl: false);
+
+            if (!propertyCheck.isValid)
+            {
+                throw new Exception(propertyCheck.message);
+            }
+
+            // Add the endpoint to the base url.
+            string urlWithEndpoint = $"{_baseUrl}/account/{_accountID}/favorite/movies";
+
+            RestRequest request = new RestRequest(urlWithEndpoint);
+
+            request.AddParameter("language", "en-US");
+            request.AddParameter("page", 1);
+            request.AddParameter("sort_by", "created_at.asc");
+            request.AddParameter("session_id", _sessionID);
+            request.AddHeader("Authorization", $"Bearer {_authToken}");
+
+            var response = await _client.ExecuteAsync(request);
+
+            // If response is not successful, throw exception.
+            if (!response.IsSuccessful)
+            {
+                throw new Exception(response.ErrorMessage);
+            }
+            // If the response has no content, return empty list.
+            else if (string.IsNullOrEmpty(response.Content))
+            {
+                return (false, null);
+            }
+            else
+            {
+                // Convert content to json object.
+                var movieResultJson = JObject.Parse(response.Content);
+
+                // Retrieve the array of artist from the json object and convert it back to string.
+                var movieJson = movieResultJson.Root["results"];
+
+                // Deserialize
+                List<TMDB_Movie> movies = JsonConvert.DeserializeObject<List<TMDB_Movie>>(movieJson.ToString());
+
+                return (true, movies);
+            }
+        }
+
         public static void Logout()
         {
             _accountID = string.Empty;
