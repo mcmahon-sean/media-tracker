@@ -105,7 +105,6 @@ class TMDBService {
     if (response.statusCode == 200) {
       final data = jsonDecode(utf8.decode(response.bodyBytes));
       final results = data['results'] as List<dynamic>;
-      print(results);
       return results.map((json) => TMDBMovie.fromJson(json)).toList();
     } else {
       throw Exception('Failed to fetch rated movies');
@@ -126,7 +125,6 @@ class TMDBService {
     if (response.statusCode == 200) {
       final data = jsonDecode(utf8.decode(response.bodyBytes));
       final results = data['results'] as List<dynamic>;
-      print(results);
       return results.map((json) => TMDBTvShow.fromJson(json)).toList();
     } else {
       throw Exception('Failed to fetch favorite TV shows');

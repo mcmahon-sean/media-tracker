@@ -38,7 +38,7 @@ class _TmdbSectionState extends ConsumerState<TmdbSection> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const TabBar(
-            tabs: [Tab(text: 'Rated Movies'), Tab(text: 'Favorite TV Shows')],
+            tabs: [Tab(text: 'Rated Movies'), Tab(text: 'Rated TV Shows')],
             indicatorColor: Colors.grey,
             labelColor: Colors.white,
             unselectedLabelColor: Colors.grey,
