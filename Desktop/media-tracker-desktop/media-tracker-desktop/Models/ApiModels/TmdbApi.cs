@@ -198,6 +198,10 @@ namespace media_tracker_desktop.Models.ApiModels
                             return string.Empty;
                         }
                     }
+                    catch (HttpRequestException)
+                    {
+                        throw;
+                    }
                     catch (Exception)
                     {
                         throw;

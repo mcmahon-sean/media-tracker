@@ -15,6 +15,13 @@ namespace media_tracker_desktop.Forms
 
         private string? _newSessionIDFromTMDBEditButton = string.Empty;
 
+        private TextBox txtSteam = new TextBox();
+        private TextBox txtLastFm = new TextBox();
+
+        private bool isSteamToBeUnlinked = false;
+        private bool isLastFMToBeUnlinked = false;
+        private bool isTMDBToBeUnlinked = false;
+
         private void MainForm_Load(object sender, EventArgs e)
         {
             InitializeApp();
@@ -199,7 +206,7 @@ namespace media_tracker_desktop.Forms
                 FlatStyle = FlatStyle.Flat,
                 AutoSize = true
             };
-            btnEditUser.Click += btnEditUser_Click;
+            btnEditUser.Click += btnEditUser_Click!;
 
             Button btnDeleteUser = new Button
             {
@@ -210,7 +217,7 @@ namespace media_tracker_desktop.Forms
                 FlatStyle = FlatStyle.Flat,
                 AutoSize = true
             };
-            btnDeleteUser.Click += btnDeleteUser_Click;
+            btnDeleteUser.Click += btnDeleteUser_Click!;
 
             var btnLogout = new Button
             {
@@ -284,13 +291,23 @@ namespace media_tracker_desktop.Forms
                 Location = new System.Drawing.Point(20, 20),
                 AutoSize = true
             };
-            var txtSteam = new TextBox
+            txtSteam = new TextBox
             {
                 Name = "txtSteam",
                 Text = UserAppAccount.UserSteamID ?? "",
                 Location = new System.Drawing.Point(200, 18),
                 Width = 200
             };
+            Button btnUnlinkSteam = new Button
+            {
+                Text = "Unlink",
+                Location = new System.Drawing.Point(410, 18),
+                BackColor = System.Drawing.Color.FromArgb(50, 50, 50),
+                ForeColor = System.Drawing.Color.White,
+                FlatStyle = FlatStyle.Flat,
+                AutoSize = true
+            };
+            btnUnlinkSteam.Click += btnUnlinkSteam_Click!;
 
             // Last.fm
             var lblLastFm = new Label
@@ -300,13 +317,23 @@ namespace media_tracker_desktop.Forms
                 Location = new System.Drawing.Point(20, 60),
                 AutoSize = true
             };
-            var txtLastFm = new TextBox
+            txtLastFm = new TextBox
             {
                 Name = "txtLastFm",
                 Text = UserAppAccount.UserLastFmID ?? "",
                 Location = new System.Drawing.Point(200, 58),
                 Width = 200
             };
+            Button btnUnlinkLastFM = new Button
+            {
+                Text = "Unlink",
+                Location = new System.Drawing.Point(410, 58),
+                BackColor = System.Drawing.Color.FromArgb(50, 50, 50),
+                ForeColor = System.Drawing.Color.White,
+                FlatStyle = FlatStyle.Flat,
+                AutoSize = true
+            };
+            btnUnlinkLastFM.Click += btnUnlinkLastFM_Click!;
 
             // TMDB
             var lblTmdb = new Label
@@ -316,7 +343,7 @@ namespace media_tracker_desktop.Forms
                 Location = new System.Drawing.Point(20, 100),
                 AutoSize = true
             };
-            var btnTmdb = new Button
+            Button btnTmdb = new Button
             {
                 Name = "btnTmdb",
                 Text = "Update TMDB",
@@ -325,8 +352,19 @@ namespace media_tracker_desktop.Forms
                 BackColor = Color.White,
                 AutoSize = true
             };
+            btnTmdb.Click += btnTmdb_Click!;
 
-            btnTmdb.Click += btnTmdb_Click;
+            Button btnUnlinkTMDB = new Button
+            {
+                Text = "Unlink",
+                Location = new System.Drawing.Point(410, 98),
+                BackColor = System.Drawing.Color.FromArgb(50, 50, 50),
+                ForeColor = System.Drawing.Color.White,
+                FlatStyle = FlatStyle.Flat,
+                AutoSize = true
+            };
+            btnUnlinkTMDB.Click += btnUnlinkTMDB_Click!;
+
 
             // Save button
             var btnSave = new Button
@@ -338,17 +376,7 @@ namespace media_tracker_desktop.Forms
                 FlatStyle = FlatStyle.Flat,
                 AutoSize = true
             };
-            btnSave.Click += (s, e) =>
-            {
-                string newSteamID = txtSteam.Text.Trim();
-                string newLastFmID = txtLastFm.Text.Trim();
-                string? newTmdbID = _newSessionIDFromTMDBEditButton;
-
-                UpdateUserPlatformIDs(newSteamID, newLastFmID, newTmdbID!);
-
-                MessageBox.Show("Platform info updated!", "Saved", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                ShowDashboard();
-            };
+            btnSave.Click += btnSave_Click!;
 
             // Cancel button
             var btnCancel = new Button
@@ -365,10 +393,13 @@ namespace media_tracker_desktop.Forms
             // Add controls
             editPanel.Controls.Add(lblSteam);
             editPanel.Controls.Add(txtSteam);
+            editPanel.Controls.Add(btnUnlinkSteam);
             editPanel.Controls.Add(lblLastFm);
             editPanel.Controls.Add(txtLastFm);
+            editPanel.Controls.Add(btnUnlinkLastFM);
             editPanel.Controls.Add(lblTmdb);
             editPanel.Controls.Add(btnTmdb);
+            editPanel.Controls.Add(btnUnlinkTMDB);
             editPanel.Controls.Add(btnSave);
             editPanel.Controls.Add(btnCancel);
 
@@ -377,7 +408,147 @@ namespace media_tracker_desktop.Forms
 
         private async void btnTmdb_Click(object sender, EventArgs e)
         {
-            _newSessionIDFromTMDBEditButton = await TmdbApi.RetrieveSessionID();
+            try
+            {
+                _newSessionIDFromTMDBEditButton = await TmdbApi.RetrieveSessionID();
+            }
+            catch (HttpRequestException error)
+            {
+                if (error.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                {
+                    MessageBox.Show("Permission denied.");
+                }
+            }
+            catch (Exception error)
+            {
+                MessageBox.Show($"Error: {error.Message}");
+            }
+        }
+
+        private async void btnSave_Click(object sender, EventArgs e)
+        {
+            string message = "";
+
+            string newSteamID = txtSteam.Text.Trim();
+            string newLastFmID = txtLastFm.Text.Trim();
+            string? newTmdbID = _newSessionIDFromTMDBEditButton;
+
+            UpdateUserPlatformIDs(newSteamID, newLastFmID, newTmdbID!);
+
+            if (!string.IsNullOrEmpty(newSteamID) || !string.IsNullOrEmpty(newLastFmID) || !string.IsNullOrEmpty(newTmdbID))
+            {
+                message += "Platform info updated!\n\n";
+            }
+
+            if (isSteamToBeUnlinked)
+            {
+                // Unlink account.
+                Dictionary<string, dynamic> result = await UserAppAccount.UnlinkApiAccount(UserAppAccount.SteamPlatformID);
+
+                message += result["statusMessage"] + "\n";
+
+                if (result["status"] == "success")
+                {
+                    txtSteam.Text = "";
+                }
+            }
+
+            if (isLastFMToBeUnlinked)
+            {
+                // Unlink account.
+                Dictionary<string, dynamic> result = await UserAppAccount.UnlinkApiAccount(UserAppAccount.LastFMPlatformID);
+
+                message += result["statusMessage"] + "\n";
+
+                if (result["status"] == "success")
+                {
+                    txtLastFm.Text = "";
+                }
+            }
+
+            if (isTMDBToBeUnlinked)
+            {
+                // Unlink account.
+                Dictionary<string, dynamic> result = await UserAppAccount.UnlinkApiAccount(UserAppAccount.TMDBPlatformID);
+
+                message += result["statusMessage"] + "\n";
+            }
+
+            if (!string.IsNullOrEmpty(message))
+            {
+                MessageBox.Show(message, "Saved", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+
+            ShowDashboard();
+        }
+
+        private void btnUnlinkSteam_Click(object sender, EventArgs e)
+        {
+            isSteamToBeUnlinked = false;
+
+            // If user has an account linked,
+            if (!string.IsNullOrEmpty(UserAppAccount.UserSteamID))
+            {
+                DialogResult confirmation = MessageBox.Show("Are you sure you want to unlink your steam account?", "Confirm Delete", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation);
+
+                // If user confirms unlink,
+                if (confirmation == DialogResult.Yes)
+                {
+                    // Mark it to be unlinked.
+                    isSteamToBeUnlinked = true;
+                }
+            }
+            else
+            {
+                MessageBox.Show("You don't have a steam account linked.");
+            }
+        }
+
+        private void btnUnlinkLastFM_Click(object sender, EventArgs e)
+        {
+            isLastFMToBeUnlinked = false;
+
+            // If user has an account linked,
+            if (!string.IsNullOrEmpty(UserAppAccount.UserLastFmID))
+            {
+                DialogResult confirmation = MessageBox.Show("Are you sure you want to unlink your lastFM account?", "Confirm Delete", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation);
+
+                // If user confirms unlink,
+                if (confirmation == DialogResult.Yes)
+                {
+                    // Mark it to be unlinked.
+                    isLastFMToBeUnlinked = true;
+                }
+            }
+            else
+            {
+                MessageBox.Show("You don't have a lastFM account linked.");
+            }
+        }
+
+        private void btnUnlinkTMDB_Click(object sender, EventArgs e)
+        {
+            isTMDBToBeUnlinked = false;
+
+            // If user has an account linked,
+            if (!string.IsNullOrEmpty(UserAppAccount.UserTmdbSessionID))
+            {
+                DialogResult confirmation = MessageBox.Show("Are you sure you want to unlink your TMDB account?", "Confirm Delete", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation);
+
+                // If user confirms unlink,
+                if (confirmation == DialogResult.Yes)
+                {
+                    // Mark it to be unlinked.
+                    isTMDBToBeUnlinked = true;
+
+                    // Erase session ID in case user linked tmdb then clicked unlink tmdb.
+                    _newSessionIDFromTMDBEditButton = "";
+                }
+            }
+            else
+            {
+                MessageBox.Show("You don't have a TMDB account linked.");
+            }
         }
 
         private async void UpdateUserPlatformIDs(string newSteamID, string newLastFmID, string newTmdbID)

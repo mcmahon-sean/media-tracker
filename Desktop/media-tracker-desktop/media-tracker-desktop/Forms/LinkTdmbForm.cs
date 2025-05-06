@@ -536,6 +536,13 @@ namespace media_tracker_desktop.Forms
                     MessageBox.Show($"TMDB account is already linked with {UserAppAccount.Username}");
                 }
             }
+            catch (HttpRequestException error)
+            {
+                if (error.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                {
+                    MessageBox.Show("Permission denied.");
+                }
+            }
             catch (Exception error)
             {
                 MessageBox.Show($"Error: {error.Message}");

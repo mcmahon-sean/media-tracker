@@ -6,6 +6,7 @@ using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using RestSharp;
 using Supabase;
+using Supabase.Core.Extensions;
 using System;
 using System.CodeDom;
 using System.Collections;
@@ -30,6 +31,7 @@ namespace media_tracker_desktop
         private const string ADD_THIRD_PARTY_ID = "add_3rd_party_id";
         private const string UPDATE_USER_SP_NAME = "update_user";
         private const string DELETE_USER_SP_NAME = "delete_user";
+        private const string DELETE_THIRD_PARTY_ID_SP_NAME = "delete_3rd_party";
 
         private const int STEAM_PLATFORM_ID = 1;
         private const int LASTFM_PLATFORM_ID = 2;
@@ -566,6 +568,96 @@ namespace media_tracker_desktop
             {
                 return (false, error.Message);
 
+            }
+        }
+
+        public static async Task<Dictionary<string, dynamic>> UnlinkApiAccount(int platformID)
+        {
+            Dictionary<string, dynamic> unlinkResult = new Dictionary<string, dynamic>
+            {
+                ["status"] = "",
+                ["statusMessage"] = ""
+            };
+
+            string userPlatID = GetUserPlatformID(platformID);
+
+            if (userPlatID.Contains("Invalid"))
+            {
+                unlinkResult["status"] = "error";
+                unlinkResult["statusMessage"] = "Invalid platform ID.";
+
+                return unlinkResult;
+            }
+
+            var unlinkParam = new
+            {
+                username_input = _username,
+                platform_id_input = platformID,
+                user_plat_id_input = userPlatID
+            };
+
+            // Execute the stored procedure and wait for a response.
+            var response = await _connection.Rpc(DELETE_THIRD_PARTY_ID_SP_NAME, unlinkParam);
+
+            if (response.Content.Contains("deleted"))
+            {
+                string platformName = GetPlatformName(platformID);
+
+                unlinkResult["status"] = "success";
+                unlinkResult["statusMessage"] = $"Successfully unlinked {platformName} account.";
+
+                LogOutPlatform(platformID);
+
+                return unlinkResult;
+            }
+            else
+            {
+                unlinkResult["status"] = "error";
+                unlinkResult["statusMessage"] = response.Content;
+
+                return unlinkResult;
+            }
+        }
+
+        // Method: Retrieve the user's platform ID based on the platform ID passed.
+        private static string GetUserPlatformID(int platformID)
+        {
+            switch(platformID)
+            {
+                case STEAM_PLATFORM_ID:
+                    return _userSteamID;
+                case LASTFM_PLATFORM_ID:
+                    return _userLastFmID;
+                case TMDB_PLATFORM_ID:
+                    return _userTmdbSessionID;
+                default:
+                    return "Invalid platform ID.";
+            }
+        }
+
+        // Method: Log out the user from the specified platform.
+        private static void LogOutPlatform(int platformID)
+        {
+            switch (platformID)
+            {
+                case STEAM_PLATFORM_ID:
+                    _userSteamID = "";
+
+                    SteamApi.Logout();
+                    break;
+                case LASTFM_PLATFORM_ID:
+                    _userLastFmID = "";
+
+                    LastFMApi.Logout();
+                    break;
+                case TMDB_PLATFORM_ID:
+                    _userTmdbSessionID = "";
+                    _userTmdbAccountID = "";
+
+                    TmdbApi.Logout();
+                    break;
+                default:
+                    break;
             }
         }
 
