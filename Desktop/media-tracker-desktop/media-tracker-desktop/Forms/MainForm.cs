@@ -13,19 +13,33 @@ namespace media_tracker_desktop.Forms
             this.Load += MainForm_Load;
         }
 
+        private static readonly string[] LASTFM_OPTIONS = ["TopArtists", "RecentTracks"];
+
         private string? _newSessionIDFromTMDBEditButton = string.Empty;
 
-        private TextBox txtSteam = new TextBox();
-        private TextBox txtLastFm = new TextBox();
+        private TextBox _txtSteam = new TextBox();
+        private TextBox _txtLastFm = new TextBox();
 
-        private bool isSteamToBeUnlinked = false;
-        private bool isLastFMToBeUnlinked = false;
-        private bool isTMDBToBeUnlinked = false;
+        private bool _isSteamToBeUnlinked = false;
+        private bool _isLastFMToBeUnlinked = false;
+        private bool _isTMDBToBeUnlinked = false;
+
+        private bool _lastFMOptionVisible = false;
+
+        private ContextMenuStrip _cmsLastFMOptions = new ContextMenuStrip();
 
         private void MainForm_Load(object sender, EventArgs e)
         {
             InitializeApp();
             ShowHome();
+        }
+
+        public static string[] LastFMOptions
+        {
+            get
+            {
+                return LASTFM_OPTIONS;
+            }
         }
 
         // Method: Initialize the components that are necessary for the app to run.
@@ -35,6 +49,10 @@ namespace media_tracker_desktop.Forms
             AppElement.AddMainIcon(btnLinkLastFM, Properties.Resources.icon_music, new Size(20, 20));
             AppElement.AddMainIcon(btnLinkSteam, Properties.Resources.icon_games, new Size(30, 18));
             AppElement.AddMainIcon(btnLinkTmdb, Properties.Resources.icon_movies, new Size(30, 18));
+
+            BuildOptionMenu();
+
+            _cmsLastFMOptions.ItemClicked += cmsLastFMOptions_ItemClicked!;
 
             // Initialize the database.
             string message = await SupabaseConnection.InitializeDB();
@@ -54,6 +72,11 @@ namespace media_tracker_desktop.Forms
             {
                 MessageBox.Show(message);
             }
+        }
+
+        private void BuildOptionMenu()
+        {
+            _cmsLastFMOptions = AppElement.GetSortMenu(LASTFM_OPTIONS);
         }
 
         private void ShowHome()
@@ -296,7 +319,7 @@ namespace media_tracker_desktop.Forms
                 Location = new System.Drawing.Point(20, 20),
                 AutoSize = true
             };
-            txtSteam = new TextBox
+            _txtSteam = new TextBox
             {
                 Name = "txtSteam",
                 Text = UserAppAccount.UserSteamID ?? "",
@@ -322,7 +345,7 @@ namespace media_tracker_desktop.Forms
                 Location = new System.Drawing.Point(20, 60),
                 AutoSize = true
             };
-            txtLastFm = new TextBox
+            _txtLastFm = new TextBox
             {
                 Name = "txtLastFm",
                 Text = UserAppAccount.UserLastFmID ?? "",
@@ -397,10 +420,10 @@ namespace media_tracker_desktop.Forms
 
             // Add controls
             editPanel.Controls.Add(lblSteam);
-            editPanel.Controls.Add(txtSteam);
+            editPanel.Controls.Add(_txtSteam);
             editPanel.Controls.Add(btnUnlinkSteam);
             editPanel.Controls.Add(lblLastFm);
-            editPanel.Controls.Add(txtLastFm);
+            editPanel.Controls.Add(_txtLastFm);
             editPanel.Controls.Add(btnUnlinkLastFM);
             editPanel.Controls.Add(lblTmdb);
             editPanel.Controls.Add(btnTmdb);
@@ -434,8 +457,8 @@ namespace media_tracker_desktop.Forms
         {
             string message = "";
 
-            string newSteamID = txtSteam.Text.Trim();
-            string newLastFmID = txtLastFm.Text.Trim();
+            string newSteamID = _txtSteam.Text.Trim();
+            string newLastFmID = _txtLastFm.Text.Trim();
             string? newTmdbID = _newSessionIDFromTMDBEditButton;
 
             UpdateUserPlatformIDs(newSteamID, newLastFmID, newTmdbID!);
@@ -445,7 +468,7 @@ namespace media_tracker_desktop.Forms
                 message += "Platform info updated!\n\n";
             }
 
-            if (isSteamToBeUnlinked)
+            if (_isSteamToBeUnlinked)
             {
                 // Unlink account.
                 Dictionary<string, dynamic> result = await UserAppAccount.UnlinkApiAccount(UserAppAccount.SteamPlatformID);
@@ -454,11 +477,11 @@ namespace media_tracker_desktop.Forms
 
                 if (result["status"] == "success")
                 {
-                    txtSteam.Text = "";
+                    _txtSteam.Text = "";
                 }
             }
 
-            if (isLastFMToBeUnlinked)
+            if (_isLastFMToBeUnlinked)
             {
                 // Unlink account.
                 Dictionary<string, dynamic> result = await UserAppAccount.UnlinkApiAccount(UserAppAccount.LastFMPlatformID);
@@ -467,11 +490,11 @@ namespace media_tracker_desktop.Forms
 
                 if (result["status"] == "success")
                 {
-                    txtLastFm.Text = "";
+                    _txtLastFm.Text = "";
                 }
             }
 
-            if (isTMDBToBeUnlinked)
+            if (_isTMDBToBeUnlinked)
             {
                 // Unlink account.
                 Dictionary<string, dynamic> result = await UserAppAccount.UnlinkApiAccount(UserAppAccount.TMDBPlatformID);
@@ -489,7 +512,7 @@ namespace media_tracker_desktop.Forms
 
         private void btnUnlinkSteam_Click(object sender, EventArgs e)
         {
-            isSteamToBeUnlinked = false;
+            _isSteamToBeUnlinked = false;
 
             // If user has an account linked,
             if (!string.IsNullOrEmpty(UserAppAccount.UserSteamID))
@@ -500,7 +523,7 @@ namespace media_tracker_desktop.Forms
                 if (confirmation == DialogResult.Yes)
                 {
                     // Mark it to be unlinked.
-                    isSteamToBeUnlinked = true;
+                    _isSteamToBeUnlinked = true;
                 }
             }
             else
@@ -511,7 +534,7 @@ namespace media_tracker_desktop.Forms
 
         private void btnUnlinkLastFM_Click(object sender, EventArgs e)
         {
-            isLastFMToBeUnlinked = false;
+            _isLastFMToBeUnlinked = false;
 
             // If user has an account linked,
             if (!string.IsNullOrEmpty(UserAppAccount.UserLastFmID))
@@ -522,7 +545,7 @@ namespace media_tracker_desktop.Forms
                 if (confirmation == DialogResult.Yes)
                 {
                     // Mark it to be unlinked.
-                    isLastFMToBeUnlinked = true;
+                    _isLastFMToBeUnlinked = true;
                 }
             }
             else
@@ -533,7 +556,7 @@ namespace media_tracker_desktop.Forms
 
         private void btnUnlinkTMDB_Click(object sender, EventArgs e)
         {
-            isTMDBToBeUnlinked = false;
+            _isTMDBToBeUnlinked = false;
 
             // If user has an account linked,
             if (!string.IsNullOrEmpty(UserAppAccount.UserTmdbSessionID))
@@ -544,7 +567,7 @@ namespace media_tracker_desktop.Forms
                 if (confirmation == DialogResult.Yes)
                 {
                     // Mark it to be unlinked.
-                    isTMDBToBeUnlinked = true;
+                    _isTMDBToBeUnlinked = true;
 
                     // Erase session ID in case user linked tmdb then clicked unlink tmdb.
                     _newSessionIDFromTMDBEditButton = "";
@@ -576,6 +599,26 @@ namespace media_tracker_desktop.Forms
 
         private void btnHome_Click(object sender, EventArgs e) => ShowHome();
 
+        private void cmsLastFMOptions_ItemClicked(Object sender, ToolStripItemClickedEventArgs e)
+        {
+            string? option = e.ClickedItem?.Text;
+
+            if (option != null)
+            {
+                var f = new LinkLastFmForm(option)
+                {
+                    TopLevel = false,
+                    FormBorderStyle = FormBorderStyle.None,
+                    Dock = DockStyle.Fill
+                };
+
+                pnlContent.Controls.Clear();
+                pnlContent.Controls.Add(f);
+                f.Show();
+                lblTitle.Text = "Last.fm";
+            }
+        }
+
         private void btnLinkSteam_Click(object sender, EventArgs e)
         {
             var f = new LinkSteamForm() { 
@@ -591,16 +634,35 @@ namespace media_tracker_desktop.Forms
         }
         private void btnLinkLastFM_Click(object sender, EventArgs e)
         {
-            var f = new LinkLastFmForm { 
-                TopLevel = false, 
-                FormBorderStyle = FormBorderStyle.None, 
-                Dock = DockStyle.Fill 
-            };
+            if (!_lastFMOptionVisible)
+            {
+                if (!string.IsNullOrEmpty(UserAppAccount.UserLastFmID))
+                {
+                    _cmsLastFMOptions.Show(btnLinkLastFM, new Point(0, btnLinkLastFM.Height));
 
-            pnlContent.Controls.Clear(); 
-            pnlContent.Controls.Add(f); 
-            f.Show(); 
-            lblTitle.Text = "Last.fm";
+                    _lastFMOptionVisible = true;
+                }
+                else
+                {
+                    var f = new LinkLastFmForm
+                    {
+                        TopLevel = false,
+                        FormBorderStyle = FormBorderStyle.None,
+                        Dock = DockStyle.Fill
+                    };
+
+                    pnlContent.Controls.Clear();
+                    pnlContent.Controls.Add(f);
+                    f.Show();
+                    lblTitle.Text = "Last.fm";
+                }
+            }
+            else
+            {
+                _cmsLastFMOptions.Close();
+
+                _lastFMOptionVisible = false;
+            }
         }
         private void btnLinkTmdb_Click(object sender, EventArgs e)
         {

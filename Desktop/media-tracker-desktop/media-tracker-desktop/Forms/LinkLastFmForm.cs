@@ -31,9 +31,13 @@ namespace media_tracker_desktop.Forms
         private List<LastFM_Artist> _topArtists = [];
         private List<LastFM_Track> _recentTracks = [];
 
-        public LinkLastFmForm()
+        private string _dataOption = "";
+
+        public LinkLastFmForm(string option = "")
         {
             InitializeComponent();
+
+            _dataOption = option;
 
             // If user has a LastFM id,
             if (!string.IsNullOrEmpty(UserAppAccount.UserLastFmID))
@@ -49,7 +53,7 @@ namespace media_tracker_desktop.Forms
             try
             {
                 // If user has a LastFM account linked,
-                if (!string.IsNullOrEmpty(UserAppAccount.UserLastFmID))
+                if (!string.IsNullOrEmpty(UserAppAccount.UserLastFmID) && !string.IsNullOrEmpty(_dataOption))
                 {
                     // Retrieve user information.
                     (bool success, LastFM_User? user) = await LastFMApi.GetUserInfo();
@@ -65,7 +69,8 @@ namespace media_tracker_desktop.Forms
                         _topArtists = topArtists ?? [];
                         _recentTracks = recentTracks ?? [];
 
-                        BuildViewGrid(topArtists ?? [], recentTracks ?? []);
+                        //BuildViewGrid(topArtists ?? [], recentTracks ?? []);
+                        BuildViewGridBasedOnOption();
 
                         BuildSearchAndSortPanel();
 
@@ -97,20 +102,54 @@ namespace media_tracker_desktop.Forms
             }
         }
 
-        public void BuildViewGrid(List<LastFM_Artist> topArtists, List<LastFM_Track> recentTracks)
+        private void BuildViewGridBasedOnOption()
+        {
+            if (_dataOption == MainForm.LastFMOptions[0])
+            {
+                BuildTopArtistViewGrid();
+            }
+            else if (_dataOption == MainForm.LastFMOptions[1])
+            {
+                BuildRecentTrackViewGrid();
+            }
+        }
+
+        private void BuildTopArtistViewGrid()
         {
             _tableData = new DataTable();
 
-            _tableData.Columns.Add("ID");//probably won't need this
+            _tableData.Columns.Add("ID");
             _tableData.Columns.Add("Top Type");
             _tableData.Columns.Add("Artist Name");
             _tableData.Columns.Add("Top Track");
 
-            foreach (LastFM_Artist artist in topArtists)
+            foreach (LastFM_Artist artist in _topArtists)
             {
-                _tableData.Rows.Add(artist.Mbid, "Top Artist",artist.Name, null);
+                _tableData.Rows.Add(artist.Mbid, "Top Artist", artist.Name, null);
             }
-            foreach (LastFM_Track track in recentTracks)
+
+            lastFmDataGridView.DataSource = _tableData;
+
+            lastFmDataGridView.Columns["ID"].Visible = false;
+            lastFmDataGridView.RowHeadersVisible = false;
+            lastFmDataGridView.AllowUserToAddRows = false;
+
+            lastFmDataGridView.Columns["Artist Name"].Width = 200;
+            lastFmDataGridView.Columns["Top Track"].Width = 200;
+
+            BuildFavoriteButtonColumn();
+        }
+
+        private void BuildRecentTrackViewGrid()
+        {
+            _tableData = new DataTable();
+
+            _tableData.Columns.Add("ID");
+            _tableData.Columns.Add("Top Type");
+            _tableData.Columns.Add("Artist Name");
+            _tableData.Columns.Add("Top Track");
+
+            foreach (LastFM_Track track in _recentTracks)
             {
                 _tableData.Rows.Add("", "Top Track", track.ArtistName, track.Name);
             }
@@ -126,6 +165,36 @@ namespace media_tracker_desktop.Forms
 
             BuildFavoriteButtonColumn();
         }
+
+        //public void BuildViewGrid(List<LastFM_Artist> topArtists, List<LastFM_Track> recentTracks)
+        //{
+        //    _tableData = new DataTable();
+
+        //    _tableData.Columns.Add("ID");//probably won't need this
+        //    _tableData.Columns.Add("Top Type");
+        //    _tableData.Columns.Add("Artist Name");
+        //    _tableData.Columns.Add("Top Track");
+
+        //    foreach (LastFM_Artist artist in topArtists)
+        //    {
+        //        _tableData.Rows.Add(artist.Mbid, "Top Artist", artist.Name, null);
+        //    }
+        //    foreach (LastFM_Track track in recentTracks)
+        //    {
+        //        _tableData.Rows.Add("", "Top Track", track.ArtistName, track.Name);
+        //    }
+
+        //    lastFmDataGridView.DataSource = _tableData;
+
+        //    lastFmDataGridView.Columns["ID"].Visible = false;
+        //    lastFmDataGridView.RowHeadersVisible = false;
+        //    lastFmDataGridView.AllowUserToAddRows = false;
+
+        //    lastFmDataGridView.Columns["Artist Name"].Width = 200;
+        //    lastFmDataGridView.Columns["Top Track"].Width = 200;
+
+        //    BuildFavoriteButtonColumn();
+        //}
 
         private async void BuildFavoriteButtonColumn()
         {
@@ -317,7 +386,8 @@ namespace media_tracker_desktop.Forms
                 else
                 {
                     // Reset display.
-                    BuildViewGrid(_topArtists, _recentTracks);
+                    //BuildViewGrid(_topArtists, _recentTracks);
+                    BuildViewGridBasedOnOption();
                 }
             }
         }
@@ -344,7 +414,8 @@ namespace media_tracker_desktop.Forms
             List<LastFM_Track> resultTracks = DataFunctions.Sort(_recentTracks, optionTrack) ?? [];
 
             // Display data.
-            BuildViewGrid(resultArtists, resultTracks);
+            //BuildViewGrid(resultArtists, resultTracks);
+            BuildViewGridBasedOnOption();
         }
 
         // Event: When sort button is clicked.
@@ -495,7 +566,8 @@ namespace media_tracker_desktop.Forms
                 }
 
                 // Build based on whether or not the list was updated.
-                BuildViewGrid(sortedTopArtists ?? [], sortedRecentTracks ?? []);
+                //BuildViewGrid(sortedTopArtists ?? [], sortedRecentTracks ?? []);
+                BuildViewGridBasedOnOption();
             }
         }
 
