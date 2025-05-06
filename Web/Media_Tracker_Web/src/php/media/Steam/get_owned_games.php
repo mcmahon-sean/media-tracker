@@ -17,6 +17,8 @@ $apiUrl = "https://api.steampowered.com/IPlayerService/GetOwnedGames/v1/?" . htt
     'include_played_free_games' => true
 ]);
 
+
+
 // Make the API call
 $response = file_get_contents($apiUrl);
 $data = json_decode($response, true);
@@ -31,3 +33,4 @@ if (isset($data['response']['games'])) {
 } else {
     echo "No games found. This Steam profile might be private.";
 }
+
