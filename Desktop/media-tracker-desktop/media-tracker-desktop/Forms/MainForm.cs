@@ -190,10 +190,32 @@ namespace media_tracker_desktop.Forms
             };
             btnEdit.Click += (s, e) => ShowPlatformEdit();
 
+            Button btnEditUser = new Button
+            {
+                Text = "Edit User",
+                Location = new System.Drawing.Point(200, 160),
+                BackColor = System.Drawing.Color.FromArgb(50, 50, 50),
+                ForeColor = System.Drawing.Color.White,
+                FlatStyle = FlatStyle.Flat,
+                AutoSize = true
+            };
+            btnEditUser.Click += btnEditUser_Click;
+
+            Button btnDeleteUser = new Button
+            {
+                Text = "Delete User",
+                Location = new System.Drawing.Point(305, 160),
+                BackColor = System.Drawing.Color.FromArgb(50, 50, 50),
+                ForeColor = System.Drawing.Color.White,
+                FlatStyle = FlatStyle.Flat,
+                AutoSize = true
+            };
+            btnDeleteUser.Click += btnDeleteUser_Click;
+
             var btnLogout = new Button
             {
                 Text = "Logout",
-                Location = new System.Drawing.Point(200, 160),
+                Location = new System.Drawing.Point(430, 160),
                 BackColor = System.Drawing.Color.FromArgb(50, 50, 50),
                 ForeColor = System.Drawing.Color.White,
                 FlatStyle = FlatStyle.Flat,
@@ -209,11 +231,42 @@ namespace media_tracker_desktop.Forms
             dashPanel.Controls.Add(lastFm);
             dashPanel.Controls.Add(tmdb);
             dashPanel.Controls.Add(btnEdit);
+            dashPanel.Controls.Add(btnEditUser);
+            dashPanel.Controls.Add(btnDeleteUser);
             dashPanel.Controls.Add(btnLogout);
             pnlContent.Controls.Add(dashPanel);
+        }
 
-            // Refresh since somewho
-            //this.Refresh();
+        private void btnEditUser_Click(object sender, EventArgs e)
+        {
+            this.Hide();
+
+            UpdateUserForm editForm = new UpdateUserForm();
+
+            editForm.LaunchEditUserForm();
+
+            this.Show();
+        }
+
+        private async void btnDeleteUser_Click(object sender, EventArgs e)
+        {
+            DialogResult confirmation = MessageBox.Show("Are you sure you want to delete this account?", "Confirm Delete", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation);
+
+            // If user confirms deletion,
+            if (confirmation == DialogResult.Yes)
+            {
+                // Delete user.
+                Dictionary<string, dynamic> result = await UserAppAccount.DeleteUser();
+
+                MessageBox.Show(result["statusMessage"]);
+
+                // If user successfully deleted,
+                if (result["status"] == "success")
+                {
+                    // Show home screen with the login and signup buttons.
+                    ShowHome();
+                }
+            }
         }
 
         private void ShowPlatformEdit()
