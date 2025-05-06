@@ -13,7 +13,14 @@ namespace media_tracker_desktop.Forms
             this.Load += MainForm_Load;
         }
 
-        private static readonly string[] LASTFM_OPTIONS = ["TopArtists", "RecentTracks"];
+        private static readonly string[] LASTFM_OPTIONS = ["Top Artists", "Recent Tracks"];
+        private static readonly string[] TMDB_OPTIONS = ["Favorite TV", "Favorite Movie"];
+
+        private bool _lastFMOptionVisible = false;
+        private bool _tmdbOptionVisible = false;
+
+        private ContextMenuStrip _cmsLastFMOptions = new ContextMenuStrip();
+        private ContextMenuStrip _cmsTMDBOptions = new ContextMenuStrip();
 
         private string? _newSessionIDFromTMDBEditButton = string.Empty;
 
@@ -23,10 +30,6 @@ namespace media_tracker_desktop.Forms
         private bool _isSteamToBeUnlinked = false;
         private bool _isLastFMToBeUnlinked = false;
         private bool _isTMDBToBeUnlinked = false;
-
-        private bool _lastFMOptionVisible = false;
-
-        private ContextMenuStrip _cmsLastFMOptions = new ContextMenuStrip();
 
         private void MainForm_Load(object sender, EventArgs e)
         {
@@ -41,6 +44,14 @@ namespace media_tracker_desktop.Forms
                 return LASTFM_OPTIONS;
             }
         }
+        
+        public static string[] TMDBOptions
+        {
+            get
+            {
+                return TMDB_OPTIONS;
+            }
+        }
 
         // Method: Initialize the components that are necessary for the app to run.
         private async void InitializeApp()
@@ -53,6 +64,7 @@ namespace media_tracker_desktop.Forms
             BuildOptionMenu();
 
             _cmsLastFMOptions.ItemClicked += cmsLastFMOptions_ItemClicked!;
+            _cmsTMDBOptions.ItemClicked += cmsTMDBOptions_ItemClicked!;
 
             // Initialize the database.
             string message = await SupabaseConnection.InitializeDB();
@@ -77,6 +89,7 @@ namespace media_tracker_desktop.Forms
         private void BuildOptionMenu()
         {
             _cmsLastFMOptions = AppElement.GetSortMenu(LASTFM_OPTIONS);
+            _cmsTMDBOptions = AppElement.GetSortMenu(TMDB_OPTIONS);
         }
 
         private void ShowHome()
@@ -619,6 +632,26 @@ namespace media_tracker_desktop.Forms
             }
         }
 
+        private void cmsTMDBOptions_ItemClicked(Object sender, ToolStripItemClickedEventArgs e)
+        {
+            string? option = e.ClickedItem?.Text;
+
+            if (option != null)
+            {
+                var f = new LinkTmdbForm(option)
+                {
+                    TopLevel = false,
+                    FormBorderStyle = FormBorderStyle.None,
+                    Dock = DockStyle.Fill
+                };
+
+                pnlContent.Controls.Clear();
+                pnlContent.Controls.Add(f);
+                f.Show();
+                lblTitle.Text = "TMDB";
+            }
+        }
+
         private void btnLinkSteam_Click(object sender, EventArgs e)
         {
             var f = new LinkSteamForm() { 
@@ -666,16 +699,34 @@ namespace media_tracker_desktop.Forms
         }
         private void btnLinkTmdb_Click(object sender, EventArgs e)
         {
-            var f = new LinkTmdbForm { 
-                TopLevel = false, 
-                FormBorderStyle = FormBorderStyle.None, 
-                Dock = DockStyle.Fill 
-            };
+            if (!_tmdbOptionVisible)
+            {
+                if (!string.IsNullOrEmpty(UserAppAccount.UserTmdbSessionID))
+                {
+                    _cmsTMDBOptions.Show(btnLinkTmdb, new Point(0, btnLinkTmdb.Height));
 
-            pnlContent.Controls.Clear(); 
-            pnlContent.Controls.Add(f); 
-            f.Show(); 
-            lblTitle.Text = "TMDB";
+                    _tmdbOptionVisible = true;
+                }
+                else
+                {
+                    var f = new LinkTmdbForm { 
+                        TopLevel = false, 
+                        FormBorderStyle = FormBorderStyle.None, 
+                        Dock = DockStyle.Fill 
+                    };
+
+                    pnlContent.Controls.Clear(); 
+                    pnlContent.Controls.Add(f); 
+                    f.Show(); 
+                    lblTitle.Text = "TMDB";
+                }
+            }
+            else
+            {
+                _cmsTMDBOptions.Close();
+
+                _tmdbOptionVisible = false;
+            }
         }
     }
 }

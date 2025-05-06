@@ -32,13 +32,12 @@ namespace media_tracker_desktop.Forms
 
         private DataTable _tableData = new DataTable();
         private Panel? _pnlSearchAndSort = null;
-        private TextBox _txtSearch = new TextBox();
+        private TextBox? _txtSearch = null;
         private Button _btnSort = new Button();
-        private ContextMenuStrip _sortMenu = new ContextMenuStrip();
+        private ContextMenuStrip? _sortMenu = null;
 
         private bool _lastFMSortVisible = false;
         private List<UserFavoriteMedia> _favorites = [];
-        //private List<UserFavoriteMedia> _
         private List<LastFM_Artist> _topArtists = [];
         private List<LastFM_Track> _recentTracks = [];
 
@@ -48,6 +47,7 @@ namespace media_tracker_desktop.Forms
         {
             InitializeComponent();
 
+            // Store the endpoint option.
             _dataOption = option;
 
             // If user has a LastFM id,
@@ -72,9 +72,7 @@ namespace media_tracker_desktop.Forms
                     // If success,
                     if (success && user != null)
                     {
-                        
                         await BuildViewGridBasedOnOption();
-
 
                         // Subscribe to event handlers:
                         // When any of the favorite buttons are clicked.
@@ -122,7 +120,10 @@ namespace media_tracker_desktop.Forms
                 // Save data.
                 _topArtists = topArtists ?? [];
 
-                _sortMenu = AppElement.GetSortMenu(SORT_OPTIONS_TOP_ARTIST_ASC);
+                if (_sortMenu == null)
+                {
+                    _sortMenu = AppElement.GetSortMenu(SORT_OPTIONS_TOP_ARTIST_ASC);
+                }
 
                 // Build display.
                 BuildTopArtistViewGrid(_topArtists);
@@ -135,7 +136,10 @@ namespace media_tracker_desktop.Forms
                 // Save data.
                 _recentTracks = recentTracks ?? [];
 
-                _sortMenu = AppElement.GetSortMenu(SORT_OPTIONS_RECENT_TRACK_ASC);
+                if (_sortMenu == null)
+                {
+                    _sortMenu = AppElement.GetSortMenu(SORT_OPTIONS_RECENT_TRACK_ASC);
+                }
 
                 // Build display.
                 BuildRecentTrackViewGrid(_recentTracks);
@@ -164,6 +168,7 @@ namespace media_tracker_desktop.Forms
             lastFmDataGridView.Columns["ID"].Visible = false;
             lastFmDataGridView.RowHeadersVisible = false;
             lastFmDataGridView.AllowUserToAddRows = false;
+            lastFmDataGridView.ReadOnly = true;
 
             lastFmDataGridView.Columns["Name"].Width = 200;
             lastFmDataGridView.Columns["PlayCount"].Width = 200;
@@ -194,6 +199,7 @@ namespace media_tracker_desktop.Forms
             lastFmDataGridView.Columns["ID"].Visible = false;
             lastFmDataGridView.RowHeadersVisible = false;
             lastFmDataGridView.AllowUserToAddRows = false;
+            lastFmDataGridView.ReadOnly = true;
 
             lastFmDataGridView.Columns["Name"].Width = 200;
             lastFmDataGridView.Columns["Artist"].Width = 200;
@@ -269,10 +275,6 @@ namespace media_tracker_desktop.Forms
 
                 // Retrieve the clicked button.
                 var currentButton = lastFmDataGridView.Rows[e.RowIndex].Cells[e.ColumnIndex];
-
-                // Retrieve the current type (Top Artist or Top Track).
-                //string currentRowID = (string)lastFmDataGridView.Rows[e.RowIndex].Cells["ID"].Value;
-
 
                 // Update the list of user's favorite media.
                 _favorites = await UserAppAccount.GetFavoriteMediaList();
@@ -365,7 +367,7 @@ namespace media_tracker_desktop.Forms
         }
 
         // Event: When user presses a button in the search textbox.
-        private void txtSearch_KeyDown (object sender, KeyEventArgs e)
+        private async void txtSearch_KeyDown (object sender, KeyEventArgs e)
         {
             // If user pressed enter,
             if (e.KeyCode == Keys.Enter)
@@ -385,7 +387,7 @@ namespace media_tracker_desktop.Forms
                 else
                 {
                     // Reset display.
-                    BuildViewGridBasedOnOption();
+                    await BuildViewGridBasedOnOption();
                 }
             }
         }
@@ -397,17 +399,22 @@ namespace media_tracker_desktop.Forms
 
             if (_dataOption == MainForm.LastFMOptions[0])
             {
+                // Query options:
+                // Ensure that the search is case insensitive.
                 QueryOptions<LastFM_Artist> optionArtist = new QueryOptions<LastFM_Artist>
                 {
                     Where = a => a.Name.ToLower().Contains(text)
                 };
 
+                // Retrieve data.
                 List<LastFM_Artist> resultArtists = DataFunctions.Sort(_topArtists, optionArtist) ?? [];
 
                 BuildTopArtistViewGrid(resultArtists);
             }
             else if (_dataOption == MainForm.LastFMOptions[1])
             {
+                // Query options:
+                // Ensure that the search is case insensitive.
                 QueryOptions<LastFM_Track> optionTrack = new QueryOptions<LastFM_Track>
                 {
                     Where = t => t.Name.ToLower().Contains(text) || t.ArtistName.ToLower().Contains(text)
@@ -469,30 +476,30 @@ namespace media_tracker_desktop.Forms
             // Display Option 1
             if (_dataOption == MainForm.LastFMOptions[0])
             {
-                List<LastFM_Artist> favorites = [];
+                List<LastFM_Artist> sortedArtists = [];
 
                 // Sorting Option 1
                 if (option == SORT_OPTIONS_TOP_ARTIST_ASC[0])
                 {
                     // Sort data.
-                    favorites = SortTopArtist("asc");
+                    sortedArtists = SortTopArtist("asc");
 
                     // Change sort option to opposite.
                     _sortMenu.Items[0].Text = SORT_OPTIONS_TOP_ARTIST_DESC[0];
 
                     // Display.
-                    BuildTopArtistViewGrid(favorites);
+                    BuildTopArtistViewGrid(sortedArtists);
                 }
                 else if (option == SORT_OPTIONS_TOP_ARTIST_DESC[0])
                 {
                     // Sort data.
-                    favorites = SortTopArtist("desc");
+                    sortedArtists = SortTopArtist("desc");
 
                     // Change sort option to opposite.
                     _sortMenu.Items[0].Text = SORT_OPTIONS_TOP_ARTIST_ASC[0];
 
                     // Display.
-                    BuildTopArtistViewGrid(favorites);
+                    BuildTopArtistViewGrid(sortedArtists);
                 }
                 // Sorting Option 2
                 else if (option == SORT_OPTIONS_TOP_ARTIST_ASC[1])
@@ -504,13 +511,13 @@ namespace media_tracker_desktop.Forms
                     };
 
                     // Sort data.
-                    favorites = DataFunctions.Sort(_topArtists, options) ?? [];
+                    sortedArtists = DataFunctions.Sort(_topArtists, options) ?? [];
 
                     // Change sort option to opposite.
                     _sortMenu.Items[1].Text = SORT_OPTIONS_TOP_ARTIST_DESC[1];
 
                     // Display.
-                    BuildTopArtistViewGrid(favorites);
+                    BuildTopArtistViewGrid(sortedArtists);
                 }
                 else if (option == SORT_OPTIONS_TOP_ARTIST_DESC[1])
                 {
@@ -521,13 +528,13 @@ namespace media_tracker_desktop.Forms
                     };
 
                     // Sort data.
-                    favorites = DataFunctions.Sort(_topArtists, options) ?? [];
+                    sortedArtists = DataFunctions.Sort(_topArtists, options) ?? [];
 
                     // Change sort option to opposite.
                     _sortMenu.Items[1].Text = SORT_OPTIONS_TOP_ARTIST_ASC[1];
 
                     // Display.
-                    BuildTopArtistViewGrid(favorites);
+                    BuildTopArtistViewGrid(sortedArtists);
                 }
                 // Sorting Option 3
                 else if (option == SORT_OPTIONS_TOP_ARTIST_ASC[2])
@@ -539,13 +546,13 @@ namespace media_tracker_desktop.Forms
                     };
 
                     // Sort data.
-                    favorites = DataFunctions.Sort(_topArtists, options) ?? [];
+                    sortedArtists = DataFunctions.Sort(_topArtists, options) ?? [];
 
                     // Change sort option to opposite.
                     _sortMenu.Items[2].Text = SORT_OPTIONS_TOP_ARTIST_DESC[2];
 
                     // Display.
-                    BuildTopArtistViewGrid(favorites);
+                    BuildTopArtistViewGrid(sortedArtists);
                 }
                 else if (option == SORT_OPTIONS_TOP_ARTIST_DESC[2])
                 {
@@ -556,42 +563,42 @@ namespace media_tracker_desktop.Forms
                     };
 
                     // Sort data.
-                    favorites = DataFunctions.Sort(_topArtists, options) ?? [];
+                    sortedArtists = DataFunctions.Sort(_topArtists, options) ?? [];
 
                     // Change sort option to opposite.
                     _sortMenu.Items[2].Text = SORT_OPTIONS_TOP_ARTIST_ASC[2];
 
                     // Display.
-                    BuildTopArtistViewGrid(favorites);
+                    BuildTopArtistViewGrid(sortedArtists);
                 }
             }
             // Display Option 2
             else if (_dataOption == MainForm.LastFMOptions[1])
             {
-                List<LastFM_Track> favorites = [];
+                List<LastFM_Track> sortedTracks = [];
 
                 // Sorting Option 1
                 if (option == SORT_OPTIONS_RECENT_TRACK_ASC[0])
                 {
                     // Sort data.
-                    favorites = SortRecentTrack("asc");
+                    sortedTracks = SortRecentTrack("asc");
 
                     // Change sort option to opposite.
                     _sortMenu.Items[0].Text = SORT_OPTIONS_RECENT_TRACK_DESC[0];
 
                     // Display.
-                    BuildRecentTrackViewGrid(favorites);
+                    BuildRecentTrackViewGrid(sortedTracks);
                 }
                 else if (option == SORT_OPTIONS_RECENT_TRACK_DESC[0])
                 {
                     // Sort data.
-                    favorites = SortRecentTrack("desc");
+                    sortedTracks = SortRecentTrack("desc");
 
                     // Change sort option to opposite.
                     _sortMenu.Items[0].Text = SORT_OPTIONS_RECENT_TRACK_ASC[0];
 
                     // Display.
-                    BuildRecentTrackViewGrid(favorites);
+                    BuildRecentTrackViewGrid(sortedTracks);
                 }
                 // Sorting Option 2
                 else if (option == SORT_OPTIONS_RECENT_TRACK_ASC[1])
@@ -603,13 +610,13 @@ namespace media_tracker_desktop.Forms
                     };
 
                     // Sort data.
-                    favorites = DataFunctions.Sort(_recentTracks, options) ?? [];
+                    sortedTracks = DataFunctions.Sort(_recentTracks, options) ?? [];
 
                     // Change sort option to opposite.
                     _sortMenu.Items[1].Text = SORT_OPTIONS_RECENT_TRACK_DESC[1];
 
                     // Display.
-                    BuildRecentTrackViewGrid(favorites);
+                    BuildRecentTrackViewGrid(sortedTracks);
                 }
                 else if (option == SORT_OPTIONS_RECENT_TRACK_DESC[1])
                 {
@@ -620,13 +627,13 @@ namespace media_tracker_desktop.Forms
                     };
 
                     // Sort data.
-                    favorites = DataFunctions.Sort(_recentTracks, options) ?? [];
+                    sortedTracks = DataFunctions.Sort(_recentTracks, options) ?? [];
 
                     // Change sort option to opposite.
                     _sortMenu.Items[1].Text = SORT_OPTIONS_RECENT_TRACK_ASC[1];
 
                     // Display.
-                    BuildRecentTrackViewGrid(favorites);
+                    BuildRecentTrackViewGrid(sortedTracks);
                 }
                 // Sorting Option 3
                 else if (option == SORT_OPTIONS_RECENT_TRACK_ASC[2])
@@ -638,13 +645,13 @@ namespace media_tracker_desktop.Forms
                     };
 
                     // Sort data.
-                    favorites = DataFunctions.Sort(_recentTracks, options) ?? [];
+                    sortedTracks = DataFunctions.Sort(_recentTracks, options) ?? [];
 
                     // Change sort option to opposite.
                     _sortMenu.Items[2].Text = SORT_OPTIONS_RECENT_TRACK_DESC[2];
 
                     // Display.
-                    BuildRecentTrackViewGrid(favorites);
+                    BuildRecentTrackViewGrid(sortedTracks);
                 }
                 else if (option == SORT_OPTIONS_RECENT_TRACK_DESC[2])
                 {
@@ -655,13 +662,13 @@ namespace media_tracker_desktop.Forms
                     };
 
                     // Sort data.
-                    favorites = DataFunctions.Sort(_recentTracks, options) ?? [];
+                    sortedTracks = DataFunctions.Sort(_recentTracks, options) ?? [];
 
                     // Change sort option to opposite.
                     _sortMenu.Items[2].Text = SORT_OPTIONS_RECENT_TRACK_ASC[2];
 
                     // Display.
-                    BuildRecentTrackViewGrid(favorites);
+                    BuildRecentTrackViewGrid(sortedTracks);
                 }
                 // Sorting Option 4
                 else if (option == SORT_OPTIONS_RECENT_TRACK_ASC[3])
@@ -673,13 +680,13 @@ namespace media_tracker_desktop.Forms
                     };
 
                     // Sort data.
-                    favorites = DataFunctions.Sort(_recentTracks, options) ?? [];
+                    sortedTracks = DataFunctions.Sort(_recentTracks, options) ?? [];
 
                     // Change sort option to opposite.
                     _sortMenu.Items[3].Text = SORT_OPTIONS_RECENT_TRACK_DESC[3];
 
                     // Display.
-                    BuildRecentTrackViewGrid(favorites);
+                    BuildRecentTrackViewGrid(sortedTracks);
                 }
                 else if (option == SORT_OPTIONS_RECENT_TRACK_DESC[3])
                 {
@@ -690,13 +697,13 @@ namespace media_tracker_desktop.Forms
                     };
 
                     // Sort data.
-                    favorites = DataFunctions.Sort(_recentTracks, options) ?? [];
+                    sortedTracks = DataFunctions.Sort(_recentTracks, options) ?? [];
 
                     // Change sort option to opposite.
                     _sortMenu.Items[3].Text = SORT_OPTIONS_RECENT_TRACK_ASC[3];
 
                     // Display.
-                    BuildRecentTrackViewGrid(favorites);
+                    BuildRecentTrackViewGrid(sortedTracks);
                 }
             }
         }
@@ -706,7 +713,7 @@ namespace media_tracker_desktop.Forms
             QueryOptions<UserFavoriteMedia> options = new QueryOptions<UserFavoriteMedia>
             {
                 Where = m => m.MediaTypeID == (int)UserAppAccount.MediaTypeID.Artist,
-                OrderBy = m => m.MediaTypeID,
+                OrderBy = m => m.MediaID,
                 OrderByDirection = orderByDirection
             };
 
@@ -739,7 +746,7 @@ namespace media_tracker_desktop.Forms
             QueryOptions<UserFavoriteMedia> options = new QueryOptions<UserFavoriteMedia>
             {
                 Where = m => m.MediaTypeID == (int)UserAppAccount.MediaTypeID.Song,
-                OrderBy = m => m.MediaTypeID,
+                OrderBy = m => m.MediaID,
                 OrderByDirection = orderByDirection
             };
 
