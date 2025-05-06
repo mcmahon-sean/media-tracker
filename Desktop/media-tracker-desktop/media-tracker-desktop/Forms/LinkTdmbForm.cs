@@ -491,7 +491,7 @@ namespace media_tracker_desktop.Forms
             // Ensure user is logged in.
             if (!UserAppAccount.UserLoggedIn)
             {
-                MessageBox.Show("Please Sign-In first.");
+                MessageBox.Show("Please Sign-In first.", "Not Signed-In", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
 

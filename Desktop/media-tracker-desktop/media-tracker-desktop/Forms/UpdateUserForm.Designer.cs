@@ -106,6 +106,7 @@
             // 
             // txtUsername
             // 
+            txtUsername.Cursor = Cursors.No;
             txtUsername.Location = new Point(193, 87);
             txtUsername.Name = "txtUsername";
             txtUsername.ReadOnly = true;
@@ -165,7 +166,7 @@
             AcceptButton = btnConfirm;
             AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
-            BackColor = Color.FromArgb(45, 45, 48);
+            BackColor = Color.FromArgb(32, 32, 32);
             CancelButton = btnCancel;
             ClientSize = new Size(505, 527);
             Controls.Add(btnCancel);

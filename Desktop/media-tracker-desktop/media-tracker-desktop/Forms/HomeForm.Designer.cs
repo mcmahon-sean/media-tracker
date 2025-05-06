@@ -15,34 +15,45 @@ namespace media_tracker_desktop.Forms
 
         private void InitializeComponent()
         {
-            this.signInButton = new System.Windows.Forms.Button();
-            this.signUpButton = new System.Windows.Forms.Button();
-            this.SuspendLayout();
+            signInButton = new Button();
+            signUpButton = new Button();
+            SuspendLayout();
             // 
             // signInButton
             // 
-            this.signInButton.Location = new System.Drawing.Point(50, 30);
-            this.signInButton.Name = "signInButton";
-            this.signInButton.Size = new System.Drawing.Size(100, 40);
-            this.signInButton.Text = "Sign In";
-            this.signInButton.Click += new System.EventHandler(this.signInButton_Click);
+            signInButton.BackColor = Color.White;
+            signInButton.FlatStyle = FlatStyle.Popup;
+            signInButton.ForeColor = Color.Black;
+            signInButton.Location = new Point(50, 30);
+            signInButton.Name = "signInButton";
+            signInButton.Size = new Size(100, 40);
+            signInButton.TabIndex = 0;
+            signInButton.Text = "Sign In";
+            signInButton.UseVisualStyleBackColor = false;
+            signInButton.Click += signInButton_Click;
             // 
             // signUpButton
             // 
-            this.signUpButton.Location = new System.Drawing.Point(200, 30);
-            this.signUpButton.Name = "signUpButton";
-            this.signUpButton.Size = new System.Drawing.Size(100, 40);
-            this.signUpButton.Text = "Sign Up";
-            this.signUpButton.Click += new System.EventHandler(this.signUpButton_Click);
+            signUpButton.BackColor = Color.White;
+            signUpButton.FlatStyle = FlatStyle.Popup;
+            signUpButton.ForeColor = Color.Black;
+            signUpButton.Location = new Point(200, 30);
+            signUpButton.Name = "signUpButton";
+            signUpButton.Size = new Size(100, 40);
+            signUpButton.TabIndex = 1;
+            signUpButton.Text = "Sign Up";
+            signUpButton.UseVisualStyleBackColor = false;
+            signUpButton.Click += signUpButton_Click;
             // 
             // HomeForm
             // 
-            this.ClientSize = new System.Drawing.Size(360, 100);
-            this.Controls.Add(this.signInButton);
-            this.Controls.Add(this.signUpButton);
-            this.Name = "HomeForm";
-            this.Text = "Welcome";
-            this.ResumeLayout(false);
+            BackColor = Color.FromArgb(32, 32, 32);
+            ClientSize = new Size(360, 100);
+            Controls.Add(signInButton);
+            Controls.Add(signUpButton);
+            Name = "HomeForm";
+            Text = "Welcome";
+            ResumeLayout(false);
         }
     }
 }

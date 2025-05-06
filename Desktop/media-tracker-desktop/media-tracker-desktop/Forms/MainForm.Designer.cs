@@ -22,10 +22,10 @@ namespace media_tracker_desktop.Forms
         private void InitializeComponent()
         {
             pnlSidebar = new Panel();
+            btnLinkSteam = new Button();
             label1 = new Label();
             btnLinkTmdb = new Button();
             btnLinkLastFM = new Button();
-            btnLinkSteam = new Button();
             btnHome = new Button();
             lblTitle = new Label();
             pnlContent = new Panel();
@@ -45,6 +45,20 @@ namespace media_tracker_desktop.Forms
             pnlSidebar.Name = "pnlSidebar";
             pnlSidebar.Size = new Size(200, 650);
             pnlSidebar.TabIndex = 2;
+            // 
+            // btnLinkSteam
+            // 
+            btnLinkSteam.BackColor = Color.FromArgb(34, 37, 41);
+            btnLinkSteam.FlatAppearance.BorderSize = 0;
+            btnLinkSteam.FlatStyle = FlatStyle.Popup;
+            btnLinkSteam.ForeColor = Color.White;
+            btnLinkSteam.Location = new Point(12, 162);
+            btnLinkSteam.Name = "btnLinkSteam";
+            btnLinkSteam.Size = new Size(170, 54);
+            btnLinkSteam.TabIndex = 2;
+            btnLinkSteam.Text = "Steam";
+            btnLinkSteam.UseVisualStyleBackColor = false;
+            btnLinkSteam.Click += btnLinkSteam_Click;
             // 
             // label1
             // 
@@ -84,20 +98,6 @@ namespace media_tracker_desktop.Forms
             btnLinkLastFM.Text = "Last.fm";
             btnLinkLastFM.UseVisualStyleBackColor = false;
             btnLinkLastFM.Click += btnLinkLastFM_Click;
-            // 
-            // btnLinkSteam
-            // 
-            btnLinkSteam.BackColor = Color.FromArgb(34, 37, 41);
-            btnLinkSteam.FlatAppearance.BorderSize = 0;
-            btnLinkSteam.FlatStyle = FlatStyle.Popup;
-            btnLinkSteam.ForeColor = Color.White;
-            btnLinkSteam.Location = new Point(12, 162);
-            btnLinkSteam.Name = "btnLinkSteam";
-            btnLinkSteam.Size = new Size(170, 54);
-            btnLinkSteam.TabIndex = 2;
-            btnLinkSteam.Text = "Steam";
-            btnLinkSteam.UseVisualStyleBackColor = false;
-            btnLinkSteam.Click += btnLinkSteam_Click;
             // 
             // btnHome
             // 

@@ -296,20 +296,6 @@ namespace media_tracker_desktop.Forms
             _sortMenu = AppElement.GetSortMenu(SORT_OPTIONS_ASC);
         }
 
-        // Method: Add search bar for the panel.
-        private void AddSearchBar(Panel panel)
-        {
-            _txtSearch = new TextBox();
-
-            // Properties:
-            _txtSearch.Location = new Point(15, 15);
-            _txtSearch.PlaceholderText = "Search for artist or track...";
-            _txtSearch.Width = 350;
-
-            // Add to panel.
-            panel.Controls.Add(_txtSearch);
-        }
-
         // Event: When user presses a button in the search textbox.
         private void txtSearch_KeyDown (object sender, KeyEventArgs e)
         {
@@ -361,24 +347,6 @@ namespace media_tracker_desktop.Forms
             BuildViewGrid(resultArtists, resultTracks);
         }
 
-        // Method: Add sort button.
-        private void AddSortButton(Panel panel)
-        {
-            _btnSort = new Button();
-
-            // Properties:
-            _btnSort.Location = new Point(400, 15);
-            _btnSort.Text = "Sort Menu";
-            _btnSort.AutoSize = true;
-            _btnSort.BackColor = Color.White;
-
-            // Add to panel.
-            panel.Controls.Add(_btnSort);
-
-            // Add sort menu.
-            //AddSortMenu();
-        }
-
         // Event: When sort button is clicked.
         private void btnSort_Click(object sender, EventArgs e)
         {
@@ -403,20 +371,6 @@ namespace media_tracker_desktop.Forms
                 // Menu is not visible.
                 _lastFMSortVisible = false;
             }
-        }
-
-        // Method: Adds a context menu strip to button.
-        private void AddSortMenu()
-        {
-            _sortMenu = new ContextMenuStrip();
-
-            // Options:
-            ToolStripMenuItem artistSort = new ToolStripMenuItem("Artist (asc)");
-            ToolStripMenuItem trackSort = new ToolStripMenuItem("Track (asc)");
-            ToolStripMenuItem favoriteSort = new ToolStripMenuItem("Favorite (asc)");
-
-            // Add to button.
-            _sortMenu.Items.AddRange(new ToolStripItem[] { artistSort, trackSort, favoriteSort });
         }
 
         // Event: When a sort item is clicked in the sort menu,
@@ -629,7 +583,7 @@ namespace media_tracker_desktop.Forms
             // Ensure user is logged in.
             if (!UserAppAccount.UserLoggedIn)
             {
-                MessageBox.Show("Please Sign-In first.");
+                MessageBox.Show("Please Sign-In first.", "Not Signed-In", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
 

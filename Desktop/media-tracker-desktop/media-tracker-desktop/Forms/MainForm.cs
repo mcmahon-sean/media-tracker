@@ -85,9 +85,9 @@ namespace media_tracker_desktop.Forms
                 {
                     Text = "Login",
                     Location = new System.Drawing.Point(20, 100),
-                    BackColor = System.Drawing.Color.FromArgb(50, 50, 50),
-                    ForeColor = System.Drawing.Color.White,
-                    FlatStyle = FlatStyle.Flat,
+                    BackColor = System.Drawing.Color.White,
+                    ForeColor = System.Drawing.Color.Black,
+                    FlatStyle = FlatStyle.Popup,
                     AutoSize = true
                 };
                 btnLogin.Click += (s, e) => ShowSignin();
@@ -96,9 +96,9 @@ namespace media_tracker_desktop.Forms
                 {
                     Text = "Sign Up",
                     Location = new System.Drawing.Point(100, 100),
-                    BackColor = System.Drawing.Color.FromArgb(50, 50, 50),
-                    ForeColor = System.Drawing.Color.White,
-                    FlatStyle = FlatStyle.Flat,
+                    BackColor = System.Drawing.Color.White,
+                    ForeColor = System.Drawing.Color.Black,
+                    FlatStyle = FlatStyle.Popup,
                     AutoSize = true
                 };
                 btnSignup.Click += (s, e) => ShowSignup();
@@ -195,8 +195,8 @@ namespace media_tracker_desktop.Forms
             {
                 Text = "Add/Edit Platform",
                 Location = new System.Drawing.Point(20, 160),
-                BackColor = System.Drawing.Color.FromArgb(50, 50, 50),
-                ForeColor = System.Drawing.Color.White,
+                BackColor = System.Drawing.Color.White,
+                ForeColor = System.Drawing.Color.Black,
                 FlatStyle = FlatStyle.Flat,
                 AutoSize = true
             };
@@ -206,8 +206,8 @@ namespace media_tracker_desktop.Forms
             {
                 Text = "Edit User",
                 Location = new System.Drawing.Point(200, 160),
-                BackColor = System.Drawing.Color.FromArgb(50, 50, 50),
-                ForeColor = System.Drawing.Color.White,
+                BackColor = System.Drawing.Color.White,
+                ForeColor = System.Drawing.Color.Black,
                 FlatStyle = FlatStyle.Flat,
                 AutoSize = true
             };
@@ -217,8 +217,8 @@ namespace media_tracker_desktop.Forms
             {
                 Text = "Delete User",
                 Location = new System.Drawing.Point(305, 160),
-                BackColor = System.Drawing.Color.FromArgb(50, 50, 50),
-                ForeColor = System.Drawing.Color.White,
+                BackColor = System.Drawing.Color.White,
+                ForeColor = System.Drawing.Color.Black,
                 FlatStyle = FlatStyle.Flat,
                 AutoSize = true
             };
@@ -228,8 +228,8 @@ namespace media_tracker_desktop.Forms
             {
                 Text = "Logout",
                 Location = new System.Drawing.Point(430, 160),
-                BackColor = System.Drawing.Color.FromArgb(50, 50, 50),
-                ForeColor = System.Drawing.Color.White,
+                BackColor = System.Drawing.Color.White,
+                ForeColor = System.Drawing.Color.Black,
                 FlatStyle = FlatStyle.Flat,
                 AutoSize = true
             };
@@ -307,8 +307,8 @@ namespace media_tracker_desktop.Forms
             {
                 Text = "Unlink",
                 Location = new System.Drawing.Point(410, 18),
-                BackColor = System.Drawing.Color.FromArgb(50, 50, 50),
-                ForeColor = System.Drawing.Color.White,
+                BackColor = System.Drawing.Color.White,
+                ForeColor = System.Drawing.Color.Black,
                 FlatStyle = FlatStyle.Flat,
                 AutoSize = true
             };
@@ -333,8 +333,8 @@ namespace media_tracker_desktop.Forms
             {
                 Text = "Unlink",
                 Location = new System.Drawing.Point(410, 58),
-                BackColor = System.Drawing.Color.FromArgb(50, 50, 50),
-                ForeColor = System.Drawing.Color.White,
+                BackColor = System.Drawing.Color.White,
+                ForeColor = System.Drawing.Color.Black,
                 FlatStyle = FlatStyle.Flat,
                 AutoSize = true
             };
@@ -363,8 +363,8 @@ namespace media_tracker_desktop.Forms
             {
                 Text = "Unlink",
                 Location = new System.Drawing.Point(410, 98),
-                BackColor = System.Drawing.Color.FromArgb(50, 50, 50),
-                ForeColor = System.Drawing.Color.White,
+                BackColor = System.Drawing.Color.White,
+                ForeColor = System.Drawing.Color.Black,
                 FlatStyle = FlatStyle.Flat,
                 AutoSize = true
             };
@@ -376,8 +376,8 @@ namespace media_tracker_desktop.Forms
             {
                 Text = "Save",
                 Location = new System.Drawing.Point(150, 140),
-                BackColor = System.Drawing.Color.FromArgb(50, 50, 50),
-                ForeColor = System.Drawing.Color.White,
+                BackColor = System.Drawing.Color.White,
+                ForeColor = System.Drawing.Color.Black,
                 FlatStyle = FlatStyle.Flat,
                 AutoSize = true
             };
@@ -388,8 +388,8 @@ namespace media_tracker_desktop.Forms
             {
                 Text = "Cancel",
                 Location = new System.Drawing.Point(230, 140),
-                BackColor = System.Drawing.Color.FromArgb(50, 50, 50),
-                ForeColor = System.Drawing.Color.White,
+                BackColor = System.Drawing.Color.White,
+                ForeColor = System.Drawing.Color.Black,
                 FlatStyle = FlatStyle.Flat,
                 AutoSize = true
             };
@@ -578,18 +578,42 @@ namespace media_tracker_desktop.Forms
 
         private void btnLinkSteam_Click(object sender, EventArgs e)
         {
-            var f = new LinkSteamForm() { TopLevel = false, FormBorderStyle = FormBorderStyle.None, Dock = DockStyle.Fill };
-            pnlContent.Controls.Clear(); pnlContent.Controls.Add(f); f.Show(); lblTitle.Text = "Steam";
+            var f = new LinkSteamForm() { 
+                TopLevel = false, 
+                FormBorderStyle = FormBorderStyle.None, 
+                Dock = DockStyle.Fill 
+            };
+
+            pnlContent.Controls.Clear(); 
+            pnlContent.Controls.Add(f); 
+            f.Show(); 
+            lblTitle.Text = "Steam";
         }
         private void btnLinkLastFM_Click(object sender, EventArgs e)
         {
-            var f = new LinkLastFmForm { TopLevel = false, FormBorderStyle = FormBorderStyle.None, Dock = DockStyle.Fill };
-            pnlContent.Controls.Clear(); pnlContent.Controls.Add(f); f.Show(); lblTitle.Text = "Last.fm";
+            var f = new LinkLastFmForm { 
+                TopLevel = false, 
+                FormBorderStyle = FormBorderStyle.None, 
+                Dock = DockStyle.Fill 
+            };
+
+            pnlContent.Controls.Clear(); 
+            pnlContent.Controls.Add(f); 
+            f.Show(); 
+            lblTitle.Text = "Last.fm";
         }
         private void btnLinkTmdb_Click(object sender, EventArgs e)
         {
-            var f = new LinkTmdbForm { TopLevel = false, FormBorderStyle = FormBorderStyle.None, Dock = DockStyle.Fill };
-            pnlContent.Controls.Clear(); pnlContent.Controls.Add(f); f.Show(); lblTitle.Text = "TMDB";
+            var f = new LinkTmdbForm { 
+                TopLevel = false, 
+                FormBorderStyle = FormBorderStyle.None, 
+                Dock = DockStyle.Fill 
+            };
+
+            pnlContent.Controls.Clear(); 
+            pnlContent.Controls.Add(f); 
+            f.Show(); 
+            lblTitle.Text = "TMDB";
         }
     }
 }

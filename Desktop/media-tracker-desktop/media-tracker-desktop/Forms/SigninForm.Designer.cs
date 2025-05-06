@@ -31,7 +31,7 @@ namespace media_tracker_desktop.Forms
             // 
             // panel1
             // 
-            panel1.BackColor = Color.FromArgb(30, 30, 30);
+            panel1.BackColor = Color.FromArgb(32, 32, 32);
             panel1.Controls.Add(lblUsername);
             panel1.Controls.Add(txtUsername);
             panel1.Controls.Add(lblPassword);
@@ -55,8 +55,8 @@ namespace media_tracker_desktop.Forms
             // 
             // txtUsername
             // 
-            txtUsername.BackColor = Color.FromArgb(30, 30, 30);
-            txtUsername.ForeColor = Color.White;
+            txtUsername.BackColor = Color.White;
+            txtUsername.ForeColor = Color.Black;
             txtUsername.Location = new Point(121, 17);
             txtUsername.Name = "txtUsername";
             txtUsername.Size = new Size(240, 31);
@@ -66,7 +66,7 @@ namespace media_tracker_desktop.Forms
             // 
             lblPassword.AutoSize = true;
             lblPassword.ForeColor = Color.White;
-            lblPassword.Location = new Point(20, 60);
+            lblPassword.Location = new Point(20, 57);
             lblPassword.Name = "lblPassword";
             lblPassword.Size = new Size(91, 25);
             lblPassword.TabIndex = 2;
@@ -74,9 +74,9 @@ namespace media_tracker_desktop.Forms
             // 
             // txtPassword
             // 
-            txtPassword.BackColor = Color.FromArgb(30, 30, 30);
-            txtPassword.ForeColor = Color.White;
-            txtPassword.Location = new Point(121, 57);
+            txtPassword.BackColor = Color.White;
+            txtPassword.ForeColor = Color.Black;
+            txtPassword.Location = new Point(121, 54);
             txtPassword.Name = "txtPassword";
             txtPassword.PasswordChar = '*';
             txtPassword.Size = new Size(240, 31);
@@ -84,13 +84,13 @@ namespace media_tracker_desktop.Forms
             // 
             // btnSignIn
             // 
-            btnSignIn.BackColor = Color.FromArgb(60, 60, 60);
+            btnSignIn.BackColor = Color.White;
             btnSignIn.FlatAppearance.BorderSize = 0;
-            btnSignIn.FlatStyle = FlatStyle.Flat;
-            btnSignIn.ForeColor = Color.White;
-            btnSignIn.Location = new Point(100, 100);
+            btnSignIn.FlatStyle = FlatStyle.Popup;
+            btnSignIn.ForeColor = Color.Black;
+            btnSignIn.Location = new Point(121, 108);
             btnSignIn.Name = "btnSignIn";
-            btnSignIn.Size = new Size(100, 30);
+            btnSignIn.Size = new Size(102, 38);
             btnSignIn.TabIndex = 4;
             btnSignIn.Text = "Sign In";
             btnSignIn.UseVisualStyleBackColor = false;
@@ -98,13 +98,13 @@ namespace media_tracker_desktop.Forms
             // 
             // btnRegister
             // 
-            btnRegister.BackColor = Color.FromArgb(60, 60, 60);
+            btnRegister.BackColor = Color.White;
             btnRegister.FlatAppearance.BorderSize = 0;
-            btnRegister.FlatStyle = FlatStyle.Flat;
-            btnRegister.ForeColor = Color.White;
-            btnRegister.Location = new Point(210, 100);
+            btnRegister.FlatStyle = FlatStyle.Popup;
+            btnRegister.ForeColor = Color.Black;
+            btnRegister.Location = new Point(259, 108);
             btnRegister.Name = "btnRegister";
-            btnRegister.Size = new Size(100, 30);
+            btnRegister.Size = new Size(102, 38);
             btnRegister.TabIndex = 5;
             btnRegister.Text = "Register";
             btnRegister.UseVisualStyleBackColor = false;
@@ -113,7 +113,7 @@ namespace media_tracker_desktop.Forms
             // SigninForm
             // 
             AcceptButton = btnSignIn;
-            BackColor = Color.FromArgb(45, 45, 48);
+            BackColor = Color.FromArgb(32, 32, 32);
             ClientSize = new Size(430, 211);
             Controls.Add(panel1);
             Name = "SigninForm";
