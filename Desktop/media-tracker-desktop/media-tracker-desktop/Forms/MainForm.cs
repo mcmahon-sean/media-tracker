@@ -31,6 +31,11 @@ namespace media_tracker_desktop.Forms
         // Method: Initialize the components that are necessary for the app to run.
         private async void InitializeApp()
         {
+            // Initialize Icons for buttons.
+            AppElement.AddMainIcon(btnLinkLastFM, Properties.Resources.icon_music, new Size(20, 20));
+            AppElement.AddMainIcon(btnLinkSteam, Properties.Resources.icon_games, new Size(30, 18));
+            AppElement.AddMainIcon(btnLinkTmdb, Properties.Resources.icon_movies, new Size(30, 18));
+
             // Initialize the database.
             string message = await SupabaseConnection.InitializeDB();
 
