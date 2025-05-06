@@ -9,7 +9,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $platform_id = sanitizeInt($_POST['platform_id']);
         $user_plat_id = sanitizeString($_POST['user_plat_id']);
     } else {
-        die('Missing POST data.');
+        echo 'Missing POST data.';
     }
 } elseif (isset($_GET['auth_tmdb']) && $_GET['auth_tmdb'] === 'true') {
     // TMDB redirect
@@ -20,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         die('Missing TMDB session data.');
     }
 } else {
-    die('Invalid request.');
+    echo 'Invalid request.';
 }
 
 // Update databse and session

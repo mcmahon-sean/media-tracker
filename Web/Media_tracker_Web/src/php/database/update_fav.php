@@ -1,6 +1,7 @@
 <?php
     require '../db.php';
-
+    require_once '../tools.php';
+    
     try{
         if (isset($_POST['username']) &&
         isset($_POST['media_id'])) {

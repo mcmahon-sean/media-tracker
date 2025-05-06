@@ -38,6 +38,14 @@ require_once 'src/php/config.php';
             >
               Home
             </a>
+            <a
+              class="btn btn-dark w-100 mt-2"
+              id="btn-home"
+              href="src/php/views/manage_user.php"
+              role="button"
+            >
+              Manager user
+            </a>
           </div>
           <hr />
           <div class="dropdown">

@@ -1,5 +1,6 @@
 <?php
 require_once '../db.php';
+require_once '../tools.php';
 
 try {
     // Check if all required POST data is set

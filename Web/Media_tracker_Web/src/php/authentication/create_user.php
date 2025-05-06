@@ -17,6 +17,7 @@
         $stmt->execute([$username, $first, $last, $email, $password]);
 
         echo "User created!";
+        header("Location: ../../../index.php");
         } else {
             echo "Required fields are missing.";
         }
