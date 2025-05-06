@@ -1,4 +1,5 @@
 ﻿using media_tracker_desktop.Models;
+using media_tracker_desktop.Models.LastFM;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -52,6 +53,24 @@ namespace media_tracker_desktop
             catch (NullReferenceException)
             {
                 return null;
+            }
+        }
+
+        public static List<T> SortFavorite<T>(string orderByDirection, List<T> favorites, List<T> unfavorites)
+        {
+            if (orderByDirection == "asc")
+            {
+                favorites.AddRange(unfavorites);
+                return favorites;
+            }
+            else if (orderByDirection == "desc")
+            {
+                unfavorites.AddRange(favorites);
+                return unfavorites;
+            }
+            else
+            {
+                return [];
             }
         }
     }
