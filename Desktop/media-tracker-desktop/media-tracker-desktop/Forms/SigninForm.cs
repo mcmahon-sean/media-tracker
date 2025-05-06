@@ -2,6 +2,7 @@ using System;
 using System.Windows.Forms;
 using Supabase;
 using media_tracker_desktop.Models;
+using media_tracker_desktop.Models.SupabaseFunctionObjects;
 
 namespace media_tracker_desktop.Forms
 {
@@ -21,7 +22,7 @@ namespace media_tracker_desktop.Forms
             {
                 var user = new UserLoginParam(txtUsername.Text.Trim(), txtPassword.Text.Trim());
 
-                var (success, message) = await UserAppAccount.AuthenticateUser(user);
+                var (success, message) = await AuthenticateUserFunction.AuthenticateUser(user);
 
                 if (success)
                     LoginSucceeded?.Invoke(this, EventArgs.Empty);

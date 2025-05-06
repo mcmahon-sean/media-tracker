@@ -2,6 +2,7 @@
 using System.Windows.Forms;
 using Supabase;
 using media_tracker_desktop.Models;
+using media_tracker_desktop.Models.SupabaseFunctionObjects;
 
 namespace media_tracker_desktop.Forms
 {
@@ -26,7 +27,7 @@ namespace media_tracker_desktop.Forms
                     txtPassword.Text.Trim()
                 );
 
-                var (created, message) = await UserAppAccount.CreateUser(newUser);
+                var (created, message) = await CreateUserFunction.CreateUser(newUser);
 
                 if (created)
                 {
