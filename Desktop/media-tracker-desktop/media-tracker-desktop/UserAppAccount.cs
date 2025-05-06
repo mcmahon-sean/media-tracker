@@ -8,12 +8,14 @@ using RestSharp;
 using Supabase;
 using System;
 using System.CodeDom;
+using System.Collections;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
 using System.Net;
 using System.Printing;
 using System.Runtime.CompilerServices;
+using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media.Animation;
@@ -26,6 +28,9 @@ namespace media_tracker_desktop
         private const string CREATE_USER_SP_NAME = "CreateUser";
         private const string AUTHENTICATE_USER_SP_NAME = "AuthenticateUser";
         private const string ADD_THIRD_PARTY_ID = "add_3rd_party_id";
+        private const string UPDATE_USER_SP_NAME = "update_user";
+        private const string DELETE_USER_SP_NAME = "delete_user";
+
         private const int STEAM_PLATFORM_ID = 1;
         private const int LASTFM_PLATFORM_ID = 2;
         private const int TMDB_PLATFORM_ID = 3;
@@ -305,6 +310,150 @@ namespace media_tracker_desktop
                     default:
                         break;
                 }
+            }
+        }
+
+        /// <summary>
+        /// Update user details.
+        /// </summary>
+        /// <param name="newUsername"></param>
+        /// <param name="newFirstName"></param>
+        /// <param name="newLastName"></param>
+        /// <param name="newEmail"></param>
+        /// <param name="newPassword"></param>
+        /// <returns>Returns a dictionary<string, dynamic> where string has status { "error", "success" } and the second part is the statusMessage.</returns>
+        public static async Task<Dictionary<string, dynamic>> UpdateUser(string newUsername = "", string newFirstName = "", string newLastName = "", string newEmail = "", string newPassword = "")
+        {
+            // Dictionary to be returned.
+            Dictionary<string, dynamic> updateResult = new Dictionary<string, dynamic>
+            {
+                { "status", "" },
+                { "statusMessage", "" }
+            };
+
+            // These variables are used to determine if a field changes or not.
+            // They are set to have the same user details.
+            // But when user updates a detail, they are stored in these variables, overriding the previous detail.
+            // Passwords will update regardless if it's the same. Can't and shouldn't retrieve passwords.
+            string updateUsername = _username;
+            string updateFirstName = _firstName;
+            string updateLastName = _lastName;
+            string updateEmail = _email;
+            string updatePassword = newPassword;
+
+            // If username changed,
+            if (newUsername != _username)
+            {
+                List<User> existingUsers = await SupabaseConnection.GetTableRecord<User>(_connection);
+
+                // If username already exists in the database, return error.
+                if (existingUsers.Any(u => u.Username == newUsername))
+                {
+                    updateResult["status"] = "error";
+                    updateResult["statusMessage"] = "Username is already taken.";
+
+                    return updateResult;
+                }
+
+                // Otherwise, update username.
+                updateUsername = newUsername;
+            }
+
+            // If first name change, set new first name.
+            if (newFirstName != _firstName)
+            {
+                updateFirstName = newFirstName;
+            }
+
+            // If last name change, set new last name.
+            if (newLastName != _lastName)
+            {
+                updateLastName = newLastName;
+            }
+
+            // If email change, set new email.
+            if (newEmail != _email)
+            {
+                updateEmail = newEmail;
+            }
+
+            try
+            {
+                // Parameter for SP with validations.
+                UpdateUserParam updateUser = new UpdateUserParam(
+                    updateUsername,
+                    updateFirstName,
+                    updateLastName,
+                    updateEmail,
+                    updatePassword
+                );
+
+                // Execute the stored procedure and wait for a response.
+                var response = await _connection.Rpc(UPDATE_USER_SP_NAME, updateUser);
+
+                // If success,
+                if (response.Content.Contains("User has been updated"))
+                {
+                    updateResult["status"] = "success";
+                    updateResult["statusMessage"] = "Successfully updated user.";
+
+                    // Update session variables.
+                    _username = newUsername;
+                    _firstName = newFirstName;
+                    _lastName = newLastName;
+                    _email = newEmail;
+
+                    return updateResult;
+                }
+                else
+                {
+                    updateResult["status"] = "error";
+                    updateResult["statusMessage"] = response.Content ?? "An error occurred.";
+
+                    return updateResult;
+                }
+            }
+            catch (Exception error)
+            {
+                updateResult["status"] = "error";
+                updateResult["statusMessage"] = error.Message;
+
+                return updateResult;
+            }
+        }
+
+        // Method: Delete user.
+        public static async Task<Dictionary<string, dynamic>> DeleteUser()
+        {
+            Dictionary<string, dynamic> deleteResult = new Dictionary<string, dynamic>
+            {
+                ["status"] = "",
+                ["statusMessage"] = ""
+            };
+
+            var deleteUserParam = new
+            {
+                username_input = _username
+            };        
+
+            // Execute the stored procedure and wait for a response.
+            var response = await _connection.Rpc(DELETE_USER_SP_NAME, deleteUserParam);
+
+            if (response.Content.Contains("User has been deleted"))
+            {
+                deleteResult["status"] = "success";
+                deleteResult["statusMessage"] = "Successfully deleted account.";
+
+                LogOut();
+
+                return deleteResult;
+            }
+            else
+            {
+                deleteResult["status"] = "error";
+                deleteResult["statusMessage"] = response.Content;
+
+                return deleteResult;
             }
         }
 
