@@ -8,28 +8,36 @@ using media_tracker_desktop.Models.ApiModels;
 using System.Data;
 using media_tracker_desktop.Models.SupabaseTables;
 using media_tracker_desktop.Models.TMDB;
+using media_tracker_desktop.Models.LastFM;
 using media_tracker_desktop.Models.SupabaseFunctionObjects;
 
 namespace media_tracker_desktop.Forms
 {
     public partial class LinkSteamForm : Form
     {
-        private readonly string[] SORT_OPTIONS_ASC = ["Name (asc)", "Hours Played (asc)", "Favorite (asc)"];
-        private readonly string[] SORT_OPTIONS_DESC = ["Name (desc)", "Hours Played (desc)", "Favorite (desc)"];
+        private readonly string[] SORT_OPTIONS_OWNED_GAME_ASC = ["Favorite (asc)", "Name (asc)", "Hours Played (asc)"];
+        private readonly string[] SORT_OPTIONS_OWNED_GAME_DESC = ["Favorite (desc)", "Name (desc)", "Hours Played (desc)"];
+
+        private const string FILLED_STAR = "\u2605";
+        private const string EMPTY_STAR = "\u2730";
 
         private DataTable _tableData = new DataTable();
-        private Panel _pnlSearchAndSort = new Panel();
-        private TextBox _txtSearch = new TextBox();
+        private Panel? _pnlSearchAndSort = null;
+        private TextBox? _txtSearch = null;
         private Button _btnSort = new Button();
-        private ContextMenuStrip _sortMenu = new ContextMenuStrip();
+        private ContextMenuStrip? _sortMenu = null;
 
         private bool _steamSortVisible = false;
         private List<UserFavoriteMedia> _favorites = [];
         private List<Steam_Game> _ownedGames = [];
 
-        public LinkSteamForm()
+        private string _dataOption = "";
+
+        public LinkSteamForm(string option = "")
         {
             InitializeComponent();
+
+            _dataOption = option;
         }
 
         private async void LinkSteamForm_Load(object sender, EventArgs e)
@@ -48,32 +56,17 @@ namespace media_tracker_desktop.Forms
                 // If user has a steam account linked,
                 if (!string.IsNullOrEmpty(UserAppAccount.UserSteamID))
                 {
-                    // Retrieve owned games.
-                    (bool success, List<Steam_Game>? games) = await SteamApi.GetOwnedGames();
+                    await BuildViewGridBasedOnOption();                        
 
-                    // If success,
-                    if (success)
-                    {
-                        _ownedGames = games ?? [];
-
-                        BuildViewGrid(games ?? []);
-
-                        BuildSearchAndSortPanel();
-
-                        // Subscribe to event handlers:
-                        // When any of the favorite buttons are clicked.
-                        steamDataGridView.CellClick += btnFavorite_CellClick!;
-                        // When any sort items in the sort menu are clicked.
-                        _sortMenu.ItemClicked += sortMenu_ItemClicked!;
-                        // When the sort menu button is clicked.
-                        _btnSort.Click += btnSort_Click!;
-                        // When user presses a button in search bar.
-                        _txtSearch.KeyDown += txtSearch_KeyDown!;
-                    }
-                    else
-                    {
-                        BuildViewGrid([]);
-                    }
+                    // Subscribe to event handlers:
+                    // When any of the favorite buttons are clicked.
+                    steamDataGridView.CellClick += btnFavorite_CellClick!;
+                    // When any sort items in the sort menu are clicked.
+                    _sortMenu.ItemClicked += sortMenu_ItemClicked!;
+                    // When the sort menu button is clicked.
+                    _btnSort.Click += btnSort_Click!;
+                    // When user presses a button in search bar.
+                    _txtSearch.KeyDown += txtSearch_KeyDown!;
                 }
                 // If user doesn't have steam account linked,
                 else
@@ -88,41 +81,65 @@ namespace media_tracker_desktop.Forms
             }
         }
 
-        // Method: Display the list of games.
-        private void BuildViewGrid(List<Steam_Game> games)
+        /// <summary>
+        /// Builds display based on endpoint option.
+        /// </summary>
+        private async Task BuildViewGridBasedOnOption()
         {
-            // Create a table to be used for the data grid.
+            if (_pnlSearchAndSort == null)
+            {
+                BuildSearchAndSortPanel();
+            }
+
+            if (_dataOption == MainForm.SteamOptions[0])
+            {
+                // Retrieve data.
+                (bool success, List<Steam_Game>? ownedGames) = await SteamApi.GetOwnedGames();
+
+                // Save data.
+                _ownedGames = ownedGames ?? [];
+
+                if (_sortMenu == null)
+                {
+                    _sortMenu = AppElement.GetSortMenu(SORT_OPTIONS_OWNED_GAME_ASC);
+                }
+
+                // Build display.
+                BuildOwnedGameViewGrid(_ownedGames);
+            }
+        }
+
+        private void BuildOwnedGameViewGrid(List<Steam_Game> ownedGames)
+        {
             _tableData = new DataTable();
 
-            // Add the columns to be displayed.
-            _tableData.Columns.Add("AppID");
-            _tableData.Columns.Add("Title");
+            // Columns:
+            _tableData.Columns.Add("ID");
+            _tableData.Columns.Add("Name");
             _tableData.Columns.Add("Hours Played");
 
+            // Return if no owned games.
             if (_ownedGames.Count <= 0 || _ownedGames == null)
             {
-                steamDataGridView.DataSource = _tableData;
-                MessageBox.Show("You don't own any games.");
-                return;
+                MessageBox.Show("You don't own any game.", "No Data", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
 
-            // Add the rows to be displayed,
-            foreach (Steam_Game game in games)
+            // Foreach data,
+            foreach (Steam_Game game in ownedGames)
             {
-                _tableData.Rows.Add(game.AppID, game.Name, game.PlaytimeForever / 60);
+                // Add row.
+                _tableData.Rows.Add(game.AppID, game.Name, game.PlaytimeForever);
             }
 
-            // Add the table.
             steamDataGridView.DataSource = _tableData;
 
-            // This is to retrieve the game's ID from the row in which the favorite button is clicked.
-            //hide the appid column and the row header
-            steamDataGridView.Columns["AppID"].Visible = false;
+            // Configurations:
+            steamDataGridView.Columns["ID"].Visible = false;
             steamDataGridView.RowHeadersVisible = false;
             steamDataGridView.AllowUserToAddRows = false;
+            steamDataGridView.ReadOnly = true;
 
-            //set width for title column
-            steamDataGridView.Columns["Title"].Width = 200;
+            steamDataGridView.Columns["Name"].Width = 200;
             steamDataGridView.Columns["Hours Played"].Width = 200;
 
             BuildFavoriteButtonColumn();
@@ -138,20 +155,23 @@ namespace media_tracker_desktop.Forms
             // Foreach row in the data grid,
             foreach (DataGridViewRow row in steamDataGridView.Rows)
             {
-                // Retrieve the current game ID.
-                string currentRowAppID = (string)row.Cells["AppID"].Value;
-
                 // Default: Unfavorite the button.
-                row.Cells["btnFavorite"].Value = "\u2730";
+                row.Cells["btnFavorite"].Value = EMPTY_STAR;
 
-                // Retrieve the game with the same game ID from the favorite list.
-                // Make sure that it is from the Steam platform.
-                var favoriteGame = _favorites.FirstOrDefault(g => g.MediaPlatID == currentRowAppID && g.PlatformID == UserAppAccount.SteamPlatformID);
-
-                // If a game exist, mark the button as favorite.
-                if (favoriteGame != null)
+                if (_dataOption == MainForm.SteamOptions[0])
                 {
-                    row.Cells["btnFavorite"].Value = "\u2605";
+                    // Retrieve the current game ID.
+                    string currentRowAppID = (string)row.Cells["ID"].Value;
+
+                    // Retrieve the game with the same game ID from the favorite list.
+                    // Make sure that it is from the Steam platform.
+                    var favoriteGame = _favorites.FirstOrDefault(g => g.MediaPlatID == currentRowAppID && g.PlatformID == UserAppAccount.SteamPlatformID);
+
+                    // If a game exist, mark the button as favorite.
+                    if (favoriteGame != null)
+                    {
+                        row.Cells["btnFavorite"].Value = FILLED_STAR;
+                    }
                 }
             }
         }
@@ -175,41 +195,45 @@ namespace media_tracker_desktop.Forms
                 // Retrieve the clicked button.
                 var currentButton = steamDataGridView.Rows[e.RowIndex].Cells[e.ColumnIndex];
 
-                // Retrieve the current game ID.
-                string currentRowAppID = (string)steamDataGridView.Rows[e.RowIndex].Cells["AppID"].Value;
-
                 // Update the list of user's favorite media.
                 _favorites = await UserAppAccount.GetFavoriteMediaList();
 
-                // Retrieve the game with the same game ID from the favorite list.
-                // Make sure that it is from the Steam platform.
-                var favoriteGame = _favorites.FirstOrDefault(g => g.MediaPlatID == currentRowAppID && g.PlatformID == UserAppAccount.SteamPlatformID);
-
-                // If there is no game,
-                if (favoriteGame == null)
+                if (_dataOption == MainForm.SteamOptions[0])
                 {
-                    // Fill in the star.
-                    currentButton.Value = "\u2605";
-                }
-                // Else,
-                else
-                {
-                    // Empty the star.
-                    currentButton.Value = "\u2730";
+                    // Retrieve the current game ID.
+                    string currentRowID = (string)steamDataGridView.Rows[e.RowIndex].Cells["ID"].Value;
+
+                    // Retrieve the game with the same game ID from the favorite list.
+                    // Make sure that it is from the Steam platform.
+                    var favoriteGame = _favorites.FirstOrDefault(g => g.MediaPlatID == currentRowID && g.PlatformID == UserAppAccount.SteamPlatformID);
+
+                    // If there is no game,
+                    if (favoriteGame == null)
+                    {
+                        // Fill in the star.
+                        currentButton.Value = FILLED_STAR;
+                    }
+                    // Else,
+                    else
+                    {
+                        // Empty the star.
+                        currentButton.Value = EMPTY_STAR;
+                    }
+
+                    // Retrieve the game title of the current row.
+                    string currentRowName = (string)steamDataGridView.Rows[e.RowIndex].Cells["Name"].Value;
+
+                    // Update the favorite status of the media.
+                    // The SP unfavorites/favorites media.
+                    await UserAppAccount.FavoriteMedia(
+                        platformID: UserAppAccount.SteamPlatformID,
+                        username: UserAppAccount.Username,
+                        mediaTypeID: UserAppAccount.MediaTypeID.Game,
+                        mediaPlatformID: currentRowID,
+                        title: currentRowName
+                        );
                 }
 
-                // Retrieve the game title of the current row.
-                string currentRowTitle = (string)steamDataGridView.Rows[e.RowIndex].Cells["Title"].Value;
-
-                // Update the favorite status of the media.
-                // The SP unfavorites/favorites media.
-                await UserAppAccount.FavoriteMedia(
-                    platformID: UserAppAccount.SteamPlatformID,
-                    username: UserAppAccount.Username,
-                    mediaTypeID: UserAppAccount.MediaTypeID.Game,
-                    mediaPlatformID: currentRowAppID,
-                    title: currentRowTitle
-                    );
             }
             catch (Exception error)
             {
@@ -228,16 +252,13 @@ namespace media_tracker_desktop.Forms
 
             // Retrieve the search box and sort button from panel.
             _txtSearch = (TextBox)_pnlSearchAndSort.Controls["txtSearch"]!;
-            _txtSearch.PlaceholderText = "Search for title...";
+            _txtSearch.PlaceholderText = "Search for game name...";
 
             _btnSort = (Button)_pnlSearchAndSort.Controls["btnSort"]!;
-
-            // Add sort menu.
-            _sortMenu = AppElement.GetSortMenu(SORT_OPTIONS_ASC);
         }
 
         // Event: When user presses a button in the search textbox.
-        private void txtSearch_KeyDown(object sender, KeyEventArgs e)
+        private async void txtSearch_KeyDown(object sender, KeyEventArgs e)
         {
             // If user pressed enter,
             if (e.KeyCode == Keys.Enter)
@@ -257,7 +278,7 @@ namespace media_tracker_desktop.Forms
                 else
                 {
                     // Reset display.
-                    BuildViewGrid(_ownedGames);
+                    await BuildViewGridBasedOnOption();
                 }
             }
         }
@@ -267,23 +288,31 @@ namespace media_tracker_desktop.Forms
         {
             text.ToLower();
 
-            // Query options:
-            // Ensure that the search is case insensitive.
-            QueryOptions<Steam_Game> option = new QueryOptions<Steam_Game>
+            if (_dataOption == MainForm.SteamOptions[0])
             {
-                Where = t => t.Name.ToLower().Contains(text)
-            };
+                // Query options:
+                // Ensure that the search is case insensitive.
+                QueryOptions<Steam_Game> option = new QueryOptions<Steam_Game>
+                {
+                    Where = g => g.Name.ToLower().Contains(text)
+                };
 
-            // Retrieve data.
-            List<Steam_Game> resultGames = DataFunctions.Sort(_ownedGames, option) ?? [];
+                // Retrieve data.
+                List<Steam_Game> resultGames = DataFunctions.Sort(_ownedGames, option) ?? [];
 
-            // Display data.
-            BuildViewGrid(resultGames);
+                BuildOwnedGameViewGrid(resultGames);
+            }
         }
 
         // Event: When sort button is clicked.
         private void btnSort_Click(object sender, EventArgs e)
         {
+            if (_sortMenu == null)
+            {
+                MessageBox.Show("Sort menu didn't show up.");
+                return;
+            }
+
             // Retrieve sort button.
             _btnSort = (Button)sender;
 
@@ -327,90 +356,108 @@ namespace media_tracker_desktop.Forms
         // Method: Sorts the data based on sort option.
         private void SortData(string option)
         {
-            List<Steam_Game>? sortedGames = [];
-
-            // If there is data to be sorted,
-            if (_ownedGames != null)
+            // Display Option 1
+            if (_dataOption == MainForm.SteamOptions[0])
             {
-                // First Sorting Option
-                if (option == SORT_OPTIONS_ASC[0])
+                List<Steam_Game> sortedGames = [];
+
+                // Sorting Option 1
+                if (option == SORT_OPTIONS_OWNED_GAME_ASC[0])
                 {
-                    QueryOptions<Steam_Game> optionGame = new QueryOptions<Steam_Game>
+                    // Sort data.
+                    sortedGames = SortOwnedGame("asc");
+
+                    // Change sort option to opposite.
+                    _sortMenu.Items[0].Text = SORT_OPTIONS_OWNED_GAME_DESC[0];
+
+                    // Display.
+                    BuildOwnedGameViewGrid(sortedGames);
+                }
+                else if (option == SORT_OPTIONS_OWNED_GAME_DESC[0])
+                {
+                    // Sort data.
+                    sortedGames = SortOwnedGame("desc");
+
+                    // Change sort option to opposite.
+                    _sortMenu.Items[0].Text = SORT_OPTIONS_OWNED_GAME_ASC[0];
+
+                    // Display.
+                    BuildOwnedGameViewGrid(sortedGames);
+                }
+                // Sorting Option 2
+                if (option == SORT_OPTIONS_OWNED_GAME_ASC[1])
+                {
+                    QueryOptions<Steam_Game> options = new QueryOptions<Steam_Game>
                     {
-                        OrderBy = t => t.Name,
+                        OrderBy = g => g.Name,
                         OrderByDirection = "asc"
                     };
 
-                    sortedGames = DataFunctions.Sort(_ownedGames, optionGame);
+                    // Sort data.
+                    sortedGames = DataFunctions.Sort(_ownedGames, options) ?? [];
 
-                    _sortMenu.Items[0].Text = SORT_OPTIONS_DESC[0];
+                    // Change sort option to opposite.
+                    _sortMenu.Items[1].Text = SORT_OPTIONS_OWNED_GAME_DESC[1];
+
+                    // Display.
+                    BuildOwnedGameViewGrid(sortedGames);
                 }
-                else if (option == SORT_OPTIONS_DESC[0])
+                else if (option == SORT_OPTIONS_OWNED_GAME_DESC[1])
                 {
-                    QueryOptions<Steam_Game> optionGame = new QueryOptions<Steam_Game>
+                    QueryOptions<Steam_Game> options = new QueryOptions<Steam_Game>
                     {
-                        OrderBy = t => t.Name,
+                        OrderBy = g => g.Name,
                         OrderByDirection = "desc"
                     };
 
-                    sortedGames = DataFunctions.Sort(_ownedGames, optionGame);
+                    // Sort data.
+                    sortedGames = DataFunctions.Sort(_ownedGames, options) ?? [];
 
-                    _sortMenu.Items[0].Text = SORT_OPTIONS_ASC[0];
+                    // Change sort option to opposite.
+                    _sortMenu.Items[1].Text = SORT_OPTIONS_OWNED_GAME_ASC[1];
+
+                    // Display.
+                    BuildOwnedGameViewGrid(sortedGames);
                 }
-                // Second Sorting Option
-                else if (option == SORT_OPTIONS_ASC[1])
+                // Sorting Option 3
+                if (option == SORT_OPTIONS_OWNED_GAME_ASC[2])
                 {
-                    QueryOptions<Steam_Game> optionGame = new QueryOptions<Steam_Game>
+                    QueryOptions<Steam_Game> options = new QueryOptions<Steam_Game>
                     {
-                        OrderBy = t => t.PlaytimeForever,
+                        OrderBy = g => g.PlaytimeForever,
                         OrderByDirection = "asc"
                     };
 
-                    sortedGames = DataFunctions.Sort(_ownedGames, optionGame);
+                    // Sort data.
+                    sortedGames = DataFunctions.Sort(_ownedGames, options) ?? [];
 
-                    _sortMenu.Items[1].Text = SORT_OPTIONS_DESC[1];
+                    // Change sort option to opposite.
+                    _sortMenu.Items[2].Text = SORT_OPTIONS_OWNED_GAME_DESC[2];
+
+                    // Display.
+                    BuildOwnedGameViewGrid(sortedGames);
                 }
-                else if (option == SORT_OPTIONS_DESC[1])
+                else if (option == SORT_OPTIONS_OWNED_GAME_DESC[2])
                 {
-                    QueryOptions<Steam_Game> optionGame = new QueryOptions<Steam_Game>
+                    QueryOptions<Steam_Game> options = new QueryOptions<Steam_Game>
                     {
-                        OrderBy = t => t.PlaytimeForever,
+                        OrderBy = g => g.PlaytimeForever,
                         OrderByDirection = "desc"
                     };
 
-                    sortedGames = DataFunctions.Sort(_ownedGames, optionGame);
+                    // Sort data.
+                    sortedGames = DataFunctions.Sort(_ownedGames, options) ?? [];
 
-                    _sortMenu.Items[1].Text = SORT_OPTIONS_ASC[1];
+                    // Change sort option to opposite.
+                    _sortMenu.Items[2].Text = SORT_OPTIONS_OWNED_GAME_ASC[2];
+
+                    // Display.
+                    BuildOwnedGameViewGrid(sortedGames);
                 }
-                // Third Sorting Option
-                else if (option == SORT_OPTIONS_ASC[2])
-                {
-                    List<Steam_Game> games = RetrieveSortedFavorites("asc");
-
-                    // Update list.
-                    sortedGames = games;
-
-                    // Update the menu item.
-                    _sortMenu.Items[2].Text = SORT_OPTIONS_DESC[2];
-                }
-                else if (option == SORT_OPTIONS_DESC[2])
-                {
-                    List<Steam_Game> games = RetrieveSortedFavorites("desc");
-
-                    // Update list.
-                    sortedGames = games;
-
-                    // Update the menu item.
-                    _sortMenu.Items[2].Text = SORT_OPTIONS_ASC[2];
-                }
-
-                // Build based on whether or not the list was updated.
-                BuildViewGrid(sortedGames ?? []);
             }
         }
 
-        // Method: Sorts the favorites.
-        private List<Steam_Game> RetrieveSortedFavorites(string orderByDirection)
+        private List<Steam_Game> SortOwnedGame(string orderByDirection)
         {
             // Sort options based on passed orderByDirection.
             // Also, only games.
@@ -421,50 +468,28 @@ namespace media_tracker_desktop.Forms
                 OrderByDirection = orderByDirection
             };
 
-            // Retrieve the sorted favorites.
             List<UserFavoriteMedia> sortedFavorites = DataFunctions.Sort(_favorites, options) ?? [];
 
-            // Initialize lists.
-            List<Steam_Game> favoriteGameList = [];
-            List<Steam_Game> unfavoriteGameList = [];
+            List<Steam_Game> favorites = [];
+            List<Steam_Game> unfavorites = [];
 
-            // Foreach game that is currently in display,
             foreach (Steam_Game game in _ownedGames)
             {
-                // If that game is a favorite,
-                if (_favorites.Any(f => f.MediaPlatID == game.AppID.ToString()))
+                // If game is in favorites,
+                if (sortedFavorites.Any(f => f.MediaPlatID == game.AppID.ToString()))
                 {
-                    // Add it to the favorite list.
-                    favoriteGameList.Add(game);
+                    // Add it.
+                    favorites.Add(game);
                 }
                 // Else,
                 else
                 {
-                    // Add to the unfavorite list.
-                    unfavoriteGameList.Add(game);
+                    // Add to unfavorite list.
+                    unfavorites.Add(game);
                 }
             }
 
-            // If the order is asc,
-            if (orderByDirection == "asc")
-            {
-                // Add list together so that the favorite is first.
-                favoriteGameList.AddRange(unfavoriteGameList);
-
-                return favoriteGameList;
-            }
-            // If the order is desc,
-            else if (orderByDirection == "desc")
-            {
-                // Add list together so that the favorite is last.
-                unfavoriteGameList.AddRange(favoriteGameList);
-
-                return unfavoriteGameList;
-            }
-            else
-            {
-                return [];
-            }
+            return DataFunctions.SortFavorite(orderByDirection, favorites, unfavorites);
         }
 
         private async void linkButton_Click(object sender, EventArgs e)
@@ -472,7 +497,7 @@ namespace media_tracker_desktop.Forms
             // Ensure user is logged in.
             if (!UserAppAccount.UserLoggedIn)
             {
-                MessageBox.Show("Please Sign-In first.");
+                MessageBox.Show("Please Sign-In first.", "Not Signed-In", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
 
@@ -497,8 +522,9 @@ namespace media_tracker_desktop.Forms
                     // If added,
                     if (added)
                     {
-                        // Load display.
-                        await LoadSteamAsync();
+                        pnlLink.Visible = false;
+
+                        MessageBox.Show("Account linked successfully!\n\nChoose an option from the Steam menu to display data.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
                     else
                     {

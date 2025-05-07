@@ -15,8 +15,8 @@ namespace media_tracker_desktop.Forms
 
         private void InitializeComponent()
         {
-            DataGridViewCellStyle dataGridViewCellStyle3 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle4 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
             pnlLink = new Panel();
             linkButton = new Button();
             tmdbDataGridView = new DataGridView();
@@ -26,13 +26,13 @@ namespace media_tracker_desktop.Forms
             // 
             // pnlLink
             // 
-            pnlLink.BackColor = Color.FromArgb(45, 45, 48);
+            pnlLink.BackColor = Color.FromArgb(35, 35, 35);
             pnlLink.Controls.Add(linkButton);
             pnlLink.Dock = DockStyle.Top;
             pnlLink.Location = new Point(0, 0);
             pnlLink.Margin = new Padding(4, 5, 4, 5);
             pnlLink.Name = "pnlLink";
-            pnlLink.Size = new Size(911, 100);
+            pnlLink.Size = new Size(911, 83);
             pnlLink.TabIndex = 1;
             // 
             // linkButton
@@ -41,10 +41,10 @@ namespace media_tracker_desktop.Forms
             linkButton.FlatStyle = FlatStyle.Flat;
             linkButton.Font = new Font("Segoe UI", 10F);
             linkButton.ForeColor = Color.Black;
-            linkButton.Location = new Point(17, 20);
+            linkButton.Location = new Point(22, 24);
             linkButton.Margin = new Padding(4, 5, 4, 5);
             linkButton.Name = "linkButton";
-            linkButton.Size = new Size(229, 60);
+            linkButton.Size = new Size(143, 38);
             linkButton.TabIndex = 0;
             linkButton.Text = "Link TMDB";
             linkButton.UseVisualStyleBackColor = false;
@@ -53,32 +53,32 @@ namespace media_tracker_desktop.Forms
             // tmdbDataGridView
             // 
             tmdbDataGridView.BackgroundColor = Color.FromArgb(30, 30, 30);
-            dataGridViewCellStyle3.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle3.BackColor = Color.FromArgb(70, 70, 70);
-            dataGridViewCellStyle3.Font = new Font("Segoe UI", 9F);
-            dataGridViewCellStyle3.ForeColor = Color.White;
-            dataGridViewCellStyle3.SelectionBackColor = SystemColors.Highlight;
-            dataGridViewCellStyle3.SelectionForeColor = SystemColors.HighlightText;
-            dataGridViewCellStyle3.WrapMode = DataGridViewTriState.True;
-            tmdbDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle3;
+            dataGridViewCellStyle1.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle1.BackColor = Color.FromArgb(70, 70, 70);
+            dataGridViewCellStyle1.Font = new Font("Segoe UI", 9F);
+            dataGridViewCellStyle1.ForeColor = Color.White;
+            dataGridViewCellStyle1.SelectionBackColor = SystemColors.Highlight;
+            dataGridViewCellStyle1.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle1.WrapMode = DataGridViewTriState.True;
+            tmdbDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
             tmdbDataGridView.ColumnHeadersHeight = 34;
-            dataGridViewCellStyle4.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle4.BackColor = Color.FromArgb(50, 50, 50);
-            dataGridViewCellStyle4.Font = new Font("Segoe UI", 9F);
-            dataGridViewCellStyle4.ForeColor = Color.White;
-            dataGridViewCellStyle4.SelectionBackColor = SystemColors.Highlight;
-            dataGridViewCellStyle4.SelectionForeColor = SystemColors.HighlightText;
-            dataGridViewCellStyle4.WrapMode = DataGridViewTriState.False;
-            tmdbDataGridView.DefaultCellStyle = dataGridViewCellStyle4;
+            dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle2.BackColor = Color.FromArgb(50, 50, 50);
+            dataGridViewCellStyle2.Font = new Font("Segoe UI", 9F);
+            dataGridViewCellStyle2.ForeColor = Color.White;
+            dataGridViewCellStyle2.SelectionBackColor = SystemColors.Highlight;
+            dataGridViewCellStyle2.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle2.WrapMode = DataGridViewTriState.False;
+            tmdbDataGridView.DefaultCellStyle = dataGridViewCellStyle2;
             tmdbDataGridView.Dock = DockStyle.Fill;
             tmdbDataGridView.EnableHeadersVisualStyles = false;
             tmdbDataGridView.GridColor = Color.Gray;
-            tmdbDataGridView.Location = new Point(0, 100);
+            tmdbDataGridView.Location = new Point(0, 83);
             tmdbDataGridView.Margin = new Padding(4, 5, 4, 5);
             tmdbDataGridView.Name = "tmdbDataGridView";
             tmdbDataGridView.RowHeadersVisible = false;
             tmdbDataGridView.RowHeadersWidth = 62;
-            tmdbDataGridView.Size = new Size(911, 307);
+            tmdbDataGridView.Size = new Size(911, 324);
             tmdbDataGridView.TabIndex = 0;
             // 
             // LinkTmdbForm

@@ -81,5 +81,14 @@ namespace media_tracker_desktop
 
             return sortMenu;
         }
+
+        public static void AddMainIcon(Button btn, Image icon, Size size)
+        {
+            Image resizedImage = new Bitmap(icon, size);
+
+            btn.Image = resizedImage;
+            btn.ImageAlign = ContentAlignment.MiddleLeft;
+            btn.Padding = new Padding(30, 0, 0, 0);
+        }
     }
 }
