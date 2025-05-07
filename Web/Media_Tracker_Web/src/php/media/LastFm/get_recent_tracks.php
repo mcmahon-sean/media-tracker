@@ -25,7 +25,7 @@ if(isset($_SESSION['signed_in']) && $_SESSION['signed_in'] === true) {
         $data = json_decode($response, true);
         $trackList = $data['recenttracks']['track'] ?? [];
 
-        $recentTracks = array_map(fn($item) => new LastFmTrack($item), $trackList);
+        $recentTracks = array_map(fn($item) => new LastFmTrack($item, 'recenttracks'), $trackList);
     }
 } else {
     $error = "Please login to view.";
