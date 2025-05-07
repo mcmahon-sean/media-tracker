@@ -113,6 +113,14 @@
                             const platform = document.getElementById("platform_id").value;
                             const user_plat_id = document.getElementById("user_plat_id").value;
                             const username = document.querySelector("input[name='username']").value;
+                            const userLabel = document.getElementById("usrLabel");
+
+                            if (platform == "1") {
+                                userLabel.innerHTML = "Enter Steam ID:";
+                            }
+                            else {
+                                userLabel.innerHTML = "Enter Username:";
+                            }
 
                             switch (platform) {
                                 case "3":

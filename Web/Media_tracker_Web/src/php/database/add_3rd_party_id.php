@@ -1,20 +1,21 @@
 <?php
 session_start();
 require_once '../db.php';
+require_once '../tools.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Regular form submission (Steam or Last.FM)
     if (isset($_POST['platform_id'], $_POST['user_plat_id'])) {
-        $platform_id = (int)$_POST['platform_id'];
-        $user_plat_id = $_POST['user_plat_id'];
+        $platform_id = sanitizeInt($_POST['platform_id']);
+        $user_plat_id = sanitizeString($_POST['user_plat_id']);
     } else {
         die('Missing POST data.');
     }
 } elseif (isset($_GET['auth_tmdb']) && $_GET['auth_tmdb'] === 'true') {
     // TMDB redirect
     if (isset($_SESSION['platform_id'], $_SESSION['user_plat_id'])) {
-        $platform_id = (int)$_SESSION['platform_id'];
-        $user_plat_id = $_SESSION['user_plat_id'];
+        $platform_id = sanitizeInt($_SESSION['platform_id']);
+        $user_plat_id = sanitizeString($_SESSION['user_plat_id']);
     } else {
         die('Missing TMDB session data.');
     }
@@ -24,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // Update databse and session
 try {
-    $username = $_SESSION['username'];
+    $username = sanitizeString($_SESSION['username']);
     $stmt = $pdo->prepare("SELECT public.add_3rd_party_id(?, ?, ?)");
     $stmt->execute([$username, $platform_id, $user_plat_id]);
 
