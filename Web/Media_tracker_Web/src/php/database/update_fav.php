@@ -5,8 +5,8 @@
         if (isset($_POST['username']) &&
         isset($_POST['media_id'])) {
 
-            $username = $_POST['username'];
-            $mediaID = $_POST['media_id'];
+            $username = sanitizeString($_POST['username']);
+            $mediaID = sanitizeInt($_POST['media_id']);
     
             $stmt = $pdo->prepare("SELECT public.update_fav(?, ?)");
             $stmt->execute([$username, $mediaID]);
