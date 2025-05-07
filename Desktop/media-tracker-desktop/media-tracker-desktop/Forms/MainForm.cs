@@ -564,7 +564,7 @@ namespace media_tracker_desktop.Forms
             }
             else
             {
-                MessageBox.Show("You don't have a steam account linked.");
+                MessageBox.Show("You don't have a steam account linked.", "No Account Linked", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
 
@@ -587,7 +587,7 @@ namespace media_tracker_desktop.Forms
             }
             else
             {
-                MessageBox.Show("You don't have a lastFM account linked.");
+                MessageBox.Show("You don't have a lastFM account linked.", "No Account Linked", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
 
@@ -596,7 +596,7 @@ namespace media_tracker_desktop.Forms
             _isTMDBToBeUnlinked = false;
 
             // If user has an account linked,
-            if (!string.IsNullOrEmpty(UserAppAccount.UserTmdbSessionID))
+            if (!string.IsNullOrEmpty(UserAppAccount.UserTmdbSessionID) && !string.IsNullOrEmpty(UserAppAccount.UserTmdbSessionID))
             {
                 DialogResult confirmation = MessageBox.Show("Are you sure you want to unlink your TMDB account?", "Confirm Delete", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation);
 
@@ -612,7 +612,7 @@ namespace media_tracker_desktop.Forms
             }
             else
             {
-                MessageBox.Show("You don't have a TMDB account linked.");
+                MessageBox.Show("You don't have a TMDB account linked.", "No Account Linked", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
 
@@ -785,7 +785,7 @@ namespace media_tracker_desktop.Forms
             if (!_tmdbOptionVisible)
             {
                 // If user has an account,
-                if (!string.IsNullOrEmpty(UserAppAccount.UserTmdbSessionID))
+                if (!string.IsNullOrEmpty(UserAppAccount.UserTmdbSessionID) && !string.IsNullOrEmpty(UserAppAccount.UserTmdbAccountID))
                 {
                     // Show endpoint menu.
                     _cmsTMDBOptions.Show(btnLinkTmdb, new Point(0, btnLinkTmdb.Height));

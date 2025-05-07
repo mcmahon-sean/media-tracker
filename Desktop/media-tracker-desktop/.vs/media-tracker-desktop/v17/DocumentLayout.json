@@ -3,28 +3,28 @@
   "WorkspaceRootPath": "C:\\Users\\bondh\\OneDrive - MNSCU\\MTRepo\\media-tracker\\Desktop\\media-tracker-desktop\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{E1D13E99-C696-41F3-9B58-A1C5D7155072}|media-tracker-desktop\\media-tracker-desktop.csproj|c:\\users\\bondh\\onedrive - mnscu\\mtrepo\\media-tracker\\desktop\\media-tracker-desktop\\media-tracker-desktop\\forms\\mainform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{E1D13E99-C696-41F3-9B58-A1C5D7155072}|media-tracker-desktop\\media-tracker-desktop.csproj|solutionrelative:media-tracker-desktop\\forms\\mainform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{E1D13E99-C696-41F3-9B58-A1C5D7155072}|media-tracker-desktop\\media-tracker-desktop.csproj|c:\\users\\bondh\\onedrive - mnscu\\mtrepo\\media-tracker\\desktop\\media-tracker-desktop\\media-tracker-desktop\\forms\\linksteamform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E1D13E99-C696-41F3-9B58-A1C5D7155072}|media-tracker-desktop\\media-tracker-desktop.csproj|solutionrelative:media-tracker-desktop\\forms\\linksteamform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{E1D13E99-C696-41F3-9B58-A1C5D7155072}|media-tracker-desktop\\media-tracker-desktop.csproj|c:\\users\\bondh\\onedrive - mnscu\\mtrepo\\media-tracker\\desktop\\media-tracker-desktop\\media-tracker-desktop\\forms\\linktdmbform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{E1D13E99-C696-41F3-9B58-A1C5D7155072}|media-tracker-desktop\\media-tracker-desktop.csproj|solutionrelative:media-tracker-desktop\\forms\\linktdmbform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{E1D13E99-C696-41F3-9B58-A1C5D7155072}|media-tracker-desktop\\media-tracker-desktop.csproj|c:\\users\\bondh\\onedrive - mnscu\\mtrepo\\media-tracker\\desktop\\media-tracker-desktop\\media-tracker-desktop\\models\\apimodels\\tmdbapi.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{E1D13E99-C696-41F3-9B58-A1C5D7155072}|media-tracker-desktop\\media-tracker-desktop.csproj|solutionrelative:media-tracker-desktop\\models\\apimodels\\tmdbapi.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{E1D13E99-C696-41F3-9B58-A1C5D7155072}|media-tracker-desktop\\media-tracker-desktop.csproj|c:\\users\\bondh\\onedrive - mnscu\\mtrepo\\media-tracker\\desktop\\media-tracker-desktop\\media-tracker-desktop\\forms\\linksteamform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{E1D13E99-C696-41F3-9B58-A1C5D7155072}|media-tracker-desktop\\media-tracker-desktop.csproj|solutionrelative:media-tracker-desktop\\forms\\linksteamform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{E1D13E99-C696-41F3-9B58-A1C5D7155072}|media-tracker-desktop\\media-tracker-desktop.csproj|c:\\users\\bondh\\onedrive - mnscu\\mtrepo\\media-tracker\\desktop\\media-tracker-desktop\\media-tracker-desktop\\forms\\linklastfmform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{E1D13E99-C696-41F3-9B58-A1C5D7155072}|media-tracker-desktop\\media-tracker-desktop.csproj|solutionrelative:media-tracker-desktop\\forms\\linklastfmform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{E1D13E99-C696-41F3-9B58-A1C5D7155072}|media-tracker-desktop\\media-tracker-desktop.csproj|c:\\users\\bondh\\onedrive - mnscu\\mtrepo\\media-tracker\\desktop\\media-tracker-desktop\\media-tracker-desktop\\forms\\mainform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
-      "RelativeMoniker": "D:0:0:{E1D13E99-C696-41F3-9B58-A1C5D7155072}|media-tracker-desktop\\media-tracker-desktop.csproj|solutionrelative:media-tracker-desktop\\forms\\mainform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
+      "AbsoluteMoniker": "D:0:0:{E1D13E99-C696-41F3-9B58-A1C5D7155072}|media-tracker-desktop\\media-tracker-desktop.csproj|c:\\users\\bondh\\onedrive - mnscu\\mtrepo\\media-tracker\\desktop\\media-tracker-desktop\\media-tracker-desktop\\forms\\mainform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E1D13E99-C696-41F3-9B58-A1C5D7155072}|media-tracker-desktop\\media-tracker-desktop.csproj|solutionrelative:media-tracker-desktop\\forms\\mainform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E1D13E99-C696-41F3-9B58-A1C5D7155072}|media-tracker-desktop\\media-tracker-desktop.csproj|c:\\users\\bondh\\onedrive - mnscu\\mtrepo\\media-tracker\\desktop\\media-tracker-desktop\\media-tracker-desktop\\userappaccount.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E1D13E99-C696-41F3-9B58-A1C5D7155072}|media-tracker-desktop\\media-tracker-desktop.csproj|solutionrelative:media-tracker-desktop\\userappaccount.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E1D13E99-C696-41F3-9B58-A1C5D7155072}|media-tracker-desktop\\media-tracker-desktop.csproj|c:\\users\\bondh\\onedrive - mnscu\\mtrepo\\media-tracker\\desktop\\media-tracker-desktop\\media-tracker-desktop\\models\\apimodels\\tmdbapi.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E1D13E99-C696-41F3-9B58-A1C5D7155072}|media-tracker-desktop\\media-tracker-desktop.csproj|solutionrelative:media-tracker-desktop\\models\\apimodels\\tmdbapi.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -34,11 +34,24 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 4,
+          "SelectedChildIndex": 3,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 4,
+              "Title": "UserAppAccount.cs",
+              "DocumentMoniker": "C:\\Users\\bondh\\OneDrive - MNSCU\\MTRepo\\media-tracker\\Desktop\\media-tracker-desktop\\media-tracker-desktop\\UserAppAccount.cs",
+              "RelativeDocumentMoniker": "media-tracker-desktop\\UserAppAccount.cs",
+              "ToolTip": "C:\\Users\\bondh\\OneDrive - MNSCU\\MTRepo\\media-tracker\\Desktop\\media-tracker-desktop\\media-tracker-desktop\\UserAppAccount.cs",
+              "RelativeToolTip": "media-tracker-desktop\\UserAppAccount.cs",
+              "ViewState": "AgIAAGEAAAAAAAAAAAApwG4AAAAdAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-05-07T01:43:16.701Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
               "Title": "TmdbApi.cs",
               "DocumentMoniker": "C:\\Users\\bondh\\OneDrive - MNSCU\\MTRepo\\media-tracker\\Desktop\\media-tracker-desktop\\media-tracker-desktop\\Models\\ApiModels\\TmdbApi.cs",
               "RelativeDocumentMoniker": "media-tracker-desktop\\Models\\ApiModels\\TmdbApi.cs",
@@ -46,8 +59,7 @@
               "RelativeToolTip": "media-tracker-desktop\\Models\\ApiModels\\TmdbApi.cs",
               "ViewState": "AgIAALoAAAAAAAAAAAAMwMcAAAAVAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-05-07T01:09:48.014Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-05-07T01:09:48.014Z"
             },
             {
               "$type": "Document",
@@ -57,61 +69,49 @@
               "RelativeDocumentMoniker": "media-tracker-desktop\\Forms\\LinkTdmbForm.cs",
               "ToolTip": "C:\\Users\\bondh\\OneDrive - MNSCU\\MTRepo\\media-tracker\\Desktop\\media-tracker-desktop\\media-tracker-desktop\\Forms\\LinkTdmbForm.cs",
               "RelativeToolTip": "media-tracker-desktop\\Forms\\LinkTdmbForm.cs",
-              "ViewState": "AgIAAOsCAAAAAAAAAAAAAPoCAAANAAAAAAAAAA==",
+              "ViewState": "AgIAAJ8AAAAAAAAAAAAQwKQAAAAjAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-05-07T01:07:23.57Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 0,
               "Title": "LinkSteamForm.cs",
               "DocumentMoniker": "C:\\Users\\bondh\\OneDrive - MNSCU\\MTRepo\\media-tracker\\Desktop\\media-tracker-desktop\\media-tracker-desktop\\Forms\\LinkSteamForm.cs",
               "RelativeDocumentMoniker": "media-tracker-desktop\\Forms\\LinkSteamForm.cs",
               "ToolTip": "C:\\Users\\bondh\\OneDrive - MNSCU\\MTRepo\\media-tracker\\Desktop\\media-tracker-desktop\\media-tracker-desktop\\Forms\\LinkSteamForm.cs",
               "RelativeToolTip": "media-tracker-desktop\\Forms\\LinkSteamForm.cs",
-              "ViewState": "AgIAAP4BAAAAAAAAAAAAAA8CAAAVAAAAAAAAAA==",
+              "ViewState": "AgIAAHgAAAAAAAAAAAAowIEAAAANAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-05-07T01:07:21.346Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 2,
               "Title": "LinkLastFmForm.cs",
               "DocumentMoniker": "C:\\Users\\bondh\\OneDrive - MNSCU\\MTRepo\\media-tracker\\Desktop\\media-tracker-desktop\\media-tracker-desktop\\Forms\\LinkLastFmForm.cs",
               "RelativeDocumentMoniker": "media-tracker-desktop\\Forms\\LinkLastFmForm.cs",
               "ToolTip": "C:\\Users\\bondh\\OneDrive - MNSCU\\MTRepo\\media-tracker\\Desktop\\media-tracker-desktop\\media-tracker-desktop\\Forms\\LinkLastFmForm.cs",
               "RelativeToolTip": "media-tracker-desktop\\Forms\\LinkLastFmForm.cs",
-              "ViewState": "AgIAACkDAAAAAAAAAAAAwDIDAAAVAAAAAAAAAA==",
+              "ViewState": "AgIAABoAAAAAAAAAAAAAwC0AAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-05-07T00:57:43.371Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 3,
               "Title": "MainForm.cs",
               "DocumentMoniker": "C:\\Users\\bondh\\OneDrive - MNSCU\\MTRepo\\media-tracker\\Desktop\\media-tracker-desktop\\media-tracker-desktop\\Forms\\MainForm.cs",
               "RelativeDocumentMoniker": "media-tracker-desktop\\Forms\\MainForm.cs",
               "ToolTip": "C:\\Users\\bondh\\OneDrive - MNSCU\\MTRepo\\media-tracker\\Desktop\\media-tracker-desktop\\media-tracker-desktop\\Forms\\MainForm.cs",
               "RelativeToolTip": "media-tracker-desktop\\Forms\\MainForm.cs",
-              "ViewState": "AgIAAD0BAAAAAAAAAAA6wEIBAAAxAAAAAAAAAA==",
+              "ViewState": "AgIAAOgBAAAAAAAAAAApwPABAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-05-07T00:55:24.883Z",
               "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 5,
-              "Title": "MainForm.cs [Design]",
-              "DocumentMoniker": "C:\\Users\\bondh\\OneDrive - MNSCU\\MTRepo\\media-tracker\\Desktop\\media-tracker-desktop\\media-tracker-desktop\\Forms\\MainForm.cs",
-              "RelativeDocumentMoniker": "media-tracker-desktop\\Forms\\MainForm.cs",
-              "ToolTip": "C:\\Users\\bondh\\OneDrive - MNSCU\\MTRepo\\media-tracker\\Desktop\\media-tracker-desktop\\media-tracker-desktop\\Forms\\MainForm.cs [Design]",
-              "RelativeToolTip": "media-tracker-desktop\\Forms\\MainForm.cs [Design]",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-05-07T00:55:20.564Z",
-              "EditorCaption": " [Design]"
             }
           ]
         }

@@ -30,6 +30,7 @@ namespace media_tracker_desktop.Forms
         private bool _steamSortVisible = false;
         private List<UserFavoriteMedia> _favorites = [];
         private List<Steam_Game> _ownedGames = [];
+        private int _ownedGameCount = 0;
 
         private string _dataOption = "";
 
@@ -96,6 +97,10 @@ namespace media_tracker_desktop.Forms
                 // Retrieve data.
                 (bool success, List<Steam_Game>? ownedGames) = await SteamApi.GetOwnedGames();
 
+                // Store the count for an error message that occurs when user doesn't have data.
+                // Placed here because this is the freshest data.
+                _ownedGameCount = ownedGames != null ? ownedGames.Count : 0;
+
                 // Save data.
                 _ownedGames = ownedGames ?? [];
 
@@ -119,7 +124,7 @@ namespace media_tracker_desktop.Forms
             _tableData.Columns.Add("Hours Played");
 
             // Return if no owned games.
-            if (_ownedGames.Count <= 0 || _ownedGames == null)
+            if (_ownedGameCount <= 0 || _ownedGames == null)
             {
                 MessageBox.Show("You don't own any game.", "No Data", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
@@ -299,6 +304,9 @@ namespace media_tracker_desktop.Forms
 
                 // Retrieve data.
                 List<Steam_Game> resultGames = DataFunctions.Sort(_ownedGames, option) ?? [];
+
+                // Store data, so that the sort works on the searched data.
+                _ownedGames = resultGames;
 
                 BuildOwnedGameViewGrid(resultGames);
             }

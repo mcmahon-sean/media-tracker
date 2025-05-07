@@ -168,13 +168,14 @@ namespace media_tracker_desktop
 
                         break;
                     case TMDB_PLATFORM_ID:
-                        _userTmdbSessionID = userAccount.UserPlatID.ToString();
-                        TmdbApi.SessionID = _userTmdbSessionID;
-
                         var (accountIDFound, accountID) = await GetTmdbAccountID(userAccount.UserPlatID.ToString());
 
+                        // Only update session variables for tmdb when both account and session are not null.
                         if (accountIDFound)
                         {
+                            _userTmdbSessionID = userAccount.UserPlatID.ToString();
+                            TmdbApi.SessionID = _userTmdbSessionID;
+
                             _userTmdbAccountID = accountID;
                             TmdbApi.AccountID = _userTmdbAccountID;
                         }

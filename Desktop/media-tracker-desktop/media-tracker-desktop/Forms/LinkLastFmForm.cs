@@ -40,7 +40,9 @@ namespace media_tracker_desktop.Forms
         private bool _lastFMSortVisible = false;
         private List<UserFavoriteMedia> _favorites = [];
         private List<LastFM_Artist> _topArtists = [];
+        private int _topArtistCount = 0;
         private List<LastFM_Track> _recentTracks = [];
+        private int _recentTrackCount = 0;
 
         private string _dataOption = "";
 
@@ -107,6 +109,10 @@ namespace media_tracker_desktop.Forms
                 // Retrieve data.
                 (bool success1, List<LastFM_Artist>? topArtists) = await LastFMApi.GetUserTopArtists();
 
+                // Store the count for an error message that occurs when user doesn't have data.
+                // Placed here because this is the freshest data.
+                _topArtistCount = topArtists != null ? topArtists.Count : 0;
+
                 // Save data.
                 _topArtists = topArtists ?? [];
 
@@ -126,6 +132,10 @@ namespace media_tracker_desktop.Forms
             {
                 // Retrieve data.
                 (bool success2, List<LastFM_Track>? recentTracks) = await LastFMApi.GetUserRecentTracks();
+
+                // Store the count for an error message that occurs when user doesn't have data.
+                // Placed here because this is the freshest data.
+                _recentTrackCount = recentTracks != null ? recentTracks.Count : 0;
 
                 // Save data.
                 _recentTracks = recentTracks ?? [];
@@ -154,7 +164,7 @@ namespace media_tracker_desktop.Forms
             _tableData.Columns.Add("PlayCount");
 
             // Return if no top artist.
-            if (_topArtists.Count <= 0 || _topArtists == null)
+            if (_topArtistCount <= 0 || _topArtists == null)
             {
                 MessageBox.Show("You don't have any top artists.", "No Data", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
@@ -191,7 +201,7 @@ namespace media_tracker_desktop.Forms
             _tableData.Columns.Add("Album");
 
             // Return if no recent tracks.
-            if (_recentTracks.Count <= 0 || _recentTracks == null)
+            if (_recentTrackCount <= 0 || _recentTracks == null)
             {
                 MessageBox.Show("You don't have any recent tracks.", "No Data", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
@@ -418,6 +428,9 @@ namespace media_tracker_desktop.Forms
                 // Retrieve data.
                 List<LastFM_Artist> resultArtists = DataFunctions.Sort(_topArtists, optionArtist) ?? [];
 
+                // Store data, so that the sort works on the searched data.
+                _topArtists = resultArtists;
+
                 BuildTopArtistViewGrid(resultArtists);
             }
             else if (_dataOption == MainForm.LastFMOptions[1])
@@ -426,11 +439,14 @@ namespace media_tracker_desktop.Forms
                 // Ensure that the search is case insensitive.
                 QueryOptions<LastFM_Track> optionTrack = new QueryOptions<LastFM_Track>
                 {
-                    Where = t => t.Name.ToLower().Contains(text) || t.ArtistName.ToLower().Contains(text)
+                    Where = t => t.Name.ToLower().Contains(text)
                 };
 
                 // Retrieve data.
                 List<LastFM_Track> resultTracks = DataFunctions.Sort(_recentTracks, optionTrack) ?? [];
+
+                // Store data, so that the sort works on the searched data.
+                _recentTracks = resultTracks;
 
                 BuildRecentTrackViewGrid(resultTracks);
             }

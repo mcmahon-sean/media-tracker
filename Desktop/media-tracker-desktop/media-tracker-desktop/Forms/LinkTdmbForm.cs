@@ -37,7 +37,9 @@ namespace media_tracker_desktop.Forms
         private bool _tmdbSortVisible = false;
         private List<UserFavoriteMedia> _favorites = [];
         private List<TMDB_TV_Show> _tvShows = [];
+        private int _tvShowCount = 0;
         private List<TMDB_Movie> _movies = [];
+        private int _movieCount = 0;
 
         private string _dataOption = "";
 
@@ -104,6 +106,10 @@ namespace media_tracker_desktop.Forms
                 // Retrieve data.
                 (bool isTVSuccess, List<TMDB_TV_Show>? tvShows) = await TmdbApi.GetUserFavoriteTV();
 
+                // Store the count for an error message that occurs when user doesn't have data.
+                // Placed here because this is the freshest data.
+                _tvShowCount = tvShows != null ? tvShows.Count : 0;
+
                 // Save data.
                 _tvShows = tvShows ?? [];
 
@@ -123,6 +129,10 @@ namespace media_tracker_desktop.Forms
             {
                 // Retrieve data.
                 (bool isMovieSuccess, List<TMDB_Movie>? movies) = await TmdbApi.GetUserFavoriteMovies();
+
+                // Store the count for an error message that occurs when user doesn't have data.
+                // Placed here because this is the freshest data.
+                _movieCount = movies != null ? movies.Count : 0;
 
                 // Save data.
                 _movies = movies ?? [];
@@ -150,7 +160,7 @@ namespace media_tracker_desktop.Forms
             _tableData.Columns.Add("Name");
 
             // Return if no favorite tv shows.
-            if (_tvShows.Count <= 0 || _tvShows == null)
+            if (_tvShowCount <= 0 || _tvShows == null)
             {
                 MessageBox.Show("You don't have any favorite tv show.", "No Data", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
@@ -185,7 +195,7 @@ namespace media_tracker_desktop.Forms
             _tableData.Columns.Add("Title");
 
             // Return if no favorite movies.
-            if (_movies.Count <= 0 || _movies == null)
+            if (_movieCount <= 0 || _movies == null)
             {
                 MessageBox.Show("You don't have any favorite movie.", "No Data", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
@@ -376,6 +386,9 @@ namespace media_tracker_desktop.Forms
                 // Retrieve data.
                 List<TMDB_TV_Show> resultTvShows = DataFunctions.Sort(_tvShows, optionTvShow) ?? [];
 
+                // Store data, so that the sort works on the searched data.
+                _tvShows = resultTvShows;
+
                 BuildFavoriteTVShowViewGrid(resultTvShows);
             }
             else if (_dataOption == MainForm.TMDBOptions[1])
@@ -389,6 +402,9 @@ namespace media_tracker_desktop.Forms
 
                 // Retrieve data.
                 List<TMDB_Movie> resultMovies = DataFunctions.Sort(_movies, optionMovie) ?? [];
+
+                // Store data, so that the sort works on the searched data.
+                _movies = resultMovies;
 
                 BuildFavoriteMovieViewGrid(resultMovies);
             }
