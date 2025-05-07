@@ -14,13 +14,16 @@ namespace media_tracker_desktop.Forms
         }
 
         private static readonly string[] LASTFM_OPTIONS = ["Top Artists", "Recent Tracks"];
-        private static readonly string[] TMDB_OPTIONS = ["Favorite TV", "Favorite Movie"];
+        private static readonly string[] TMDB_OPTIONS = ["Favorite TV Show", "Favorite Movie"];
+        private static readonly string[] STEAM_OPTIONS = ["Owned Games"];
 
         private bool _lastFMOptionVisible = false;
         private bool _tmdbOptionVisible = false;
+        private bool _steamOptionVisible = false;
 
         private ContextMenuStrip _cmsLastFMOptions = new ContextMenuStrip();
         private ContextMenuStrip _cmsTMDBOptions = new ContextMenuStrip();
+        private ContextMenuStrip _cmsSteamOptions = new ContextMenuStrip();
 
         private string? _newSessionIDFromTMDBEditButton = string.Empty;
 
@@ -37,6 +40,7 @@ namespace media_tracker_desktop.Forms
             ShowHome();
         }
 
+        // Getters
         public static string[] LastFMOptions
         {
             get
@@ -53,6 +57,14 @@ namespace media_tracker_desktop.Forms
             }
         }
 
+        public static string[] SteamOptions
+        {
+            get
+            {
+                return STEAM_OPTIONS;
+            }
+        }
+
         // Method: Initialize the components that are necessary for the app to run.
         private async void InitializeApp()
         {
@@ -65,6 +77,7 @@ namespace media_tracker_desktop.Forms
 
             _cmsLastFMOptions.ItemClicked += cmsLastFMOptions_ItemClicked!;
             _cmsTMDBOptions.ItemClicked += cmsTMDBOptions_ItemClicked!;
+            _cmsSteamOptions.ItemClicked += cmsSteamOptions_ItemClicked!;
 
             // Initialize the database.
             string message = await SupabaseConnection.InitializeDB();
@@ -90,6 +103,7 @@ namespace media_tracker_desktop.Forms
         {
             _cmsLastFMOptions = AppElement.GetSortMenu(LASTFM_OPTIONS);
             _cmsTMDBOptions = AppElement.GetSortMenu(TMDB_OPTIONS);
+            _cmsSteamOptions = AppElement.GetSortMenu(STEAM_OPTIONS);
         }
 
         private void ShowHome()
@@ -614,10 +628,13 @@ namespace media_tracker_desktop.Forms
 
         private void cmsLastFMOptions_ItemClicked(Object sender, ToolStripItemClickedEventArgs e)
         {
+            // Retrieve endpoint option.
             string? option = e.ClickedItem?.Text;
 
+            // If there's an option,
             if (option != null)
             {
+                // Pass option to the form.
                 var f = new LinkLastFmForm(option)
                 {
                     TopLevel = false,
@@ -634,11 +651,37 @@ namespace media_tracker_desktop.Forms
 
         private void cmsTMDBOptions_ItemClicked(Object sender, ToolStripItemClickedEventArgs e)
         {
+            // Retrieve endpoint option.
             string? option = e.ClickedItem?.Text;
 
+            // If there's an option,
             if (option != null)
             {
+                // Pass option to the form.
                 var f = new LinkTmdbForm(option)
+                {
+                    TopLevel = false,
+                    FormBorderStyle = FormBorderStyle.None,
+                    Dock = DockStyle.Fill
+                };
+
+                pnlContent.Controls.Clear();
+                pnlContent.Controls.Add(f);
+                f.Show();
+                lblTitle.Text = "TMDB";
+            }
+        }
+
+        private void cmsSteamOptions_ItemClicked(Object sender, ToolStripItemClickedEventArgs e)
+        {
+            // Retrieve endpoint option.
+            string? option = e.ClickedItem?.Text;
+
+            // If there's an option,
+            if (option != null)
+            {
+                // Pass option to the form.
+                var f = new LinkSteamForm(option)
                 {
                     TopLevel = false,
                     FormBorderStyle = FormBorderStyle.None,
@@ -654,27 +697,55 @@ namespace media_tracker_desktop.Forms
 
         private void btnLinkSteam_Click(object sender, EventArgs e)
         {
-            var f = new LinkSteamForm() { 
-                TopLevel = false, 
-                FormBorderStyle = FormBorderStyle.None, 
-                Dock = DockStyle.Fill 
-            };
+            // If endpoint menu is not visible,
+            if (!_steamOptionVisible)
+            {
+                // If user has an account,
+                if (!string.IsNullOrEmpty(UserAppAccount.UserSteamID))
+                {
+                    // Show endpoint menu.
+                    _cmsSteamOptions.Show(btnLinkSteam, new Point(0, btnLinkSteam.Height));
 
-            pnlContent.Controls.Clear(); 
-            pnlContent.Controls.Add(f); 
-            f.Show(); 
-            lblTitle.Text = "Steam";
+                    _steamOptionVisible = true;
+                }
+                // Else, just have the link panel open.
+                else
+                {
+                    var f = new LinkSteamForm 
+                    { 
+                        TopLevel = false, 
+                        FormBorderStyle = FormBorderStyle.None, 
+                        Dock = DockStyle.Fill 
+                    };
+
+                    pnlContent.Controls.Clear(); 
+                    pnlContent.Controls.Add(f); 
+                    f.Show(); 
+                    lblTitle.Text = "Steam";
+                }
+            }
+            // Else, close the menu.
+            else
+            {
+                _cmsSteamOptions.Close();
+
+                _steamOptionVisible = false;
+            }
         }
         private void btnLinkLastFM_Click(object sender, EventArgs e)
         {
+            // If endpoint menu is not visible,
             if (!_lastFMOptionVisible)
             {
+                // If user has an account,
                 if (!string.IsNullOrEmpty(UserAppAccount.UserLastFmID))
                 {
+                    // Show endpoint menu.
                     _cmsLastFMOptions.Show(btnLinkLastFM, new Point(0, btnLinkLastFM.Height));
 
                     _lastFMOptionVisible = true;
                 }
+                // Else, just have the link panel open.
                 else
                 {
                     var f = new LinkLastFmForm
@@ -690,6 +761,7 @@ namespace media_tracker_desktop.Forms
                     lblTitle.Text = "Last.fm";
                 }
             }
+            // Else, close the menu.
             else
             {
                 _cmsLastFMOptions.Close();
@@ -699,14 +771,18 @@ namespace media_tracker_desktop.Forms
         }
         private void btnLinkTmdb_Click(object sender, EventArgs e)
         {
+            // If endpoint menu is not visible,
             if (!_tmdbOptionVisible)
             {
+                // If user has an account,
                 if (!string.IsNullOrEmpty(UserAppAccount.UserTmdbSessionID))
                 {
+                    // Show endpoint menu.
                     _cmsTMDBOptions.Show(btnLinkTmdb, new Point(0, btnLinkTmdb.Height));
 
                     _tmdbOptionVisible = true;
                 }
+                // Else, just have the link panel open.
                 else
                 {
                     var f = new LinkTmdbForm { 
@@ -721,6 +797,7 @@ namespace media_tracker_desktop.Forms
                     lblTitle.Text = "TMDB";
                 }
             }
+            // Else, close the menu.
             else
             {
                 _cmsTMDBOptions.Close();

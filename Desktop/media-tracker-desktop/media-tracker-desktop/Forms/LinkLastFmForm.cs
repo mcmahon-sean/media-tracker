@@ -66,28 +66,17 @@ namespace media_tracker_desktop.Forms
                 // If user has a LastFM account linked,
                 if (!string.IsNullOrEmpty(UserAppAccount.UserLastFmID) && !string.IsNullOrEmpty(_dataOption))
                 {
-                    // Retrieve user information.
-                    (bool success, LastFM_User? user) = await LastFMApi.GetUserInfo();
+                    await BuildViewGridBasedOnOption();
 
-                    // If success,
-                    if (success && user != null)
-                    {
-                        await BuildViewGridBasedOnOption();
-
-                        // Subscribe to event handlers:
-                        // When any of the favorite buttons are clicked.
-                        lastFmDataGridView.CellClick += btnFavorite_CellClick!;
-                        // When any sort items in the sort menu are clicked.
-                        _sortMenu.ItemClicked += sortMenu_ItemClicked!;
-                        // When the sort menu button is clicked.
-                        _btnSort.Click += btnSort_Click!;
-                        // When user presses a button in search bar.
-                        _txtSearch.KeyDown += txtSearch_KeyDown!;
-                    }
-                    else if (user == null)
-                    {
-                        pnlLink.Visible = true;
-                    }
+                    // Subscribe to event handlers:
+                    // When any of the favorite buttons are clicked.
+                    lastFmDataGridView.CellClick += btnFavorite_CellClick!;
+                    // When any sort items in the sort menu are clicked.
+                    _sortMenu.ItemClicked += sortMenu_ItemClicked!;
+                    // When the sort menu button is clicked.
+                    _btnSort.Click += btnSort_Click!;
+                    // When user presses a button in search bar.
+                    _txtSearch.KeyDown += txtSearch_KeyDown!;
                 }
                 // If user doesn't have LastFM account linked,
                 else
@@ -124,6 +113,10 @@ namespace media_tracker_desktop.Forms
                 {
                     _sortMenu = AppElement.GetSortMenu(SORT_OPTIONS_TOP_ARTIST_ASC);
                 }
+                if (_txtSearch != null)
+                {
+                    _txtSearch.PlaceholderText = "Search for artist...";
+                }
 
                 // Build display.
                 BuildTopArtistViewGrid(_topArtists);
@@ -140,6 +133,10 @@ namespace media_tracker_desktop.Forms
                 {
                     _sortMenu = AppElement.GetSortMenu(SORT_OPTIONS_RECENT_TRACK_ASC);
                 }
+                if (_txtSearch != null)
+                {
+                    _txtSearch.PlaceholderText = "Search for track...";
+                }
 
                 // Build display.
                 BuildRecentTrackViewGrid(_recentTracks);
@@ -154,6 +151,12 @@ namespace media_tracker_desktop.Forms
             _tableData.Columns.Add("ID");
             _tableData.Columns.Add("Name");
             _tableData.Columns.Add("PlayCount");
+
+            // Return if no top artist.
+            if (_topArtists.Count <= 0 || _topArtists == null)
+            {
+                MessageBox.Show("You don't have any top artists.", "No Data", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
 
             // Foreach data,
             foreach (LastFM_Artist artist in topArtists)
@@ -185,6 +188,12 @@ namespace media_tracker_desktop.Forms
             _tableData.Columns.Add("Name");
             _tableData.Columns.Add("Artist");
             _tableData.Columns.Add("Album");
+
+            // Return if no recent tracks.
+            if (_recentTracks.Count <= 0 || _recentTracks == null)
+            {
+                MessageBox.Show("You don't have any recent tracks.", "No Data", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
 
             // Foreach data,
             foreach (LastFM_Track track in recentTracks)
@@ -361,7 +370,6 @@ namespace media_tracker_desktop.Forms
             this.Controls.Add(_pnlSearchAndSort);
 
             _txtSearch = (TextBox)_pnlSearchAndSort.Controls["txtSearch"]!;
-            _txtSearch.PlaceholderText = "Search for artist or track...";
 
             _btnSort = (Button)_pnlSearchAndSort.Controls["btnSort"]!;
         }
@@ -430,6 +438,12 @@ namespace media_tracker_desktop.Forms
         // Event: When sort button is clicked.
         private void btnSort_Click(object sender, EventArgs e)
         {
+            if (_sortMenu == null)
+            {
+                MessageBox.Show("Sort menu didn't show up.");
+                return;
+            }
+
             // Retrieve sort button.
             _btnSort = (Button)sender;
 

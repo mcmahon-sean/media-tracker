@@ -63,24 +63,17 @@ namespace media_tracker_desktop.Forms
                 // If user has a TMDB account linked,
                 if (!string.IsNullOrEmpty(UserAppAccount.UserTmdbAccountID) && !string.IsNullOrEmpty(UserAppAccount.UserTmdbSessionID))
                 {
-                    // Retrieve user information.
-                    (bool success, TMDB_Account? userAccount) = await TmdbApi.GetAccountDetails();
+                    await BuildViewGridBasedOnOption();
 
-                    // If success,
-                    if (success && userAccount != null)
-                    {
-                        await BuildViewGridBasedOnOption();
-
-                        // Subscribe to event handlers:
-                        // When any of the favorite buttons are clicked.
-                        tmdbDataGridView.CellClick += btnFavorite_CellClick!;
-                        // When any sort items in the sort menu are clicked.
-                        _sortMenu.ItemClicked += sortMenu_ItemClicked!;
-                        // When the sort menu button is clicked.
-                        _btnSort.Click += btnSort_Click!;
-                        // When user presses a button in search bar.
-                        _txtSearch.KeyDown += txtSearch_KeyDown!;
-                    }
+                    // Subscribe to event handlers:
+                    // When any of the favorite buttons are clicked.
+                    tmdbDataGridView.CellClick += btnFavorite_CellClick!;
+                    // When any sort items in the sort menu are clicked.
+                    _sortMenu.ItemClicked += sortMenu_ItemClicked!;
+                    // When the sort menu button is clicked.
+                    _btnSort.Click += btnSort_Click!;
+                    // When user presses a button in search bar.
+                    _txtSearch.KeyDown += txtSearch_KeyDown!;
                 }
                 // If user doesn't have TMDB account linked,
                 else
@@ -117,7 +110,7 @@ namespace media_tracker_desktop.Forms
                 {
                     _sortMenu = AppElement.GetSortMenu(SORT_OPTIONS_FAVORITE_TV_SHOW_ASC);
                 }
-                if (_txtSearch == null)
+                if (_txtSearch != null)
                 {
                     _txtSearch.PlaceholderText = "Search for name...";
                 }
@@ -137,7 +130,7 @@ namespace media_tracker_desktop.Forms
                 {
                     _sortMenu = AppElement.GetSortMenu(SORT_OPTIONS_FAVORITE_MOVIE_ASC);
                 }
-                if (_txtSearch == null)
+                if (_txtSearch != null)
                 {
                     _txtSearch.PlaceholderText = "Search for title...";
                 }
@@ -154,6 +147,12 @@ namespace media_tracker_desktop.Forms
             // Columns:
             _tableData.Columns.Add("ID");
             _tableData.Columns.Add("Name");
+
+            // Return if no favorite tv shows.
+            if (_tvShows.Count <= 0 || _tvShows == null)
+            {
+                MessageBox.Show("You don't have any favorite tv show.", "No Data", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
 
             // Foreach data,
             foreach (TMDB_TV_Show tvShow in tvShows)
@@ -183,6 +182,12 @@ namespace media_tracker_desktop.Forms
             // Columns:
             _tableData.Columns.Add("ID");
             _tableData.Columns.Add("Title");
+
+            // Return if no favorite movies.
+            if (_movies.Count <= 0 || _movies == null)
+            {
+                MessageBox.Show("You don't have any favorite movie.", "No Data", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
 
             // Foreach data,
             foreach (TMDB_Movie movie in movies)
@@ -391,6 +396,12 @@ namespace media_tracker_desktop.Forms
         // Event: When sort button is clicked.
         private void btnSort_Click(object sender, EventArgs e)
         {
+            if (_sortMenu == null)
+            {
+                MessageBox.Show("Sort menu didn't show up.");
+                return;
+            }
+
             // Retrieve sort button.
             _btnSort = (Button)sender;
 
