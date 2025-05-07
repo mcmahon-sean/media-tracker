@@ -325,7 +325,7 @@ namespace media_tracker_desktop.Forms
                 // Delete user.
                 Dictionary<string, dynamic> result = await UserAppAccount.DeleteUser();
 
-                MessageBox.Show(result["statusMessage"]);
+                MessageBox.Show(result["statusMessage"], "Account Deleted", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
                 // If user successfully deleted,
                 if (result["status"] == "success")
@@ -476,7 +476,7 @@ namespace media_tracker_desktop.Forms
             {
                 if (error.StatusCode == System.Net.HttpStatusCode.Unauthorized)
                 {
-                    MessageBox.Show("Permission denied.");
+                    MessageBox.Show("Permission was not granted.", "Unauthorized", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
             catch (Exception error)
@@ -510,8 +510,7 @@ namespace media_tracker_desktop.Forms
                 if (result["status"] == "success")
                 {
                     _txtSteam.Text = "";
-                    txtSteam.Text = "";
-                    isSteamToBeUnlinked = false;
+                    _isSteamToBeUnlinked = false;
                 }
             }
 
@@ -525,8 +524,7 @@ namespace media_tracker_desktop.Forms
                 if (result["status"] == "success")
                 {
                     _txtLastFm.Text = "";
-                    txtLastFm.Text = "";
-                    isLastFMToBeUnlinked = false;
+                    _isLastFMToBeUnlinked = false;
                 }
             }
 
@@ -536,7 +534,7 @@ namespace media_tracker_desktop.Forms
                 Dictionary<string, dynamic> result = await Delete3rdPartyIDFunction.UnlinkApiAccount(UserAppAccount.TMDBPlatformID);
 
                 message += result["statusMessage"] + "\n";
-                isTMDBToBeUnlinked = false;
+                _isTMDBToBeUnlinked = false;
             }
 
             if (!string.IsNullOrEmpty(message))
@@ -561,8 +559,7 @@ namespace media_tracker_desktop.Forms
                 {
                     // Mark it to be unlinked.
                     _isSteamToBeUnlinked = true;
-                    isSteamToBeUnlinked = true;
-                    txtSteam.Text = "";
+                    _txtSteam.Text = "";
                 }
             }
             else
@@ -585,8 +582,7 @@ namespace media_tracker_desktop.Forms
                 {
                     // Mark it to be unlinked.
                     _isLastFMToBeUnlinked = true;
-                    isLastFMToBeUnlinked = true;
-                    txtLastFm.Text = "";
+                    _txtLastFm.Text = "";
                 }
             }
             else
@@ -705,7 +701,7 @@ namespace media_tracker_desktop.Forms
                 pnlContent.Controls.Clear();
                 pnlContent.Controls.Add(f);
                 f.Show();
-                lblTitle.Text = "TMDB";
+                lblTitle.Text = "Steam";
             }
         }
 

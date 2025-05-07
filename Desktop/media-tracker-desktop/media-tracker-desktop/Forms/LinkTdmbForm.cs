@@ -739,8 +739,9 @@ namespace media_tracker_desktop.Forms
                         // If added,
                         if (added)
                         {
-                            // Load display.
-                            await LoadTmdbAsync();
+                            pnlLink.Visible = false;
+
+                            MessageBox.Show("Account linked successfully!\n\nChoose an option from the TMDB menu to display data.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
                         }
                         else
                         {
@@ -764,7 +765,7 @@ namespace media_tracker_desktop.Forms
             {
                 if (error.StatusCode == System.Net.HttpStatusCode.Unauthorized)
                 {
-                    MessageBox.Show("Permission denied.");
+                    MessageBox.Show("Permission was not granted.", "Unauthorized", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
             catch (Exception error)

@@ -522,8 +522,9 @@ namespace media_tracker_desktop.Forms
                     // If added,
                     if (added)
                     {
-                        // Load display.
-                        await LoadSteamAsync();
+                        pnlLink.Visible = false;
+
+                        MessageBox.Show("Account linked successfully!\n\nChoose an option from the Steam menu to display data.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
                     else
                     {
