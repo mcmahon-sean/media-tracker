@@ -290,10 +290,9 @@ namespace media_tracker_desktop
         private static async Task<(bool, string)> GetTmdbAccountID(string sessionID)
         {
             string tmdbBaseUrl = ConfigurationManager.AppSettings["TMDBApiBaseUrl"];
-            string tmdbAuthToken = ConfigurationManager.AppSettings["TMDBNathanAuthToken"];
+            string tmdbApiKey = ConfigurationManager.AppSettings["TMDBApiKey"];
 
-            string tmdbUrl = $"{tmdbBaseUrl}/account/account_id?session_id={sessionID}";
-
+            string tmdbUrl = $"{tmdbBaseUrl}/account/account_id";
 
             // initialize client
             var client = new RestClient();
@@ -301,10 +300,11 @@ namespace media_tracker_desktop
             // pass the url to request
             var request = new RestRequest(tmdbUrl);
 
-            request.AddHeader("Authorization", $"Bearer {tmdbAuthToken}");
+            request.AddParameter("api_key", tmdbApiKey);
+            request.AddParameter("session_id", sessionID);
 
             // retrieve the response
-            var response = await client.ExecuteAsync(request);
+            var response = await client.GetAsync(request);
 
             try
             {
