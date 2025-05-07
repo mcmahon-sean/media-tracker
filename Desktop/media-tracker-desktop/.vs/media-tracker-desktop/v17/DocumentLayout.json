@@ -34,7 +34,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 232,
-          "SelectedChildIndex": 2,
+          "SelectedChildIndex": 0,
           "Children": [
             {
               "$type": "Document",
@@ -44,7 +44,7 @@
               "RelativeDocumentMoniker": "media-tracker-desktop\\Forms\\LinkSteamForm.cs",
               "ToolTip": "C:\\Users\\bondh\\OneDrive - MNSCU\\MTRepo\\media-tracker\\Desktop\\media-tracker-desktop\\media-tracker-desktop\\Forms\\LinkSteamForm.cs",
               "RelativeToolTip": "media-tracker-desktop\\Forms\\LinkSteamForm.cs",
-              "ViewState": "AgIAAFUAAAAAAAAAAAA0wGIAAAAuAAAAAAAAAA==",
+              "ViewState": "AgIAAE4AAAAAAAAAAADwv2IAAAAdAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-05-06T23:43:06.989Z",
               "EditorCaption": ""
@@ -59,9 +59,15 @@
               "RelativeToolTip": "media-tracker-desktop\\Forms\\MainForm.cs",
               "ViewState": "AgIAAJsCAAAAAAAAAAAQwKUCAAAxAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-05-03T16:09:58.095Z",
+              "WhenOpened": "2025-05-06T20:21:30.986Z",
               "EditorCaption": ""
-            },
+            }
+          ]
+        },
+        {
+          "DockedWidth": 168,
+          "SelectedChildIndex": 0,
+          "Children": [
             {
               "$type": "Document",
               "DocumentIndex": 0,
@@ -70,7 +76,7 @@
               "RelativeDocumentMoniker": "media-tracker-desktop\\Forms\\LinkTdmbForm.cs",
               "ToolTip": "C:\\Users\\bondh\\OneDrive - MNSCU\\MTRepo\\media-tracker\\Desktop\\media-tracker-desktop\\media-tracker-desktop\\Forms\\LinkTdmbForm.cs",
               "RelativeToolTip": "media-tracker-desktop\\Forms\\LinkTdmbForm.cs",
-              "ViewState": "AgIAADMAAAAAAAAAAAArwDwAAAAPAAAAAAAAAA==",
+              "ViewState": "AgIAADMAAAAAAAAAAAArwDwAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-05-06T21:30:29.14Z",
               "EditorCaption": ""

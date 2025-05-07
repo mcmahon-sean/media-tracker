@@ -1,4 +1,5 @@
-﻿using System;
+﻿using media_tracker_desktop.Models.SupabaseFunctionObjects;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -44,7 +45,7 @@ namespace media_tracker_desktop.Forms
             string newPassword = txtPassword.Text;
 
             // Update user.
-            Dictionary<string, dynamic> result = await UserAppAccount.UpdateUser(newUsername, newFirstName, newLastName, newEmail, newPassword);
+            Dictionary<string, dynamic> result = await UpdateUserFunction.UpdateUser(newUsername, newFirstName, newLastName, newEmail, newPassword);
 
             // If error, display error message.
             if (result["status"] == "error")

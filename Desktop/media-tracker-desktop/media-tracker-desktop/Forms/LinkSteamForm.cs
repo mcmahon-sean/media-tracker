@@ -9,6 +9,7 @@ using System.Data;
 using media_tracker_desktop.Models.SupabaseTables;
 using media_tracker_desktop.Models.TMDB;
 using media_tracker_desktop.Models.LastFM;
+using media_tracker_desktop.Models.SupabaseFunctionObjects;
 
 namespace media_tracker_desktop.Forms
 {
@@ -513,7 +514,7 @@ namespace media_tracker_desktop.Forms
                 if (steamNotLinked)
                 {
                     // Add third party id.
-                    var (added, msg) = await UserAppAccount.AddThirdPartyId(
+                    var (added, msg) = await Add3rdPartyIDFunction.AddThirdPartyId(
                         UserAppAccount.SteamPlatformID,
                         steamId
                     );

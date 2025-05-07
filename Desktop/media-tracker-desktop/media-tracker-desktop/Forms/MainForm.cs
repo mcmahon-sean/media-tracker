@@ -1,7 +1,9 @@
 using System;
 using System.Windows.Forms;
 using media_tracker_desktop;
+using Supabase;
 using media_tracker_desktop.Models.ApiModels;
+using media_tracker_desktop.Models.SupabaseFunctionObjects;
 
 namespace media_tracker_desktop.Forms
 {
@@ -24,6 +26,7 @@ namespace media_tracker_desktop.Forms
         private ContextMenuStrip _cmsLastFMOptions = new ContextMenuStrip();
         private ContextMenuStrip _cmsTMDBOptions = new ContextMenuStrip();
         private ContextMenuStrip _cmsSteamOptions = new ContextMenuStrip();
+        public static Client _connection;
 
         private string? _newSessionIDFromTMDBEditButton = string.Empty;
 
@@ -64,6 +67,8 @@ namespace media_tracker_desktop.Forms
                 return STEAM_OPTIONS;
             }
         }
+
+
 
         // Method: Initialize the components that are necessary for the app to run.
         private async void InitializeApp()
@@ -498,35 +503,40 @@ namespace media_tracker_desktop.Forms
             if (_isSteamToBeUnlinked)
             {
                 // Unlink account.
-                Dictionary<string, dynamic> result = await UserAppAccount.UnlinkApiAccount(UserAppAccount.SteamPlatformID);
+                Dictionary<string, dynamic> result = await Delete3rdPartyIDFunction.UnlinkApiAccount(UserAppAccount.SteamPlatformID);
 
                 message += result["statusMessage"] + "\n";
 
                 if (result["status"] == "success")
                 {
                     _txtSteam.Text = "";
+                    txtSteam.Text = "";
+                    isSteamToBeUnlinked = false;
                 }
             }
 
             if (_isLastFMToBeUnlinked)
             {
                 // Unlink account.
-                Dictionary<string, dynamic> result = await UserAppAccount.UnlinkApiAccount(UserAppAccount.LastFMPlatformID);
+                Dictionary<string, dynamic> result = await Delete3rdPartyIDFunction.UnlinkApiAccount(UserAppAccount.LastFMPlatformID);
 
                 message += result["statusMessage"] + "\n";
 
                 if (result["status"] == "success")
                 {
                     _txtLastFm.Text = "";
+                    txtLastFm.Text = "";
+                    isLastFMToBeUnlinked = false;
                 }
             }
 
             if (_isTMDBToBeUnlinked)
             {
                 // Unlink account.
-                Dictionary<string, dynamic> result = await UserAppAccount.UnlinkApiAccount(UserAppAccount.TMDBPlatformID);
+                Dictionary<string, dynamic> result = await Delete3rdPartyIDFunction.UnlinkApiAccount(UserAppAccount.TMDBPlatformID);
 
                 message += result["statusMessage"] + "\n";
+                isTMDBToBeUnlinked = false;
             }
 
             if (!string.IsNullOrEmpty(message))
@@ -551,6 +561,8 @@ namespace media_tracker_desktop.Forms
                 {
                     // Mark it to be unlinked.
                     _isSteamToBeUnlinked = true;
+                    isSteamToBeUnlinked = true;
+                    txtSteam.Text = "";
                 }
             }
             else
@@ -573,6 +585,8 @@ namespace media_tracker_desktop.Forms
                 {
                     // Mark it to be unlinked.
                     _isLastFMToBeUnlinked = true;
+                    isLastFMToBeUnlinked = true;
+                    txtLastFm.Text = "";
                 }
             }
             else
@@ -610,17 +624,17 @@ namespace media_tracker_desktop.Forms
         {
             if (!string.IsNullOrEmpty(newSteamID))
             {
-                (bool success, string message) = await UserAppAccount.UpdateUserPlatformID(UserAppAccount.SteamPlatformID, newSteamID);
+                (bool success, string message) = await Add3rdPartyIDFunction.UpdateUserPlatformID(UserAppAccount.SteamPlatformID, newSteamID);
             }
 
             if (!string.IsNullOrEmpty(newLastFmID))
             {
-                (bool success, string message) = await UserAppAccount.UpdateUserPlatformID(UserAppAccount.LastFMPlatformID, newLastFmID);
+                (bool success, string message) = await Add3rdPartyIDFunction.UpdateUserPlatformID(UserAppAccount.LastFMPlatformID, newLastFmID);
             }
 
             if (!string.IsNullOrEmpty(newTmdbID))
             {
-                (bool success, string message) = await UserAppAccount.UpdateUserPlatformID(UserAppAccount.TMDBPlatformID, newTmdbID);
+                (bool success, string message) = await Add3rdPartyIDFunction.UpdateUserPlatformID(UserAppAccount.TMDBPlatformID, newTmdbID);
             }
         }
 
@@ -805,5 +819,20 @@ namespace media_tracker_desktop.Forms
                 _tmdbOptionVisible = false;
             }
         }
+
+        public static void ConnectToDB(Client dbConnection)
+        {
+            _connection = EnsureConnectionNotNull(dbConnection);
+        }
+
+        private static Client EnsureConnectionNotNull(Client conn)
+        {
+            if (conn == null)
+            {
+                throw new ArgumentNullException($"Connection is null.");
+            }
+
+            return conn;
+        }
     }
-}
+    }

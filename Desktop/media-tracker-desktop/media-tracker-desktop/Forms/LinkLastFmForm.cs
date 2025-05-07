@@ -16,6 +16,7 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 using System.Windows.Documents;
 using System.Linq.Expressions;
 using System.Linq;
+using media_tracker_desktop.Models.SupabaseFunctionObjects;
 
 namespace media_tracker_desktop.Forms
 {
@@ -809,7 +810,7 @@ namespace media_tracker_desktop.Forms
                 if (lastFmNotLinked)
                 {
                     // Add third party id.
-                    var (added, msg) = await UserAppAccount.AddThirdPartyId(
+                    var (added, msg) = await Add3rdPartyIDFunction.AddThirdPartyId(
                         UserAppAccount.LastFMPlatformID,
                         username);
 

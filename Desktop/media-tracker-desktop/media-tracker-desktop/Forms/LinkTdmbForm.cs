@@ -13,6 +13,7 @@ using media_tracker_desktop.Models.ApiModels;
 using media_tracker_desktop.Models.LastFM;
 using System.Data;
 using static System.Net.Mime.MediaTypeNames;
+using media_tracker_desktop.Models.SupabaseFunctionObjects;
 
 namespace media_tracker_desktop.Forms
 {
@@ -733,7 +734,7 @@ namespace media_tracker_desktop.Forms
                     if (sessionId != null)
                     {
                         // Add third party id.
-                        (bool added, string message) = await UserAppAccount.AddThirdPartyId(UserAppAccount.TMDBPlatformID, sessionId);
+                        (bool added, string message) = await Add3rdPartyIDFunction.AddThirdPartyId(UserAppAccount.TMDBPlatformID, sessionId);
 
                         // If added,
                         if (added)
