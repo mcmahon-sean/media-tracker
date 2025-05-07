@@ -12,6 +12,7 @@ using System.Data;
 using System.Windows.Automation;
 using System.Windows.Controls.Ribbon;
 using System.DirectoryServices.ActiveDirectory;
+using media_tracker_desktop.Models.SupabaseFunctionObjects;
 
 namespace media_tracker_desktop.Forms
 {
@@ -645,7 +646,7 @@ namespace media_tracker_desktop.Forms
                 if (lastFmNotLinked)
                 {
                     // Add third party id.
-                    var (added, msg) = await UserAppAccount.AddThirdPartyId(
+                    var (added, msg) = await Add3rdPartyIDFunction.AddThirdPartyId(
                         UserAppAccount.LastFMPlatformID,
                         username);
 

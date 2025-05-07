@@ -32,5 +32,3 @@ if (!$steam_id) {
         $error = "No games found. This Steam profile might be private.";
     }
 }
-
-

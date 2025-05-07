@@ -1,7 +1,9 @@
 using System;
 using System.Windows.Forms;
 using media_tracker_desktop;
+using Supabase;
 using media_tracker_desktop.Models.ApiModels;
+using media_tracker_desktop.Models.SupabaseFunctionObjects;
 
 namespace media_tracker_desktop.Forms
 {
@@ -13,13 +15,25 @@ namespace media_tracker_desktop.Forms
             this.Load += MainForm_Load;
         }
 
+        public static Client _connection;
+
         private string? _newSessionIDFromTMDBEditButton = string.Empty;
+
+        private TextBox txtSteam = new TextBox();
+        private TextBox txtLastFm = new TextBox();
+
+        private bool isSteamToBeUnlinked = false;
+        private bool isLastFMToBeUnlinked = false;
+        private bool isTMDBToBeUnlinked = false;
 
         private void MainForm_Load(object sender, EventArgs e)
         {
             InitializeApp();
             ShowHome();
         }
+
+
+
 
         // Method: Initialize the components that are necessary for the app to run.
         private async void InitializeApp()
@@ -190,10 +204,32 @@ namespace media_tracker_desktop.Forms
             };
             btnEdit.Click += (s, e) => ShowPlatformEdit();
 
+            Button btnEditUser = new Button
+            {
+                Text = "Edit User",
+                Location = new System.Drawing.Point(200, 160),
+                BackColor = System.Drawing.Color.FromArgb(50, 50, 50),
+                ForeColor = System.Drawing.Color.White,
+                FlatStyle = FlatStyle.Flat,
+                AutoSize = true
+            };
+            btnEditUser.Click += btnEditUser_Click!;
+
+            Button btnDeleteUser = new Button
+            {
+                Text = "Delete User",
+                Location = new System.Drawing.Point(305, 160),
+                BackColor = System.Drawing.Color.FromArgb(50, 50, 50),
+                ForeColor = System.Drawing.Color.White,
+                FlatStyle = FlatStyle.Flat,
+                AutoSize = true
+            };
+            btnDeleteUser.Click += btnDeleteUser_Click!;
+
             var btnLogout = new Button
             {
                 Text = "Logout",
-                Location = new System.Drawing.Point(200, 160),
+                Location = new System.Drawing.Point(430, 160),
                 BackColor = System.Drawing.Color.FromArgb(50, 50, 50),
                 ForeColor = System.Drawing.Color.White,
                 FlatStyle = FlatStyle.Flat,
@@ -209,11 +245,42 @@ namespace media_tracker_desktop.Forms
             dashPanel.Controls.Add(lastFm);
             dashPanel.Controls.Add(tmdb);
             dashPanel.Controls.Add(btnEdit);
+            dashPanel.Controls.Add(btnEditUser);
+            dashPanel.Controls.Add(btnDeleteUser);
             dashPanel.Controls.Add(btnLogout);
             pnlContent.Controls.Add(dashPanel);
+        }
 
-            // Refresh since somewho
-            //this.Refresh();
+        private void btnEditUser_Click(object sender, EventArgs e)
+        {
+            this.Hide();
+
+            UpdateUserForm editForm = new UpdateUserForm();
+
+            editForm.LaunchEditUserForm();
+
+            this.Show();
+        }
+
+        private async void btnDeleteUser_Click(object sender, EventArgs e)
+        {
+            DialogResult confirmation = MessageBox.Show("Are you sure you want to delete this account?", "Confirm Delete", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation);
+
+            // If user confirms deletion,
+            if (confirmation == DialogResult.Yes)
+            {
+                // Delete user.
+                Dictionary<string, dynamic> result = await UserAppAccount.DeleteUser();
+
+                MessageBox.Show(result["statusMessage"]);
+
+                // If user successfully deleted,
+                if (result["status"] == "success")
+                {
+                    // Show home screen with the login and signup buttons.
+                    ShowHome();
+                }
+            }
         }
 
         private void ShowPlatformEdit()
@@ -231,13 +298,23 @@ namespace media_tracker_desktop.Forms
                 Location = new System.Drawing.Point(20, 20),
                 AutoSize = true
             };
-            var txtSteam = new TextBox
+            txtSteam = new TextBox
             {
                 Name = "txtSteam",
                 Text = UserAppAccount.UserSteamID ?? "",
                 Location = new System.Drawing.Point(200, 18),
                 Width = 200
             };
+            Button btnUnlinkSteam = new Button
+            {
+                Text = "Unlink",
+                Location = new System.Drawing.Point(410, 18),
+                BackColor = System.Drawing.Color.FromArgb(50, 50, 50),
+                ForeColor = System.Drawing.Color.White,
+                FlatStyle = FlatStyle.Flat,
+                AutoSize = true
+            };
+            btnUnlinkSteam.Click += btnUnlinkSteam_Click!;
 
             // Last.fm
             var lblLastFm = new Label
@@ -247,13 +324,23 @@ namespace media_tracker_desktop.Forms
                 Location = new System.Drawing.Point(20, 60),
                 AutoSize = true
             };
-            var txtLastFm = new TextBox
+            txtLastFm = new TextBox
             {
                 Name = "txtLastFm",
                 Text = UserAppAccount.UserLastFmID ?? "",
                 Location = new System.Drawing.Point(200, 58),
                 Width = 200
             };
+            Button btnUnlinkLastFM = new Button
+            {
+                Text = "Unlink",
+                Location = new System.Drawing.Point(410, 58),
+                BackColor = System.Drawing.Color.FromArgb(50, 50, 50),
+                ForeColor = System.Drawing.Color.White,
+                FlatStyle = FlatStyle.Flat,
+                AutoSize = true
+            };
+            btnUnlinkLastFM.Click += btnUnlinkLastFM_Click!;
 
             // TMDB
             var lblTmdb = new Label
@@ -263,7 +350,7 @@ namespace media_tracker_desktop.Forms
                 Location = new System.Drawing.Point(20, 100),
                 AutoSize = true
             };
-            var btnTmdb = new Button
+            Button btnTmdb = new Button
             {
                 Name = "btnTmdb",
                 Text = "Update TMDB",
@@ -272,8 +359,19 @@ namespace media_tracker_desktop.Forms
                 BackColor = Color.White,
                 AutoSize = true
             };
+            btnTmdb.Click += btnTmdb_Click!;
 
-            btnTmdb.Click += btnTmdb_Click;
+            Button btnUnlinkTMDB = new Button
+            {
+                Text = "Unlink",
+                Location = new System.Drawing.Point(410, 98),
+                BackColor = System.Drawing.Color.FromArgb(50, 50, 50),
+                ForeColor = System.Drawing.Color.White,
+                FlatStyle = FlatStyle.Flat,
+                AutoSize = true
+            };
+            btnUnlinkTMDB.Click += btnUnlinkTMDB_Click!;
+
 
             // Save button
             var btnSave = new Button
@@ -285,17 +383,7 @@ namespace media_tracker_desktop.Forms
                 FlatStyle = FlatStyle.Flat,
                 AutoSize = true
             };
-            btnSave.Click += (s, e) =>
-            {
-                string newSteamID = txtSteam.Text.Trim();
-                string newLastFmID = txtLastFm.Text.Trim();
-                string? newTmdbID = _newSessionIDFromTMDBEditButton;
-
-                UpdateUserPlatformIDs(newSteamID, newLastFmID, newTmdbID!);
-
-                MessageBox.Show("Platform info updated!", "Saved", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                ShowDashboard();
-            };
+            btnSave.Click += btnSave_Click!;
 
             // Cancel button
             var btnCancel = new Button
@@ -312,10 +400,13 @@ namespace media_tracker_desktop.Forms
             // Add controls
             editPanel.Controls.Add(lblSteam);
             editPanel.Controls.Add(txtSteam);
+            editPanel.Controls.Add(btnUnlinkSteam);
             editPanel.Controls.Add(lblLastFm);
             editPanel.Controls.Add(txtLastFm);
+            editPanel.Controls.Add(btnUnlinkLastFM);
             editPanel.Controls.Add(lblTmdb);
             editPanel.Controls.Add(btnTmdb);
+            editPanel.Controls.Add(btnUnlinkTMDB);
             editPanel.Controls.Add(btnSave);
             editPanel.Controls.Add(btnCancel);
 
@@ -324,24 +415,169 @@ namespace media_tracker_desktop.Forms
 
         private async void btnTmdb_Click(object sender, EventArgs e)
         {
-            _newSessionIDFromTMDBEditButton = await TmdbApi.RetrieveSessionID();
+            try
+            {
+                _newSessionIDFromTMDBEditButton = await TmdbApi.RetrieveSessionID();
+            }
+            catch (HttpRequestException error)
+            {
+                if (error.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                {
+                    MessageBox.Show("Permission denied.");
+                }
+            }
+            catch (Exception error)
+            {
+                MessageBox.Show($"Error: {error.Message}");
+            }
+        }
+
+        private async void btnSave_Click(object sender, EventArgs e)
+        {
+            string message = "";
+
+            string newSteamID = txtSteam.Text.Trim();
+            string newLastFmID = txtLastFm.Text.Trim();
+            string? newTmdbID = _newSessionIDFromTMDBEditButton;
+
+            UpdateUserPlatformIDs(newSteamID, newLastFmID, newTmdbID!);
+
+            if (!string.IsNullOrEmpty(newSteamID) || !string.IsNullOrEmpty(newLastFmID) || !string.IsNullOrEmpty(newTmdbID))
+            {
+                message += "Platform info updated!\n\n";
+            }
+
+            if (isSteamToBeUnlinked)
+            {
+                // Unlink account.
+                Dictionary<string, dynamic> result = await Delete3rdPartyIDFunction.UnlinkApiAccount(UserAppAccount.SteamPlatformID);
+
+                message += result["statusMessage"] + "\n";
+
+                if (result["status"] == "success")
+                {
+                    txtSteam.Text = "";
+                    isSteamToBeUnlinked = false;
+                }
+            }
+
+            if (isLastFMToBeUnlinked)
+            {
+                // Unlink account.
+                Dictionary<string, dynamic> result = await Delete3rdPartyIDFunction.UnlinkApiAccount(UserAppAccount.LastFMPlatformID);
+
+                message += result["statusMessage"] + "\n";
+
+                if (result["status"] == "success")
+                {
+                    txtLastFm.Text = "";
+                    isLastFMToBeUnlinked = false;
+                }
+            }
+
+            if (isTMDBToBeUnlinked)
+            {
+                // Unlink account.
+                Dictionary<string, dynamic> result = await Delete3rdPartyIDFunction.UnlinkApiAccount(UserAppAccount.TMDBPlatformID);
+
+                message += result["statusMessage"] + "\n";
+                isTMDBToBeUnlinked = false;
+            }
+
+            if (!string.IsNullOrEmpty(message))
+            {
+                MessageBox.Show(message, "Saved", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+
+            ShowDashboard();
+        }
+
+        private void btnUnlinkSteam_Click(object sender, EventArgs e)
+        {
+            isSteamToBeUnlinked = false;
+
+            // If user has an account linked,
+            if (!string.IsNullOrEmpty(UserAppAccount.UserSteamID))
+            {
+                DialogResult confirmation = MessageBox.Show("Are you sure you want to unlink your steam account?", "Confirm Delete", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation);
+
+                // If user confirms unlink,
+                if (confirmation == DialogResult.Yes)
+                {
+                    // Mark it to be unlinked.
+                    isSteamToBeUnlinked = true;
+                    txtSteam.Text = "";
+                }
+            }
+            else
+            {
+                MessageBox.Show("You don't have a steam account linked.");
+            }
+        }
+
+        private void btnUnlinkLastFM_Click(object sender, EventArgs e)
+        {
+            isLastFMToBeUnlinked = false;
+
+            // If user has an account linked,
+            if (!string.IsNullOrEmpty(UserAppAccount.UserLastFmID))
+            {
+                DialogResult confirmation = MessageBox.Show("Are you sure you want to unlink your lastFM account?", "Confirm Delete", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation);
+
+                // If user confirms unlink,
+                if (confirmation == DialogResult.Yes)
+                {
+                    // Mark it to be unlinked.
+                    isLastFMToBeUnlinked = true;
+                    txtLastFm.Text = "";
+                }
+            }
+            else
+            {
+                MessageBox.Show("You don't have a lastFM account linked.");
+            }
+        }
+
+        private void btnUnlinkTMDB_Click(object sender, EventArgs e)
+        {
+            isTMDBToBeUnlinked = false;
+
+            // If user has an account linked,
+            if (!string.IsNullOrEmpty(UserAppAccount.UserTmdbSessionID))
+            {
+                DialogResult confirmation = MessageBox.Show("Are you sure you want to unlink your TMDB account?", "Confirm Delete", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation);
+
+                // If user confirms unlink,
+                if (confirmation == DialogResult.Yes)
+                {
+                    // Mark it to be unlinked.
+                    isTMDBToBeUnlinked = true;
+
+                    // Erase session ID in case user linked tmdb then clicked unlink tmdb.
+                    _newSessionIDFromTMDBEditButton = "";
+                }
+            }
+            else
+            {
+                MessageBox.Show("You don't have a TMDB account linked.");
+            }
         }
 
         private async void UpdateUserPlatformIDs(string newSteamID, string newLastFmID, string newTmdbID)
         {
             if (!string.IsNullOrEmpty(newSteamID))
             {
-                (bool success, string message) = await UserAppAccount.UpdateUserPlatformID(UserAppAccount.SteamPlatformID, newSteamID);
+                (bool success, string message) = await Add3rdPartyIDFunction.UpdateUserPlatformID(UserAppAccount.SteamPlatformID, newSteamID);
             }
 
             if (!string.IsNullOrEmpty(newLastFmID))
             {
-                (bool success, string message) = await UserAppAccount.UpdateUserPlatformID(UserAppAccount.LastFMPlatformID, newLastFmID);
+                (bool success, string message) = await Add3rdPartyIDFunction.UpdateUserPlatformID(UserAppAccount.LastFMPlatformID, newLastFmID);
             }
 
             if (!string.IsNullOrEmpty(newTmdbID))
             {
-                (bool success, string message) = await UserAppAccount.UpdateUserPlatformID(UserAppAccount.TMDBPlatformID, newTmdbID);
+                (bool success, string message) = await Add3rdPartyIDFunction.UpdateUserPlatformID(UserAppAccount.TMDBPlatformID, newTmdbID);
             }
         }
 
@@ -362,5 +598,20 @@ namespace media_tracker_desktop.Forms
             var f = new LinkTmdbForm { TopLevel = false, FormBorderStyle = FormBorderStyle.None, Dock = DockStyle.Fill };
             pnlContent.Controls.Clear(); pnlContent.Controls.Add(f); f.Show(); lblTitle.Text = "TMDB";
         }
+
+        public static void ConnectToDB(Client dbConnection)
+        {
+            _connection = EnsureConnectionNotNull(dbConnection);
+        }
+
+        private static Client EnsureConnectionNotNull(Client conn)
+        {
+            if (conn == null)
+            {
+                throw new ArgumentNullException($"Connection is null.");
+            }
+
+            return conn;
+        }
     }
-}
+    }
