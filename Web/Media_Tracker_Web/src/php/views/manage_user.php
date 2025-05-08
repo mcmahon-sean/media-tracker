@@ -1,17 +1,31 @@
 <?php
+    
+    require_once "../db.php";
+    
     session_start();
 
     // Check if the session username is set
     if (!isset($_SESSION['username'])) {
         $error['error_message'] = 'You are not logged in.';
     } else {
-        // Retrieve user details from session
+        // Retrieve username from session
         $username = $_SESSION['username'];
 
-        // Assuming session stores user details
-        $firstName = $_SESSION['firstName'] ?? 'N/A'; // Fallback to N/A if not set
-        $lastName = $_SESSION['lastName'] ?? 'N/A'; // Fallback to N/A if not set
-        $email = $_SESSION['email'] ?? 'N/A'; // Fallback to N/A if not set
+        // Fetch user details from db
+        $stmt = $pdo->prepare("SELECT * FROM users WHERE username = ?");
+        $stmt->execute([$username]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($result) {
+            $_SESSION['first_name'] = $result["first_name"];
+            $_SESSION['last_name'] = $result["last_name"];
+            $_SESSION['email'] = $result["email"];
+
+            $firstName = $_SESSION["first_name"] ?? "N/A";
+            $lastName = $_SESSION["last_name"] ?? "N/A";
+            $email = $_SESSION["email"] ?? "N/A";
+        }
+
     }
     $editMode = isset($_GET['edit']); // Check if we are in edit mode
 ?>
