@@ -133,7 +133,7 @@ namespace media_tracker_desktop.Forms
             foreach (Steam_Game game in ownedGames)
             {
                 // Add row.
-                _tableData.Rows.Add(game.AppID, game.Name, game.PlaytimeForever);
+                _tableData.Rows.Add(game.AppID, game.Name, game.GetPlaytimeHours());
             }
 
             steamDataGridView.DataSource = _tableData;

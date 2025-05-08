@@ -42,8 +42,9 @@ namespace media_tracker_desktop.Forms
             pnlSidebar.Controls.Add(btnHome);
             pnlSidebar.Dock = DockStyle.Left;
             pnlSidebar.Location = new Point(0, 0);
+            pnlSidebar.Margin = new Padding(2, 2, 2, 2);
             pnlSidebar.Name = "pnlSidebar";
-            pnlSidebar.Size = new Size(200, 650);
+            pnlSidebar.Size = new Size(140, 390);
             pnlSidebar.TabIndex = 2;
             // 
             // btnLinkSteam
@@ -52,21 +53,23 @@ namespace media_tracker_desktop.Forms
             btnLinkSteam.FlatAppearance.BorderSize = 0;
             btnLinkSteam.FlatStyle = FlatStyle.Popup;
             btnLinkSteam.ForeColor = Color.White;
-            btnLinkSteam.Location = new Point(12, 162);
+            btnLinkSteam.Location = new Point(8, 97);
+            btnLinkSteam.Margin = new Padding(2, 2, 2, 2);
             btnLinkSteam.Name = "btnLinkSteam";
-            btnLinkSteam.Size = new Size(170, 54);
+            btnLinkSteam.Size = new Size(119, 32);
             btnLinkSteam.TabIndex = 2;
             btnLinkSteam.Text = "Steam";
+            btnLinkSteam.TextAlign = ContentAlignment.MiddleRight;
             btnLinkSteam.UseVisualStyleBackColor = false;
             btnLinkSteam.Click += btnLinkSteam_Click;
             // 
             // label1
             // 
             label1.BackColor = Color.FromArgb(32, 32, 32);
-            label1.Location = new Point(15, 75);
+            label1.Location = new Point(10, 45);
             label1.Margin = new Padding(0);
             label1.Name = "label1";
-            label1.Size = new Size(167, 2);
+            label1.Size = new Size(117, 1);
             label1.TabIndex = 4;
             // 
             // btnLinkTmdb
@@ -75,11 +78,13 @@ namespace media_tracker_desktop.Forms
             btnLinkTmdb.FlatAppearance.BorderSize = 0;
             btnLinkTmdb.FlatStyle = FlatStyle.Popup;
             btnLinkTmdb.ForeColor = Color.White;
-            btnLinkTmdb.Location = new Point(12, 234);
+            btnLinkTmdb.Location = new Point(8, 140);
+            btnLinkTmdb.Margin = new Padding(2, 2, 2, 2);
             btnLinkTmdb.Name = "btnLinkTmdb";
-            btnLinkTmdb.Size = new Size(170, 54);
+            btnLinkTmdb.Size = new Size(119, 32);
             btnLinkTmdb.TabIndex = 3;
             btnLinkTmdb.Text = "TMDB";
+            btnLinkTmdb.TextAlign = ContentAlignment.MiddleRight;
             btnLinkTmdb.UseVisualStyleBackColor = false;
             btnLinkTmdb.Click += btnLinkTmdb_Click;
             // 
@@ -91,11 +96,13 @@ namespace media_tracker_desktop.Forms
             btnLinkLastFM.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
             btnLinkLastFM.ForeColor = Color.White;
             btnLinkLastFM.ImageAlign = ContentAlignment.MiddleLeft;
-            btnLinkLastFM.Location = new Point(12, 90);
+            btnLinkLastFM.Location = new Point(8, 54);
+            btnLinkLastFM.Margin = new Padding(2, 2, 2, 2);
             btnLinkLastFM.Name = "btnLinkLastFM";
-            btnLinkLastFM.Size = new Size(170, 54);
+            btnLinkLastFM.Size = new Size(119, 32);
             btnLinkLastFM.TabIndex = 1;
             btnLinkLastFM.Text = "Last.fm";
+            btnLinkLastFM.TextAlign = ContentAlignment.MiddleRight;
             btnLinkLastFM.UseVisualStyleBackColor = false;
             btnLinkLastFM.Click += btnLinkLastFM_Click;
             // 
@@ -105,9 +112,10 @@ namespace media_tracker_desktop.Forms
             btnHome.FlatAppearance.BorderSize = 0;
             btnHome.FlatStyle = FlatStyle.Popup;
             btnHome.ForeColor = Color.White;
-            btnHome.Location = new Point(12, 13);
+            btnHome.Location = new Point(8, 8);
+            btnHome.Margin = new Padding(2, 2, 2, 2);
             btnHome.Name = "btnHome";
-            btnHome.Size = new Size(170, 54);
+            btnHome.Size = new Size(119, 32);
             btnHome.TabIndex = 0;
             btnHome.Text = "Home";
             btnHome.UseVisualStyleBackColor = false;
@@ -118,9 +126,10 @@ namespace media_tracker_desktop.Forms
             lblTitle.AutoSize = true;
             lblTitle.Font = new Font("Segoe UI", 16F, FontStyle.Bold);
             lblTitle.ForeColor = Color.White;
-            lblTitle.Location = new Point(210, 10);
+            lblTitle.Location = new Point(147, 6);
+            lblTitle.Margin = new Padding(2, 0, 2, 0);
             lblTitle.Name = "lblTitle";
-            lblTitle.Size = new Size(233, 45);
+            lblTitle.Size = new Size(160, 30);
             lblTitle.TabIndex = 1;
             lblTitle.Text = "Media Tracker";
             // 
@@ -128,20 +137,22 @@ namespace media_tracker_desktop.Forms
             // 
             pnlContent.BackColor = Color.FromArgb(32, 32, 32);
             pnlContent.Dock = DockStyle.Fill;
-            pnlContent.Location = new Point(200, 0);
+            pnlContent.Location = new Point(140, 0);
+            pnlContent.Margin = new Padding(2, 2, 2, 2);
             pnlContent.Name = "pnlContent";
-            pnlContent.Size = new Size(800, 650);
+            pnlContent.Size = new Size(560, 390);
             pnlContent.TabIndex = 0;
             // 
             // MainForm
             // 
-            AutoScaleDimensions = new SizeF(10F, 25F);
+            AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.FromArgb(45, 45, 48);
-            ClientSize = new Size(1000, 650);
+            ClientSize = new Size(700, 390);
             Controls.Add(pnlContent);
             Controls.Add(lblTitle);
             Controls.Add(pnlSidebar);
+            Margin = new Padding(2, 2, 2, 2);
             Name = "MainForm";
             Text = "Media Tracker";
             pnlSidebar.ResumeLayout(false);
