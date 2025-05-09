@@ -7,6 +7,7 @@ require_once 'src/php/config.php';
 //$_SESSION['session_id'] = TMDB_SESSION_ID;
 // TEMP CODE END
 
+
 ?>
 
 <!DOCTYPE html>
@@ -23,6 +24,14 @@ require_once 'src/php/config.php';
       src="https://kit.fontawesome.com/a076d05399.js"
       crossorigin="anonymous"
     ></script>
+    <?php if (isset($_GET['created']) && $_GET['created'] == 'true'): ?>
+      <script>alert('User created successfully!');</script>
+    <?php endif; ?>
+
+    <?php if (isset($_GET['deleted']) && $_GET['deleted'] == 'true'): ?>
+      <script>alert('User deleted successfully. :(');</script>
+    <?php endif; ?>
+
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body class="bg-dark-primary">
@@ -37,6 +46,14 @@ require_once 'src/php/config.php';
               role="button"
             >
               Home
+            </a>
+            <a
+              class="btn btn-dark w-100 mt-2"
+              id="btn-home"
+              href="src/php/views/manage_user.php"
+              role="button"
+            >
+              Manager user
             </a>
           </div>
           <hr />
@@ -152,7 +169,7 @@ require_once 'src/php/config.php';
             <?php if (isset($_SESSION['user_platform_ids']['steam'])): ?>
               <p>Steam ID: <strong><?= htmlspecialchars($_SESSION['user_platform_ids']['steam']) ?></strong></p>
             <?php else: ?>
-              <p>Please add your Steam account</p>
+              <p>Steam ID: Please add your Steam account</p>
             <?php endif; ?>
 
             <!--Check to see if user has added a Last.fm account. If not, display message telling user to add an account-->

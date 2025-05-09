@@ -23,7 +23,7 @@ if(isset($_SESSION['user_platform_ids']['steam'])) {
 
     // Array to hold SteamGame objects
     $ownedGames = [];
-
+  
     if (isset($data['response']['games'])) {
         foreach ($data['response']['games'] as $gameData) {
             $ownedGames[] = new SteamGame($gameData);

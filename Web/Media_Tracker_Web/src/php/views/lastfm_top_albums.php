@@ -7,6 +7,8 @@
     require_once '../media/LastFm/get_top_albums.php';
     require_once '../filter_functions.php';
 
+    $topAlbums = [];
+
     $has_filter = isset($_GET["searchString"]) && $_GET["searchString"] != "";
     // Grab the input string and selected category for searching from the post array
     $filter_string = $_GET["searchString"] ?? "";
@@ -44,6 +46,14 @@
                 <div>
                     <a class="btn btn-dark w-100" id="btn-home" href="../../../index.php" role="button">
                         Home
+                    </a>
+                    <a
+                        class="btn btn-dark w-100 mt-2"
+                        id="btn-home"
+                        href="./manage_user.php"
+                        role="button"
+                    >
+                        Manager user
                     </a>
                 </div>
                 <hr>
