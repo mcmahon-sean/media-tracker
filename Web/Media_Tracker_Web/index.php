@@ -7,6 +7,7 @@ require_once 'src/php/config.php';
 //$_SESSION['session_id'] = TMDB_SESSION_ID;
 // TEMP CODE END
 
+
 ?>
 
 <!DOCTYPE html>
@@ -23,6 +24,14 @@ require_once 'src/php/config.php';
       src="https://kit.fontawesome.com/a076d05399.js"
       crossorigin="anonymous"
     ></script>
+    <?php if (isset($_GET['created']) && $_GET['created'] == 'true'): ?>
+      <script>alert('User created successfully!');</script>
+    <?php endif; ?>
+
+    <?php if (isset($_GET['deleted']) && $_GET['deleted'] == 'true'): ?>
+      <script>alert('User deleted successfully. :(');</script>
+    <?php endif; ?>
+
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body class="bg-dark-primary">

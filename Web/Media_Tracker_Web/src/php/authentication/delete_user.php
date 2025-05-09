@@ -24,8 +24,8 @@
             if ($result) {
                 // Optionally, you could log the user out here and redirect them to a login page
                 session_destroy(); // Uncomment to destroy the session
-                echo "Your account has been deleted successfully.";
-                header("Location: ../../../index.php");
+                // echo "Your account has been deleted successfully.";
+                header("Location: ../../../index.php?deleted=true");
                 exit;
             } else {
                 echo "There was an issue deleting your account. Please try again later.";

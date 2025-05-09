@@ -56,7 +56,8 @@
                 header("Location: ../../../index.php");
                 exit;
             } else {
-                echo "Invalid username or password";
+                header("Location: http://localhost/media-tracker/Web/Media_Tracker_Web/src/php/views/user_login.php?invalid=true");
+                exit;
             }
         } else {
             echo "Username and password required";

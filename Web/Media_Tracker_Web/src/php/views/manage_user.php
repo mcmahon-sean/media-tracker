@@ -143,7 +143,7 @@
                             <?php if (isset($_SESSION['user_platform_ids']['steam'])): ?>
                             <p>Steam ID: <strong><?= htmlspecialchars($_SESSION['user_platform_ids']['steam']) ?></strong></p>
                             <?php else: ?>
-                            <p>Please add your Steam account</p>
+                            <p>Steam ID: Please add your Steam account</p>
                             <?php endif; ?>
 
                             <!--Check to see if user has added a Last.fm account. If not, display message telling user to add an account-->
