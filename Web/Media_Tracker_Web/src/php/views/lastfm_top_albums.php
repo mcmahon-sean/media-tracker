@@ -7,8 +7,6 @@
     require_once '../media/LastFm/get_top_albums.php';
     require_once '../filter_functions.php';
 
-    $topAlbums = [];
-
     $has_filter = isset($_GET["searchString"]) && $_GET["searchString"] != "";
     // Grab the input string and selected category for searching from the post array
     $filter_string = $_GET["searchString"] ?? "";
@@ -22,8 +20,8 @@
         $sort_field = $split[0];
         $sort_dir = $split[1];
     } else {
-        $sort_field = "name";
-        $sort_dir = "asc";
+        $sort_field = "playcount";
+        $sort_dir = "desc";
     }
 
     $top_albums_filt = sortBy(filter($topAlbums, $filter_category, $filter_string), $sort_field, $sort_dir);

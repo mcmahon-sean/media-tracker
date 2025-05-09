@@ -7,8 +7,6 @@
     require_once '../media/LastFm/get_recent_tracks.php';
     require_once '../filter_functions.php';
 
-    $recentTracks = [];
-
     $has_filter = isset($_GET["searchString"]) && $_GET["searchString"] != "";
     // Grab the input string and selected category for searching from the post array
     $filter_string = $_GET["searchString"] ?? "";
@@ -22,8 +20,8 @@
         $sort_field = $split[0];
         $sort_dir = $split[1];
     } else {
-        $sort_field = "name";
-        $sort_dir = "asc";
+        $sort_field = "date";
+        $sort_dir = "desc";
     }
 
     $recent_tracks_filt = sortBy(filter($recentTracks, $filter_category, $filter_string), $sort_field, $sort_dir);

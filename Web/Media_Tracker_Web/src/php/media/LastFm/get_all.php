@@ -1,7 +1,10 @@
 <?php
 
 // Require config file
-require_once('../../configs/lastfm-config.php');
+require_once '../config.php';
+require_once '../models/Last.FM/LastFmTrack.php';
+require_once '../models/Last.FM/LastFmArtist.php';
+require_once '../models/Last.FM/LastFmAlbum.php';
 
  // Initialize variables
     $recentTracks = [];
@@ -28,24 +31,65 @@ if(isset($_SESSION['signed_in']) && $_SESSION['signed_in'] === true) {
         $topArtistsUrl = "https://ws.audioscrobbler.com/2.0/?method=user.gettopartists&user=$username&api_key=$apiKey&limit=10&format=json";
         $topTracksUrl = "https://ws.audioscrobbler.com/2.0/?method=user.gettoptracks&user=$username&api_key=$apiKey&format=json&limit=10";
 
-    
+        //loved tracks data
+        $response = @file_get_contents($lovedTracksUrl);
 
-        // Fetch data function
-        function fetchData($url, &$data, &$error, $dataName) {
-            $json = @file_get_contents($url);
-            if ($json === FALSE) {
-                $error = "Failed to fetch $dataName. Please check your username or API key.";
-            } else {
-                $data = json_decode($json, true);
-            }
+        if ($response === false) {
+            $error = "Failed to retrieve data from Last.fm.";
+        } else {
+            $data = json_decode($response, true);
+            $trackList = $data['lovedtracks']['track'] ?? [];
+
+            $lovedTracks = array_map(fn($item) => new LastFmTrack($item, 'lovedtracks'), $trackList);
         }
 
-        // Fetch all data using fetchData()
-        fetchData($recentTracksUrl, $recentTracks, $error, 'recent tracks');
-        fetchData($lovedTracksUrl, $lovedTracks, $error, 'loved tracks');
-        fetchData($topAlbumsUrl, $topAlbums, $error, 'top albums');
-        fetchData($topArtistsUrl, $topArtists, $error, 'top artists');
-        fetchData($topTracksUrl, $topTracks, $error, 'top tracks');
+        //recent tracks data
+        $response = @file_get_contents($recentTracksUrl);
+
+        if ($response === false) {
+            $error = "Failed to retrieve data from Last.fm.";
+        } else {
+            $data = json_decode($response, true);
+            $trackList = $data['recenttracks']['track'] ?? [];
+
+            $recentTracks = array_map(fn($item) => new LastFmTrack($item, 'recenttracks'), $trackList);
+        }
+
+        //top albums data
+        $response = @file_get_contents($topAlbumsUrl);
+
+        if ($response === false) {
+            $error = "Failed to retrieve data from Last.fm.";
+        } else {
+            $data = json_decode($response, true);
+            $albumList = $data['topalbums']['album'] ?? [];
+
+            $topAlbums = array_map(fn($item) => new LastFmAlbum($item), $albumList);
+        }
+
+        //top artists data
+        $response = @file_get_contents($topArtistsUrl);
+
+        if ($response === false) {
+            $error = "Failed to retrieve data from Last.fm.";
+        } else {
+            $data = json_decode($response, true);
+            $artistList = $data['topartists']['artist'] ?? [];
+
+            $topArtists = array_map(fn($item) => new LastFmArtist($item), $artistList);
+        }
+
+        //top tracks data
+        $response = @file_get_contents($topTracksUrl);
+
+        if ($response === false) {
+            $error = "Failed to retrieve data from Last.fm.";
+        } else {
+            $data = json_decode($response, true);
+            $trackList = $data['toptracks']['track'] ?? [];
+
+            $topTracks = array_map(fn($item) => new LastFmTrack($item, 'toptracks'), $trackList);
+        }
     }
 
 

@@ -15,7 +15,7 @@ if(isset($_SESSION['signed_in']) && $_SESSION['signed_in'] === true) {
         $username = $_SESSION['user_platform_ids']['lastfm'];
 
         // URL for the API request
-        $url = "https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=$username&api_key=$apiKey&format=json&limit=10";
+        $url = "https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=$username&api_key=$apiKey&format=json";
 
         // Fetch the data from the API
         $response = @file_get_contents($url);
@@ -29,7 +29,7 @@ if(isset($_SESSION['signed_in']) && $_SESSION['signed_in'] === true) {
             $data = json_decode($response, true);
             $trackList = $data['recenttracks']['track'] ?? [];
 
-            $recentTracks = array_map(fn($item) => new LastFmTrack($item), $trackList);
+            $recentTracks = array_map(fn($item) => new LastFmTrack($item, 'recenttracks'), $trackList);
         }
     }
 

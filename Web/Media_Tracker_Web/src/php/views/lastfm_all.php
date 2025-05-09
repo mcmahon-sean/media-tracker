@@ -4,17 +4,9 @@
     session_start();
 
     // Required
-    require_once '../media/LastFm/get_loved_tracks.php';
-    require_once '../media/LastFm/get_recent_tracks.php';
-    require_once '../media/LastFm/get_top_albums.php';
-    require_once '../media/LastFm/get_top_artists.php';
-    require_once '../media/LastFm/get_top_tracks.php';
-    require_once '../filter_functions.php';
+    require_once '../media/LastFm/get_all.php';
 
-    $recentTracks = [];
-    $topAlbums = [];
-    $topTracks = [];
-    $topArtists = [];
+    require_once '../filter_functions.php';
 
     $has_filter = isset($_POST["searchString"]) && $_POST["searchString"] != "";
     // Grab the input string and selected category for searching from the post array
