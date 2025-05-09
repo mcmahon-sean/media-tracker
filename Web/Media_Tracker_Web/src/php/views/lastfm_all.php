@@ -140,181 +140,185 @@
                 </div>
 
                 <!-- Loved Tracks Section -->
-                <div class="table-responsive">
-                    <h3>Loved Tracks</h3>
-                    <?php if (isset($error)): ?>
-                        <p><?php echo $error; ?></p>
-                    <?php else: ?>
-                        <table class="table table-dark table-hover" id="loved-tracks">
-                            <thead>
-                                <tr>
-                                    <th>Track Name</th>
-                                    <th>Artist Name</th>
-                                    <th>Last Played</th>
-                                    <th>URL</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php if (count($loved_tracks_filt) > 0): ?>
-                                    <?php foreach ($loved_tracks_filt as $track): ?>
-                                        <tr>
-                                            <td><?php echo htmlspecialchars($track->name); ?></td>
-                                            <td><?php echo htmlspecialchars($track->artist); ?></td>
-                                            <td><?php echo htmlspecialchars($track->getFormattedDate()); ?></td>
-                                            <td><a href="<?php echo htmlspecialchars($track->url); ?>" target="_blank">View</a></td>
-                                        </tr>
-                                    <?php endforeach; ?>
-                                <?php else: ?>
-                                    <tr>
-                                        <td colspan="4" class="lead text-center">No items match the filter</td>
-                                    </tr>
-                                <?php endif; ?>
-                            </tbody>
-                        </table>
-                    <?php endif; ?>
-                </div>
-
-                <!-- Recent Tracks Section -->
-                <div class="table-responsive">
-                    <h3>Recent Tracks</h3>
-                    <?php if (isset($error)): ?>
-                        <p><?php echo $error; ?></p>
-                    <?php else: ?>
-                        <table class="table table-dark table-hover" id="recent-tracks">
-                            <thead>
-                                <tr>
-                                    <th>Track Name</th>
-                                    <th>Artist Name</th>
-                                    <th>Last Played</th>
-                                    <th>URL</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php if (count($recent_tracks_filt) > 0): ?>
-                                    <?php foreach ($recent_tracks_filt as $track): ?>
-                                        <tr>
-                                            <td><?php echo htmlspecialchars($track->name); ?></td>
-                                            <td><?php echo htmlspecialchars($track->artist); ?></td>
-                                            <td><?php echo htmlspecialchars($track->getFormattedDate()); ?></td>
-                                            <td><a href="<?php echo htmlspecialchars($track->url); ?>" target="_blank">View</a></td>
-                                        </tr>
-                                    <?php endforeach; ?>
-                                <?php else: ?>
-                                    <tr>
-                                        <td colspan="4" class="lead text-center">No items match the filter</td>
-                                    </tr>
-                                <?php endif; ?>
-                            </tbody>
-                        </table>
-                    <?php endif; ?>
-                </div>
-
-                <!-- Top Albums Section -->
-                <div class="table-responsive">
-                    <h3>Top Albums</h3>
-                    <?php if (isset($error)): ?>
-                        <p><?php echo $error; ?></p>
-                    <?php else: ?>
-                        <table class="table table-dark table-hover" id="top-albums">
-                            <thead>
-                                <tr>
-                                    <th>Playcount</th>
-                                    <th>Album Name</th>
-                                    <th>Artist Name</th>
-                                    <th>URL</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php if (count($top_albums_filt) > 0): ?>
-                                    <?php foreach ($top_albums_filt as $album): ?>
-                                        <tr>
-                                            <td><?php echo htmlspecialchars($album->playCount); ?></td>
-                                            <td><?php echo htmlspecialchars($album->name); ?></td>
-                                            <td><?php echo htmlspecialchars($album->artist); ?></td>
-                                            <td><a href="<?php echo htmlspecialchars($album->url); ?>" target="_blank">View</a></td>
-                                        </tr>
-                                    <?php endforeach; ?>
-                                <?php else: ?>
-                                    <tr>
-                                        <td colspan="4" class="lead text-center">No items match the filter</td>
-                                    </tr>
-                                <?php endif; ?>
-                            </tbody>
-                        </table>
-                    <?php endif; ?>
-                </div>
-
-                <!-- Top Artists Section -->
-                <?php if ($top_artists_filt != "hide"): ?>
+                <?php if (isset($_SESSION['user_platform_ids']['lastfm'])): ?>
                     <div class="table-responsive">
-                        <h3>Top Artists</h3>
+                        <h3>Loved Tracks</h3>
                         <?php if (isset($error)): ?>
                             <p><?php echo $error; ?></p>
                         <?php else: ?>
-                            <table class="table table-dark table-hover" id="top-artists">
+                            <table class="table table-dark table-hover" id="loved-tracks">
                                 <thead>
                                     <tr>
-                                        <th>Playcount</th>
+                                        <th>Track Name</th>
                                         <th>Artist Name</th>
+                                        <th>Last Played</th>
                                         <th>URL</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <?php if (count($top_artists_filt) > 0): ?>
-                                        <?php foreach ($top_artists_filt as $artist): ?>
+                                    <?php if (count($loved_tracks_filt) > 0): ?>
+                                        <?php foreach ($loved_tracks_filt as $track): ?>
                                             <tr>
-                                                <td><?php echo htmlspecialchars($artist->playCount); ?></td>
-                                                <td><?php echo htmlspecialchars($artist->name); ?></td>
-                                                <td>
-                                                    <a href="<?php echo htmlspecialchars($artist->url); ?>" target="_blank">View</a>
-                                                </td>
+                                                <td><?php echo htmlspecialchars($track->name); ?></td>
+                                                <td><?php echo htmlspecialchars($track->artist); ?></td>
+                                                <td><?php echo htmlspecialchars($track->getFormattedDate()); ?></td>
+                                                <td><a href="<?php echo htmlspecialchars($track->url); ?>" target="_blank">View</a></td>
                                             </tr>
                                         <?php endforeach; ?>
                                     <?php else: ?>
                                         <tr>
-                                            <td colspan="3" class="lead text-center">No items match the filter</td>
+                                            <td colspan="4" class="lead text-center">No items match the filter</td>
                                         </tr>
                                     <?php endif; ?>
                                 </tbody>
                             </table>
                         <?php endif; ?>
                     </div>
-                <?php endif; ?>
 
-                <!-- Top Tracks Section -->
-                <div class="table-responsive">
-                    <h3>Top Tracks</h3>
-                    <?php if (isset($error)): ?>
-                        <p><?php echo $error; ?></p>
-                    <?php else: ?>
-                        <table class="table table-dark table-hover" id="top-tracks">
-                            <thead>
-                                <tr>
-                                    <th>Playcount</th>
-                                    <th>Track Name</th>
-                                    <th>Artist Name</th>
-                                    <th>URL</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php if (count($top_tracks_filt) > 0): ?>
-                                    <?php foreach ($top_tracks_filt as $track): ?>
-                                        <tr>
-                                            <td><?php echo htmlspecialchars($track->playCount); ?></td>
-                                            <td><?php echo htmlspecialchars($track->name); ?></td>
-                                            <td><?php echo htmlspecialchars($track->artist); ?></td>
-                                            <td><a href="<?php echo htmlspecialchars($track->url); ?>" target="_blank">View</a></td>
-                                        </tr>
-                                    <?php endforeach; ?>
-                                <?php else: ?>
+                    <!-- Recent Tracks Section -->
+                    <div class="table-responsive">
+                        <h3>Recent Tracks</h3>
+                        <?php if (isset($error)): ?>
+                            <p><?php echo $error; ?></p>
+                        <?php else: ?>
+                            <table class="table table-dark table-hover" id="recent-tracks">
+                                <thead>
                                     <tr>
-                                        <td colspan="4" class="lead text-center">No items match the filter</td>
+                                        <th>Track Name</th>
+                                        <th>Artist Name</th>
+                                        <th>Last Played</th>
+                                        <th>URL</th>
                                     </tr>
-                                <?php endif; ?>
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    <?php if (count($recent_tracks_filt) > 0): ?>
+                                        <?php foreach ($recent_tracks_filt as $track): ?>
+                                            <tr>
+                                                <td><?php echo htmlspecialchars($track->name); ?></td>
+                                                <td><?php echo htmlspecialchars($track->artist); ?></td>
+                                                <td><?php echo htmlspecialchars($track->getFormattedDate()); ?></td>
+                                                <td><a href="<?php echo htmlspecialchars($track->url); ?>" target="_blank">View</a></td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    <?php else: ?>
+                                        <tr>
+                                            <td colspan="4" class="lead text-center">No items match the filter</td>
+                                        </tr>
+                                    <?php endif; ?>
+                                </tbody>
+                            </table>
+                        <?php endif; ?>
+                    </div>
+
+                    <!-- Top Albums Section -->
+                    <div class="table-responsive">
+                        <h3>Top Albums</h3>
+                        <?php if (isset($error)): ?>
+                            <p><?php echo $error; ?></p>
+                        <?php else: ?>
+                            <table class="table table-dark table-hover" id="top-albums">
+                                <thead>
+                                    <tr>
+                                        <th>Playcount</th>
+                                        <th>Album Name</th>
+                                        <th>Artist Name</th>
+                                        <th>URL</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php if (count($top_albums_filt) > 0): ?>
+                                        <?php foreach ($top_albums_filt as $album): ?>
+                                            <tr>
+                                                <td><?php echo htmlspecialchars($album->playCount); ?></td>
+                                                <td><?php echo htmlspecialchars($album->name); ?></td>
+                                                <td><?php echo htmlspecialchars($album->artist); ?></td>
+                                                <td><a href="<?php echo htmlspecialchars($album->url); ?>" target="_blank">View</a></td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    <?php else: ?>
+                                        <tr>
+                                            <td colspan="4" class="lead text-center">No items match the filter</td>
+                                        </tr>
+                                    <?php endif; ?>
+                                </tbody>
+                            </table>
+                        <?php endif; ?>
+                    </div>
+
+                    <!-- Top Artists Section -->
+                    <?php if ($top_artists_filt != "hide"): ?>
+                        <div class="table-responsive">
+                            <h3>Top Artists</h3>
+                            <?php if (isset($error)): ?>
+                                <p><?php echo $error; ?></p>
+                            <?php else: ?>
+                                <table class="table table-dark table-hover" id="top-artists">
+                                    <thead>
+                                        <tr>
+                                            <th>Playcount</th>
+                                            <th>Artist Name</th>
+                                            <th>URL</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php if (count($top_artists_filt) > 0): ?>
+                                            <?php foreach ($top_artists_filt as $artist): ?>
+                                                <tr>
+                                                    <td><?php echo htmlspecialchars($artist->playCount); ?></td>
+                                                    <td><?php echo htmlspecialchars($artist->name); ?></td>
+                                                    <td>
+                                                        <a href="<?php echo htmlspecialchars($artist->url); ?>" target="_blank">View</a>
+                                                    </td>
+                                                </tr>
+                                            <?php endforeach; ?>
+                                        <?php else: ?>
+                                            <tr>
+                                                <td colspan="3" class="lead text-center">No items match the filter</td>
+                                            </tr>
+                                        <?php endif; ?>
+                                    </tbody>
+                                </table>
+                            <?php endif; ?>
+                        </div>
                     <?php endif; ?>
-                </div>
+
+                    <!-- Top Tracks Section -->
+                    <div class="table-responsive">
+                        <h3>Top Tracks</h3>
+                        <?php if (isset($error)): ?>
+                            <p><?php echo $error; ?></p>
+                        <?php else: ?>
+                            <table class="table table-dark table-hover" id="top-tracks">
+                                <thead>
+                                    <tr>
+                                        <th>Playcount</th>
+                                        <th>Track Name</th>
+                                        <th>Artist Name</th>
+                                        <th>URL</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php if (count($top_tracks_filt) > 0): ?>
+                                        <?php foreach ($top_tracks_filt as $track): ?>
+                                            <tr>
+                                                <td><?php echo htmlspecialchars($track->playCount); ?></td>
+                                                <td><?php echo htmlspecialchars($track->name); ?></td>
+                                                <td><?php echo htmlspecialchars($track->artist); ?></td>
+                                                <td><a href="<?php echo htmlspecialchars($track->url); ?>" target="_blank">View</a></td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    <?php else: ?>
+                                        <tr>
+                                            <td colspan="4" class="lead text-center">No items match the filter</td>
+                                        </tr>
+                                    <?php endif; ?>
+                                </tbody>
+                            </table>
+                        <?php endif; ?>
+                    </div>
+                <?php else: ?>
+                    <h1>Please add your Last.fm account</h1>
+                <?php endif; ?>
 
                 <!-- Commented out for consistency -->
                <!-- <?php if ($error): ?>

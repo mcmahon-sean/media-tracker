@@ -4,6 +4,8 @@
 require_once '../config.php';
 require_once '../models/Last.FM/LastFmAlbum.php';
 
+$topAlbums = [];
+
 // Username and API from config file
 $apiKey = LASTFM_API_KEY;
 

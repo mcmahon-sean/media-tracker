@@ -137,43 +137,47 @@
                     </div>
                 </div>
 
-                <div class="table-responsive">
-                    <h3>Top Artists</h3>
-                    <?php if (isset($error)): ?>
-                        <p><?php echo $error; ?></p>
-                    <?php else: ?>
-                        <table class="table table-dark table-hover" id="top-artists">
-                            <thead>
-                                <tr>
-                                    <th><a class="sort-link"<?php echo sortLink($sort_field, $sort_dir, "playcount", $filtUrl) ?>>
-                                        Playcount
-                                    </a></th>
-                                    <th><a class="sort-link"<?php echo sortLink($sort_field, $sort_dir, "name", $filtUrl) ?>>
-                                        Artist Name
-                                    </th>
-                                    <th>URL</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php if (count($top_artists_filt) > 0): ?>
-                                    <?php foreach ($top_artists_filt as $artist): ?>
-                                        <tr>
-                                            <td><?php echo htmlspecialchars($artist->playCount); ?></td>
-                                            <td><?php echo htmlspecialchars($artist->name); ?></td>
-                                            <td>
-                                                <a href="<?php echo htmlspecialchars($artist->url); ?>" target="_blank">View</a>
-                                            </td>
-                                        </tr>
-                                    <?php endforeach; ?>
-                                <?php else: ?>
+                <?php if (isset($_SESSION['user_platform_ids']['lastfm'])): ?>
+                    <div class="table-responsive">
+                        <h3>Top Artists</h3>
+                        <?php if (isset($error)): ?>
+                            <p><?php echo $error; ?></p>
+                        <?php else: ?>
+                            <table class="table table-dark table-hover" id="top-artists">
+                                <thead>
                                     <tr>
-                                        <td colspan="3" class="lead text-center">No items match the filter</td>
+                                        <th><a class="sort-link"<?php echo sortLink($sort_field, $sort_dir, "playcount", $filtUrl) ?>>
+                                            Playcount
+                                        </a></th>
+                                        <th><a class="sort-link"<?php echo sortLink($sort_field, $sort_dir, "name", $filtUrl) ?>>
+                                            Artist Name
+                                        </th>
+                                        <th>URL</th>
                                     </tr>
-                                <?php endif; ?>
-                            </tbody>
-                        </table>
-                    <?php endif; ?>
-                </div>
+                                </thead>
+                                <tbody>
+                                    <?php if (count($top_artists_filt) > 0): ?>
+                                        <?php foreach ($top_artists_filt as $artist): ?>
+                                            <tr>
+                                                <td><?php echo htmlspecialchars($artist->playCount); ?></td>
+                                                <td><?php echo htmlspecialchars($artist->name); ?></td>
+                                                <td>
+                                                    <a href="<?php echo htmlspecialchars($artist->url); ?>" target="_blank">View</a>
+                                                </td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    <?php else: ?>
+                                        <tr>
+                                            <td colspan="3" class="lead text-center">No items match the filter</td>
+                                        </tr>
+                                    <?php endif; ?>
+                                </tbody>
+                            </table>
+                        <?php endif; ?>
+                    </div>
+                <?php else: ?>
+                    <h1>Please add your Last.fm account</h1>
+                <?php endif; ?>
             </main>
         </div>
     </div>

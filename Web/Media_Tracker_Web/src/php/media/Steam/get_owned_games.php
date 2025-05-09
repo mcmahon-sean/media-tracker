@@ -3,6 +3,8 @@
 require_once '../config.php';
 require_once '../models/Steam/SteamGame.php';
 
+$ownedGames = [];
+
 $error = null;
 
 if(isset($_SESSION['user_platform_ids']['steam'])) {
