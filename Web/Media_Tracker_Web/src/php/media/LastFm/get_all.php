@@ -3,44 +3,52 @@
 // Require config file
 require_once('../../configs/lastfm-config.php');
 
-// Username and API from config file
-
-$apiKey = LASTFM_API_KEY;
-if(isset($_SESSION['signed_in']) && $_SESSION['signed_in'] === true) {
-
-    $username = $_SESSION['user_platform_ids']['lastfm'];
-
-    // URLs for the API requests
-    $lovedTracksUrl = "https://ws.audioscrobbler.com/2.0/?method=user.getlovedtracks&user=$username&api_key=$apiKey&format=json&limit=10";
-    $recentTracksUrl = "https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=$username&api_key=$apiKey&format=json&limit=10";
-    $topAlbumsUrl = "https://ws.audioscrobbler.com/2.0/?method=user.gettopalbums&user=$username&api_key=$apiKey&format=json&limit=10";
-    $topArtistsUrl = "https://ws.audioscrobbler.com/2.0/?method=user.gettopartists&user=$username&api_key=$apiKey&limit=10&format=json";
-    $topTracksUrl = "https://ws.audioscrobbler.com/2.0/?method=user.gettoptracks&user=$username&api_key=$apiKey&format=json&limit=10";
-
-    // Initialize variables
+ // Initialize variables
     $recentTracks = [];
     $lovedTracks = [];
     $topAlbums = [];
     $topArtists = [];
     $topTracks = [];
-    $error = '';
+    $error = null;
 
-    // Fetch data function
-    function fetchData($url, &$data, &$error, $dataName) {
-        $json = @file_get_contents($url);
-        if ($json === FALSE) {
-            $error = "Failed to fetch $dataName. Please check your username or API key.";
-        } else {
-            $data = json_decode($json, true);
+    // Username and API from config file
+$apiKey = LASTFM_API_KEY;
+if(isset($_SESSION['signed_in']) && $_SESSION['signed_in'] === true) {
+
+    if(!isset($_SESSION['user_platform_ids']['lastfm'])) {
+        $error = 'Last.fm Id is missing.';
+    } else {
+        
+        $username = $_SESSION['user_platform_ids']['lastfm'];
+
+        // URLs for the API requests
+        $lovedTracksUrl = "https://ws.audioscrobbler.com/2.0/?method=user.getlovedtracks&user=$username&api_key=$apiKey&format=json&limit=10";
+        $recentTracksUrl = "https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=$username&api_key=$apiKey&format=json&limit=10";
+        $topAlbumsUrl = "https://ws.audioscrobbler.com/2.0/?method=user.gettopalbums&user=$username&api_key=$apiKey&format=json&limit=10";
+        $topArtistsUrl = "https://ws.audioscrobbler.com/2.0/?method=user.gettopartists&user=$username&api_key=$apiKey&limit=10&format=json";
+        $topTracksUrl = "https://ws.audioscrobbler.com/2.0/?method=user.gettoptracks&user=$username&api_key=$apiKey&format=json&limit=10";
+
+    
+
+        // Fetch data function
+        function fetchData($url, &$data, &$error, $dataName) {
+            $json = @file_get_contents($url);
+            if ($json === FALSE) {
+                $error = "Failed to fetch $dataName. Please check your username or API key.";
+            } else {
+                $data = json_decode($json, true);
+            }
         }
+
+        // Fetch all data using fetchData()
+        fetchData($recentTracksUrl, $recentTracks, $error, 'recent tracks');
+        fetchData($lovedTracksUrl, $lovedTracks, $error, 'loved tracks');
+        fetchData($topAlbumsUrl, $topAlbums, $error, 'top albums');
+        fetchData($topArtistsUrl, $topArtists, $error, 'top artists');
+        fetchData($topTracksUrl, $topTracks, $error, 'top tracks');
     }
 
-    // Fetch all data using fetchData()
-    fetchData($recentTracksUrl, $recentTracks, $error, 'recent tracks');
-    fetchData($lovedTracksUrl, $lovedTracks, $error, 'loved tracks');
-    fetchData($topAlbumsUrl, $topAlbums, $error, 'top albums');
-    fetchData($topArtistsUrl, $topArtists, $error, 'top artists');
-    fetchData($topTracksUrl, $topTracks, $error, 'top tracks');
+
 
 } else{
     $error = "Please login to view.";

@@ -7,6 +7,8 @@
     require_once '../media/TMDB/get_rated_movies.php';
     require_once '../filter_functions.php';
 
+    $ratedMovies = [];
+
     $has_filter = isset($_GET["searchString"]) && $_GET["searchString"] != "";
     // Grab the input string and selected category for searching from the post array
     $filter_string = $_GET["searchString"] ?? "";

@@ -11,6 +11,11 @@
     require_once '../media/LastFm/get_top_tracks.php';
     require_once '../filter_functions.php';
 
+    $recentTracks = [];
+    $topAlbums = [];
+    $topTracks = [];
+    $topArtists = [];
+
     $has_filter = isset($_POST["searchString"]) && $_POST["searchString"] != "";
     // Grab the input string and selected category for searching from the post array
     $filter_string = $_POST["searchString"] ?? "";
@@ -319,11 +324,14 @@
                     <?php endif; ?>
                 </div>
 
-                <?php if ($error): ?>
+                <!-- Commented out for consistency -->
+               <!-- <?php if ($error): ?>
                     <div class="alert alert-danger">
                         <?php echo htmlspecialchars($error); ?>
                     </div>
-                <?php endif; ?>
+                <?php endif; ?> -->
+               
+
             </main>
         </div>
     </div>
