@@ -104,7 +104,6 @@
                                 </div>
                             </div>
                             <div class="row mb-3 mx-1">
-                                
                                 <label id="usrLabel" class="form-label col-xxl-2 col-lg-3 col-md-5 lead" for="user_plat_id">
                                     Enter Username:
                                 </label>
@@ -122,6 +121,14 @@
                             const platform = document.getElementById("platform_id").value;
                             const user_plat_id = document.getElementById("user_plat_id").value;
                             const username = document.querySelector("input[name='username']").value;
+                            const userLabel = document.getElementById("usrLabel");
+
+                            if (platform == "1") {
+                                userLabel.innerHTML = "Enter Steam ID:";
+                            }
+                            else {
+                                userLabel.innerHTML = "Enter Username:";
+                            }
 
                             switch (platform) {
                                 case "3":
