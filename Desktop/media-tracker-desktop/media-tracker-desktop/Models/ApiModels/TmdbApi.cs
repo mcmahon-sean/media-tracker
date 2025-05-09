@@ -139,12 +139,10 @@ namespace media_tracker_desktop.Models.ApiModels
         {
             // Build the url to create a new request token.
             string urlWithEndpoint = $"{_baseUrl}/authentication/token/new";
-            string authHeader = $"Bearer {_authToken}";
 
             RestRequest request = new RestRequest(urlWithEndpoint);
 
-            request.AddHeader("accept", "application/json");
-            request.AddHeader("Authorization", authHeader);
+            request.AddParameter("api_key", _apiKey);
 
             var response = await _client.GetAsync(request);
 
@@ -153,8 +151,6 @@ namespace media_tracker_desktop.Models.ApiModels
             {
                 // Retrieve the request token.
                 var requestToken = JObject.Parse(response.Content)["request_token"].ToString();
-
-                Console.WriteLine("{0}", response.Content);
 
                 // Build the url to send the user to authenticate this app, appending the request token.
                 var requestTokenUrl = $"{_requestTokenUrl}{requestToken}";
@@ -175,12 +171,12 @@ namespace media_tracker_desktop.Models.ApiModels
                         string jsonBodyToken = requestToken;
 
                         // Build the url to exchange the request token for a session token.
-                        urlWithEndpoint = $"{_baseUrl}/authentication/session/new";
-
+                        urlWithEndpoint = $"{_baseUrl}/authentication/session/new?api_key={_apiKey}";
+                        
                         request = new RestRequest(urlWithEndpoint);
 
                         request.AddHeader("accept", "application/json");
-                        request.AddHeader("Authorization", authHeader);
+                        request.AddHeader("Content-Type", "application/json");
                         request.AddJsonBody(new { request_token = requestToken });
 
                         response = await _client.PostAsync(request);
@@ -197,10 +193,6 @@ namespace media_tracker_desktop.Models.ApiModels
                         {
                             return string.Empty;
                         }
-                    }
-                    catch (HttpRequestException)
-                    {
-                        throw;
                     }
                     catch (Exception)
                     {
@@ -239,7 +231,7 @@ namespace media_tracker_desktop.Models.ApiModels
             RestRequest request = new RestRequest(urlWithEndpoint);
 
             request.AddParameter("session_id", _sessionID);
-            request.AddHeader("Authorization", $"Bearer {_authToken}");
+            request.AddParameter("api_key", _apiKey);
 
             var response = await _client.ExecuteAsync(request);
 
@@ -286,7 +278,7 @@ namespace media_tracker_desktop.Models.ApiModels
             request.AddParameter("page", 1);
             request.AddParameter("sort_by", "created_at.desc");
             request.AddParameter("session_id", _sessionID);
-            request.AddHeader("Authorization", $"Bearer {_authToken}");
+            request.AddParameter("api_key", _apiKey);
 
             var response = await _client.ExecuteAsync(request);
 
@@ -339,7 +331,7 @@ namespace media_tracker_desktop.Models.ApiModels
             request.AddParameter("page", 1);
             request.AddParameter("sort_by", "created_at.asc");
             request.AddParameter("session_id", _sessionID);
-            request.AddHeader("Authorization", $"Bearer {_authToken}");
+            request.AddParameter("api_key", _apiKey);
 
             var response = await _client.ExecuteAsync(request);
 
@@ -387,7 +379,7 @@ namespace media_tracker_desktop.Models.ApiModels
             request.AddParameter("page", 1);
             request.AddParameter("sort_by", "created_at.asc");
             request.AddParameter("session_id", _sessionID);
-            request.AddHeader("Authorization", $"Bearer {_authToken}");
+            request.AddParameter("api_key", _apiKey);
 
             var response = await _client.ExecuteAsync(request);
 

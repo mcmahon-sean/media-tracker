@@ -13,28 +13,42 @@ using media_tracker_desktop.Models.ApiModels;
 using media_tracker_desktop.Models.LastFM;
 using System.Data;
 using static System.Net.Mime.MediaTypeNames;
+using media_tracker_desktop.Models.SupabaseFunctionObjects;
 
 namespace media_tracker_desktop.Forms
 {
     public partial class LinkTmdbForm : Form
     {
-        private readonly string[] SORT_OPTIONS_ASC = ["Title (asc)", "Favorite (asc)"];
-        private readonly string[] SORT_OPTIONS_DESC = ["Title (desc)", "Favorite (desc)"];
+        private readonly string[] SORT_OPTIONS_FAVORITE_TV_SHOW_ASC = ["Favorite (asc)", "ID (asc)", "Name (asc)"];
+        private readonly string[] SORT_OPTIONS_FAVORITE_TV_SHOW_DESC = ["Favorite (desc)", "ID (desc)", "Name (desc)"];
+
+        private readonly string[] SORT_OPTIONS_FAVORITE_MOVIE_ASC = ["Favorite (asc)", "ID (asc)", "Name (asc)"];
+        private readonly string[] SORT_OPTIONS_FAVORITE_MOVIE_DESC = ["Favorite (desc)", "ID (desc)", "Name (desc)"];
+
+        private const string FILLED_STAR = "\u2605";
+        private const string EMPTY_STAR = "\u2730";
 
         private DataTable _tableData = new DataTable();
-        private Panel _pnlSearchAndSort = new Panel();
-        private TextBox _txtSearch = new TextBox();
+        private Panel? _pnlSearchAndSort = null;
+        private TextBox? _txtSearch = null;
         private Button _btnSort = new Button();
-        private ContextMenuStrip _sortMenu = new ContextMenuStrip();
+        private ContextMenuStrip? _sortMenu = null;
 
         private bool _tmdbSortVisible = false;
         private List<UserFavoriteMedia> _favorites = [];
         private List<TMDB_TV_Show> _tvShows = [];
+        private int _tvShowCount = 0;
         private List<TMDB_Movie> _movies = [];
+        private int _movieCount = 0;
 
-        public LinkTmdbForm()
+        private string _dataOption = "";
+
+        public LinkTmdbForm(string option = "")
         {
             InitializeComponent();
+
+            // Store the endpoint option.
+            _dataOption = option;
 
             // If user has a TMDB id,
             if (!string.IsNullOrEmpty(UserAppAccount.UserTmdbSessionID))
@@ -52,33 +66,17 @@ namespace media_tracker_desktop.Forms
                 // If user has a TMDB account linked,
                 if (!string.IsNullOrEmpty(UserAppAccount.UserTmdbAccountID) && !string.IsNullOrEmpty(UserAppAccount.UserTmdbSessionID))
                 {
-                    // Retrieve user information.
-                    (bool success, TMDB_Account? userAccount) = await TmdbApi.GetAccountDetails();
+                    await BuildViewGridBasedOnOption();
 
-                    // If success,
-                    if (success && userAccount != null)
-                    {
-                        //get favorite tv and movies
-                        (bool isTVSuccess, List<TMDB_TV_Show>? shows) = await TmdbApi.GetUserFavoriteTV();
-                        (bool isMovieSuccess, List<TMDB_Movie>? movies) = await TmdbApi.GetUserFavoriteMovies();
-
-                        _tvShows = shows ?? [];
-                        _movies = movies ?? [];
-
-                        BuildViewGrid(shows ?? [], movies ?? []);
-
-                        BuildSearchAndSortPanel();
-
-                        // Subscribe to event handlers:
-                        // When any of the favorite buttons are clicked.
-                        tmdbDataGridView.CellClick += btnFavorite_CellClick!;
-                        // When any sort items in the sort menu are clicked.
-                        _sortMenu.ItemClicked += sortMenu_ItemClicked!;
-                        // When the sort menu button is clicked.
-                        _btnSort.Click += btnSort_Click!;
-                        // When user presses a button in search bar.
-                        _txtSearch.KeyDown += txtSearch_KeyDown!;
-                    }
+                    // Subscribe to event handlers:
+                    // When any of the favorite buttons are clicked.
+                    tmdbDataGridView.CellClick += btnFavorite_CellClick!;
+                    // When any sort items in the sort menu are clicked.
+                    _sortMenu.ItemClicked += sortMenu_ItemClicked!;
+                    // When the sort menu button is clicked.
+                    _btnSort.Click += btnSort_Click!;
+                    // When user presses a button in search bar.
+                    _txtSearch.KeyDown += txtSearch_KeyDown!;
                 }
                 // If user doesn't have TMDB account linked,
                 else
@@ -93,29 +91,131 @@ namespace media_tracker_desktop.Forms
             }
         }
 
-        public void BuildViewGrid(List<TMDB_TV_Show> shows, List<TMDB_Movie> movies)
+        /// <summary>
+        /// Builds display based on endpoint option.
+        /// </summary>
+        private async Task BuildViewGridBasedOnOption()
+        {
+            if (_pnlSearchAndSort == null)
+            {
+                BuildSearchAndSortPanel();
+            }
+
+            if (_dataOption == MainForm.TMDBOptions[0])
+            {
+                // Retrieve data.
+                (bool isTVSuccess, List<TMDB_TV_Show>? tvShows) = await TmdbApi.GetUserFavoriteTV();
+
+                // Store the count for an error message that occurs when user doesn't have data.
+                // Placed here because this is the freshest data.
+                _tvShowCount = tvShows != null ? tvShows.Count : 0;
+
+                // Save data.
+                _tvShows = tvShows ?? [];
+
+                if (_sortMenu == null)
+                {
+                    _sortMenu = AppElement.GetSortMenu(SORT_OPTIONS_FAVORITE_TV_SHOW_ASC);
+                }
+                if (_txtSearch != null)
+                {
+                    _txtSearch.PlaceholderText = "Search for name...";
+                }
+
+                // Build display.
+                BuildFavoriteTVShowViewGrid(_tvShows);
+            }
+            else if (_dataOption == MainForm.TMDBOptions[1])
+            {
+                // Retrieve data.
+                (bool isMovieSuccess, List<TMDB_Movie>? movies) = await TmdbApi.GetUserFavoriteMovies();
+
+                // Store the count for an error message that occurs when user doesn't have data.
+                // Placed here because this is the freshest data.
+                _movieCount = movies != null ? movies.Count : 0;
+
+                // Save data.
+                _movies = movies ?? [];
+
+                if (_sortMenu == null)
+                {
+                    _sortMenu = AppElement.GetSortMenu(SORT_OPTIONS_FAVORITE_MOVIE_ASC);
+                }
+                if (_txtSearch != null)
+                {
+                    _txtSearch.PlaceholderText = "Search for title...";
+                }
+
+                // Build display.
+                BuildFavoriteMovieViewGrid(_movies);
+            }
+        }
+
+        private void BuildFavoriteTVShowViewGrid(List<TMDB_TV_Show> tvShows)
         {
             _tableData = new DataTable();
 
+            // Columns:
             _tableData.Columns.Add("ID");
-            _tableData.Columns.Add("Title");
-            _tableData.Columns.Add("Format");
+            _tableData.Columns.Add("Name");
 
-            foreach (TMDB_TV_Show show in shows)
+            // Return if no favorite tv shows.
+            if (_tvShowCount <= 0 || _tvShows == null)
             {
-                _tableData.Rows.Add(show.ID, show.Name, "TV Show");
+                MessageBox.Show("You don't have any favorite tv show.", "No Data", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
-            foreach (TMDB_Movie movie in movies)
+
+            // Foreach data,
+            foreach (TMDB_TV_Show tvShow in tvShows)
             {
-                _tableData.Rows.Add(movie.ID, movie.Title, "Movie");
+                // Add row.
+                _tableData.Rows.Add(tvShow.ID, tvShow.Name);
             }
 
             tmdbDataGridView.DataSource = _tableData;
 
-            tmdbDataGridView.Columns["ID"].Visible = false;
+            // Configurations:
+            //tmdbDataGridView.Columns["ID"].Visible = false;
             tmdbDataGridView.RowHeadersVisible = false;
             tmdbDataGridView.AllowUserToAddRows = false;
+            tmdbDataGridView.ReadOnly = true;
 
+            tmdbDataGridView.Columns["ID"].Width = 200;
+            tmdbDataGridView.Columns["Name"].Width = 200;
+
+            BuildFavoriteButtonColumn();
+        }
+
+        private void BuildFavoriteMovieViewGrid(List<TMDB_Movie> movies)
+        {
+            _tableData = new DataTable();
+
+            // Columns:
+            _tableData.Columns.Add("ID");
+            _tableData.Columns.Add("Title");
+
+            // Return if no favorite movies.
+            if (_movieCount <= 0 || _movies == null)
+            {
+                MessageBox.Show("You don't have any favorite movie.", "No Data", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+
+            // Foreach data,
+            foreach (TMDB_Movie movie in movies)
+            {
+                // Add row.
+                _tableData.Rows.Add(movie.ID, movie.Title);
+            }
+
+            tmdbDataGridView.DataSource = _tableData;
+
+            // Configurations:
+            //tmdbDataGridView.Columns["ID"].Visible = false;
+            tmdbDataGridView.RowHeadersVisible = false;
+            tmdbDataGridView.AllowUserToAddRows = false;
+            tmdbDataGridView.ReadOnly = true;
+
+            tmdbDataGridView.Columns["ID"].Width = 200;
             tmdbDataGridView.Columns["Title"].Width = 200;
 
             BuildFavoriteButtonColumn();
@@ -131,11 +231,11 @@ namespace media_tracker_desktop.Forms
             // Foreach row in the data grid,
             foreach (DataGridViewRow row in tmdbDataGridView.Rows)
             {
+                // Default: Unfavorite the button.
+                row.Cells["btnFavorite"].Value = EMPTY_STAR;
+
                 // Retrieve the current ID for movie or tv show.
                 string currentRowAppID = (string)row.Cells["ID"].Value;
-
-                // Default: Unfavorite the button.
-                row.Cells["btnFavorite"].Value = "\u2730";
 
                 // Retrieve the tv show/movie with the same ID from the favorite list.
                 // Make sure that it is from the TMDB platform.
@@ -144,7 +244,7 @@ namespace media_tracker_desktop.Forms
                 // If a tv show/movie exist, mark the button as favorite.
                 if (favoriteMedia != null)
                 {
-                    row.Cells["btnFavorite"].Value = "\u2605";
+                    row.Cells["btnFavorite"].Value = FILLED_STAR;
                 }
             }
         }
@@ -182,34 +282,45 @@ namespace media_tracker_desktop.Forms
                 if (favoriteMedia == null)
                 {
                     // Fill in the star.
-                    currentButton.Value = "\u2605";
+                    currentButton.Value = FILLED_STAR;
                 }
                 // Else,
                 else
                 {
                     // Empty the star.
-                    currentButton.Value = "\u2730";
+                    currentButton.Value = EMPTY_STAR;
                 }
 
-                // Retrieve the media title of the current row.
-                string currentRowTitle = (string)tmdbDataGridView.Rows[e.RowIndex].Cells["Title"].Value;
-
-                // Determine the correct format.
-                var format = UserAppAccount.MediaTypeID.TV_Show;
-                if ((string)tmdbDataGridView.Rows[e.RowIndex].Cells["Format"].Value == "Movie")
+                if (_dataOption == MainForm.TMDBOptions[0])
                 {
-                    format = UserAppAccount.MediaTypeID.Film;
-                }
+                    // Retrieve the media name of the current row.
+                    string currentRowName = (string)tmdbDataGridView.Rows[e.RowIndex].Cells["Name"].Value;
 
-                // Update the favorite status of the media.
-                // The SP unfavorites/favorites media.
-                await UserAppAccount.FavoriteMedia(
-                    platformID: UserAppAccount.TMDBPlatformID,
-                    username: UserAppAccount.Username,
-                    mediaTypeID: format,
-                    mediaPlatformID: currentRowAppID,
-                    title: currentRowTitle
-                    );
+                    // Update the favorite status of the media.
+                    // The SP unfavorites/favorites media.
+                    await UserAppAccount.FavoriteMedia(
+                        platformID: UserAppAccount.TMDBPlatformID,
+                        username: UserAppAccount.Username,
+                        mediaTypeID: UserAppAccount.MediaTypeID.TV_Show,
+                        mediaPlatformID: currentRowAppID,
+                        title: currentRowName
+                        );
+                }
+                else if (_dataOption == MainForm.TMDBOptions[1])
+                {
+                    // Retrieve the media title of the current row.
+                    string currentRowTitle = (string)tmdbDataGridView.Rows[e.RowIndex].Cells["Title"].Value;
+
+                    // Update the favorite status of the media.
+                    // The SP unfavorites/favorites media.
+                    await UserAppAccount.FavoriteMedia(
+                        platformID: UserAppAccount.TMDBPlatformID,
+                        username: UserAppAccount.Username,
+                        mediaTypeID: UserAppAccount.MediaTypeID.Film,
+                        mediaPlatformID: currentRowAppID,
+                        title: currentRowTitle
+                        );
+                }
             }
             catch (Exception error)
             {
@@ -228,16 +339,12 @@ namespace media_tracker_desktop.Forms
 
             // Retrieve the search box and sort button from panel.
             _txtSearch = (TextBox)_pnlSearchAndSort.Controls["txtSearch"]!;
-            _txtSearch.PlaceholderText = "Search for title...";
 
             _btnSort = (Button)_pnlSearchAndSort.Controls["btnSort"]!;
-
-            // Add sort menu.
-            _sortMenu = AppElement.GetSortMenu(SORT_OPTIONS_ASC);
         }
 
         // Event: When user presses a button in the search textbox.
-        private void txtSearch_KeyDown(object sender, KeyEventArgs e)
+        private async void txtSearch_KeyDown(object sender, KeyEventArgs e)
         {
             // If user pressed enter,
             if (e.KeyCode == Keys.Enter)
@@ -257,7 +364,7 @@ namespace media_tracker_desktop.Forms
                 else
                 {
                     // Reset display.
-                    BuildViewGrid(_tvShows, _movies);
+                    await BuildViewGridBasedOnOption();
                 }
             }
         }
@@ -267,29 +374,51 @@ namespace media_tracker_desktop.Forms
         {
             text.ToLower();
 
-            // Query options:
-            // Ensure that the search is case insensitive.
-            QueryOptions<TMDB_TV_Show> optionTvShow = new QueryOptions<TMDB_TV_Show>
+            if (_dataOption == MainForm.TMDBOptions[0])
             {
-                Where = t => t.Name.ToLower().Contains(text)
-            };
+                // Query options:
+                // Ensure that the search is case insensitive.
+                QueryOptions<TMDB_TV_Show> optionTvShow = new QueryOptions<TMDB_TV_Show>
+                {
+                    Where = t => t.Name.ToLower().Contains(text)
+                };
 
-            QueryOptions<TMDB_Movie> optionMovie = new QueryOptions<TMDB_Movie>
+                // Retrieve data.
+                List<TMDB_TV_Show> resultTvShows = DataFunctions.Sort(_tvShows, optionTvShow) ?? [];
+
+                // Store data, so that the sort works on the searched data.
+                _tvShows = resultTvShows;
+
+                BuildFavoriteTVShowViewGrid(resultTvShows);
+            }
+            else if (_dataOption == MainForm.TMDBOptions[1])
             {
-                Where = m => m.Title.ToLower().Contains(text)
-            };
+                // Query options:
+                // Ensure that the search is case insensitive.
+                QueryOptions<TMDB_Movie> optionMovie = new QueryOptions<TMDB_Movie>
+                {
+                    Where = m => m.Title.ToLower().Contains(text)
+                };
 
-            // Retrieve data.
-            List<TMDB_TV_Show> resultTvShows = DataFunctions.Sort(_tvShows, optionTvShow) ?? [];
-            List<TMDB_Movie> resultMovies = DataFunctions.Sort(_movies, optionMovie) ?? [];
+                // Retrieve data.
+                List<TMDB_Movie> resultMovies = DataFunctions.Sort(_movies, optionMovie) ?? [];
 
-            // Display data.
-            BuildViewGrid(resultTvShows, resultMovies);
+                // Store data, so that the sort works on the searched data.
+                _movies = resultMovies;
+
+                BuildFavoriteMovieViewGrid(resultMovies);
+            }
         }
 
         // Event: When sort button is clicked.
         private void btnSort_Click(object sender, EventArgs e)
         {
+            if (_sortMenu == null)
+            {
+                MessageBox.Show("Sort menu didn't show up.");
+                return;
+            }
+
             // Retrieve sort button.
             _btnSort = (Button)sender;
 
@@ -333,157 +462,268 @@ namespace media_tracker_desktop.Forms
         // Method: Sorts the data based on sort option.
         private void SortData(string option)
         {
-            List<TMDB_TV_Show>? sortedTvShows = [];
-            List<TMDB_Movie>? sortedMovies = [];
-
-            // If there is data to be sorted,
-            if (_tvShows != null && _movies != null)
+            // Display Option 1
+            if (_dataOption == MainForm.TMDBOptions[0])
             {
-                // First Sorting Option
-                if (option == SORT_OPTIONS_ASC[0])
+                List<TMDB_TV_Show> sortedTVShows = [];
+
+                // Sorting Option 1
+                if (option == SORT_OPTIONS_FAVORITE_TV_SHOW_ASC[0])
                 {
-                    QueryOptions<TMDB_TV_Show> optionTvShow = new QueryOptions<TMDB_TV_Show>
+                    // Sort data.
+                    sortedTVShows = SortFavoriteTVShow("asc");
+
+                    // Change sort option to opposite.
+                    _sortMenu.Items[0].Text = SORT_OPTIONS_FAVORITE_TV_SHOW_DESC[0];
+
+                    // Display.
+                    BuildFavoriteTVShowViewGrid(sortedTVShows);
+                }
+                else if (option == SORT_OPTIONS_FAVORITE_TV_SHOW_DESC[0])
+                {
+                    // Sort data.
+                    sortedTVShows = SortFavoriteTVShow("desc");
+
+                    // Change sort option to opposite.
+                    _sortMenu.Items[0].Text = SORT_OPTIONS_FAVORITE_TV_SHOW_ASC[0];
+
+                    // Display.
+                    BuildFavoriteTVShowViewGrid(sortedTVShows);
+                }
+                // Sorting Option 2
+                if (option == SORT_OPTIONS_FAVORITE_TV_SHOW_ASC[1])
+                {
+                    QueryOptions<TMDB_TV_Show> options = new QueryOptions<TMDB_TV_Show>
+                    {
+                        OrderBy = t => t.ID,
+                        OrderByDirection = "asc"
+                    };
+
+                    // Sort data.
+                    sortedTVShows = DataFunctions.Sort(_tvShows, options) ?? [];
+
+                    // Change sort option to opposite.
+                    _sortMenu.Items[1].Text = SORT_OPTIONS_FAVORITE_TV_SHOW_DESC[1];
+
+                    // Display.
+                    BuildFavoriteTVShowViewGrid(sortedTVShows);
+                }
+                else if (option == SORT_OPTIONS_FAVORITE_TV_SHOW_DESC[1])
+                {
+                    QueryOptions<TMDB_TV_Show> options = new QueryOptions<TMDB_TV_Show>
+                    {
+                        OrderBy = t => t.ID,
+                        OrderByDirection = "desc"
+                    };
+
+                    // Sort data.
+                    sortedTVShows = DataFunctions.Sort(_tvShows, options) ?? [];
+
+                    // Change sort option to opposite.
+                    _sortMenu.Items[1].Text = SORT_OPTIONS_FAVORITE_TV_SHOW_ASC[1];
+
+                    // Display.
+                    BuildFavoriteTVShowViewGrid(sortedTVShows);
+                }
+                // Sorting Option 3
+                if (option == SORT_OPTIONS_FAVORITE_TV_SHOW_ASC[2])
+                {
+                    QueryOptions<TMDB_TV_Show> options = new QueryOptions<TMDB_TV_Show>
                     {
                         OrderBy = t => t.Name,
                         OrderByDirection = "asc"
                     };
 
-                    QueryOptions<TMDB_Movie> optionMovie = new QueryOptions<TMDB_Movie>
-                    {
-                        OrderBy = m => m.Title,
-                        OrderByDirection = "asc"
-                    };
+                    // Sort data.
+                    sortedTVShows = DataFunctions.Sort(_tvShows, options) ?? [];
 
-                    sortedTvShows = DataFunctions.Sort(_tvShows, optionTvShow);
-                    sortedMovies = DataFunctions.Sort(_movies, optionMovie);
+                    // Change sort option to opposite.
+                    _sortMenu.Items[2].Text = SORT_OPTIONS_FAVORITE_TV_SHOW_DESC[2];
 
-                    _sortMenu.Items[0].Text = SORT_OPTIONS_DESC[0];
+                    // Display.
+                    BuildFavoriteTVShowViewGrid(sortedTVShows);
                 }
-                else if (option == SORT_OPTIONS_DESC[0])
+                else if (option == SORT_OPTIONS_FAVORITE_TV_SHOW_DESC[2])
                 {
-                    QueryOptions<TMDB_TV_Show> optionTvShow = new QueryOptions<TMDB_TV_Show>
+                    QueryOptions<TMDB_TV_Show> options = new QueryOptions<TMDB_TV_Show>
                     {
                         OrderBy = t => t.Name,
                         OrderByDirection = "desc"
                     };
 
-                    QueryOptions<TMDB_Movie> optionMovie = new QueryOptions<TMDB_Movie>
+                    // Sort data.
+                    sortedTVShows = DataFunctions.Sort(_tvShows, options) ?? [];
+
+                    // Change sort option to opposite.
+                    _sortMenu.Items[2].Text = SORT_OPTIONS_FAVORITE_TV_SHOW_ASC[2];
+
+                    // Display.
+                    BuildFavoriteTVShowViewGrid(sortedTVShows);
+                }
+            }
+            // Display Option 2
+            else if (_dataOption == MainForm.TMDBOptions[1])
+            {
+                List<TMDB_Movie> sortedMovies = [];
+
+                // Sorting Option 1
+                if (option == SORT_OPTIONS_FAVORITE_MOVIE_ASC[0])
+                {
+                    // Sort data.
+                    sortedMovies = SortFavoriteMovie("asc");
+
+                    // Change sort option to opposite.
+                    _sortMenu.Items[0].Text = SORT_OPTIONS_FAVORITE_MOVIE_DESC[0];
+
+                    // Display.
+                    BuildFavoriteMovieViewGrid(sortedMovies);
+                }
+                else if (option == SORT_OPTIONS_FAVORITE_MOVIE_DESC[0])
+                {
+                    // Sort data.
+                    sortedMovies = SortFavoriteMovie("desc");
+
+                    // Change sort option to opposite.
+                    _sortMenu.Items[0].Text = SORT_OPTIONS_FAVORITE_MOVIE_ASC[0];
+
+                    // Display.
+                    BuildFavoriteMovieViewGrid(sortedMovies);
+                }
+                // Sorting Option 2
+                if (option == SORT_OPTIONS_FAVORITE_MOVIE_ASC[1])
+                {
+                    QueryOptions<TMDB_Movie> options = new QueryOptions<TMDB_Movie>
                     {
-                        OrderBy = m => m.Title,
+                        OrderBy = t => t.ID,
+                        OrderByDirection = "asc"
+                    };
+
+                    // Sort data.
+                    sortedMovies = DataFunctions.Sort(_movies, options) ?? [];
+
+                    // Change sort option to opposite.
+                    _sortMenu.Items[1].Text = SORT_OPTIONS_FAVORITE_MOVIE_DESC[1];
+
+                    // Display.
+                    BuildFavoriteMovieViewGrid(sortedMovies);
+                }
+                else if (option == SORT_OPTIONS_FAVORITE_MOVIE_DESC[1])
+                {
+                    QueryOptions<TMDB_Movie> options = new QueryOptions<TMDB_Movie>
+                    {
+                        OrderBy = t => t.ID,
                         OrderByDirection = "desc"
                     };
 
-                    sortedTvShows = DataFunctions.Sort(_tvShows, optionTvShow);
-                    sortedMovies = DataFunctions.Sort(_movies, optionMovie);
+                    // Sort data.
+                    sortedMovies = DataFunctions.Sort(_movies, options) ?? [];
 
-                    _sortMenu.Items[0].Text = SORT_OPTIONS_ASC[0];
+                    // Change sort option to opposite.
+                    _sortMenu.Items[1].Text = SORT_OPTIONS_FAVORITE_MOVIE_ASC[1];
+
+                    // Display.
+                    BuildFavoriteMovieViewGrid(sortedMovies);
                 }
-                // Second Sorting Option
-                else if (option == SORT_OPTIONS_ASC[1])
+                // Sorting Option 3
+                if (option == SORT_OPTIONS_FAVORITE_MOVIE_ASC[2])
                 {
-                    (List<TMDB_TV_Show> tvShows, List<TMDB_Movie> movies) = RetrieveSortedFavorites("asc");
+                    QueryOptions<TMDB_Movie> options = new QueryOptions<TMDB_Movie>
+                    {
+                        OrderBy = t => t.Title,
+                        OrderByDirection = "asc"
+                    };
 
-                    // Update list.
-                    sortedTvShows = tvShows;
-                    sortedMovies = movies;
+                    // Sort data.
+                    sortedMovies = DataFunctions.Sort(_movies, options) ?? [];
 
-                    // Update the menu item.
-                    _sortMenu.Items[1].Text = SORT_OPTIONS_DESC[1];
+                    // Change sort option to opposite.
+                    _sortMenu.Items[2].Text = SORT_OPTIONS_FAVORITE_MOVIE_DESC[2];
+
+                    // Display.
+                    BuildFavoriteMovieViewGrid(sortedMovies);
                 }
-                else if (option == SORT_OPTIONS_DESC[1])
+                else if (option == SORT_OPTIONS_FAVORITE_MOVIE_DESC[2])
                 {
-                    (List<TMDB_TV_Show> tvShows, List<TMDB_Movie> movies) = RetrieveSortedFavorites("desc");
+                    QueryOptions<TMDB_Movie> options = new QueryOptions<TMDB_Movie>
+                    {
+                        OrderBy = t => t.Title,
+                        OrderByDirection = "desc"
+                    };
 
-                    // Update list.
-                    sortedTvShows = tvShows;
-                    sortedMovies = movies;
+                    // Sort data.
+                    sortedMovies = DataFunctions.Sort(_movies, options) ?? [];
 
-                    // Update the menu item.
-                    _sortMenu.Items[1].Text = SORT_OPTIONS_ASC[1];
+                    // Change sort option to opposite.
+                    _sortMenu.Items[2].Text = SORT_OPTIONS_FAVORITE_MOVIE_ASC[2];
+
+                    // Display.
+                    BuildFavoriteMovieViewGrid(sortedMovies);
                 }
-
-                // Build based on whether or not the list was updated.
-                BuildViewGrid(sortedTvShows ?? [], sortedMovies ?? []);
             }
         }
 
-        // Method: Sorts the favorites.
-        private (List<TMDB_TV_Show>, List<TMDB_Movie>) RetrieveSortedFavorites(string orderByDirection)
+        private List<TMDB_TV_Show> SortFavoriteTVShow(string orderByDirection)
         {
-            // Sort options based on passed orderByDirection.
-            // Also, only tv shows and movies.
             QueryOptions<UserFavoriteMedia> options = new QueryOptions<UserFavoriteMedia>
             {
-                Where = m => m.MediaTypeID == (int)UserAppAccount.MediaTypeID.TV_Show || m.MediaTypeID == (int)UserAppAccount.MediaTypeID.Film,
+                Where = m => m.MediaTypeID == (int)UserAppAccount.MediaTypeID.TV_Show,
                 OrderBy = m => m.MediaID,
                 OrderByDirection = orderByDirection
             };
 
-            // Retrieve the sorted favorites.
             List<UserFavoriteMedia> sortedFavorites = DataFunctions.Sort(_favorites, options) ?? [];
 
-            // Initialize lists.
-            List<TMDB_TV_Show> favoriteTvShowList = [];
-            List<TMDB_TV_Show> unfavoriteTvShowList = [];
-            List<TMDB_Movie> favoriteMovieList = [];
-            List<TMDB_Movie> unfavoriteMovieList = [];
+            List<TMDB_TV_Show> favorites = [];
+            List<TMDB_TV_Show> unfavorites = [];
 
-            // Foreach tv show that is currently in display,
             foreach (TMDB_TV_Show tvShow in _tvShows)
             {
-                // If that tv show is a favorite,
-                if (_favorites.Any(f => f.MediaPlatID == tvShow.ID.ToString()))
+                // If tv show is in favorites,
+                if (sortedFavorites.Any(f => f.MediaPlatID == tvShow.ID.ToString()))
                 {
-                    // Add it to the favorite list.
-                    favoriteTvShowList.Add(tvShow);
+                    // Add it.
+                    favorites.Add(tvShow);
                 }
-                // Else,
                 else
                 {
-                    // Add to the unfavorite list.
-                    unfavoriteTvShowList.Add(tvShow);
+                    // Add to unfavorite list.
+                    unfavorites.Add(tvShow);
                 }
             }
 
-            // Foreach movie that is currently in display,
+            return DataFunctions.SortFavorite(orderByDirection, favorites, unfavorites);
+        }
+
+        private List<TMDB_Movie> SortFavoriteMovie(string orderByDirection)
+        {
+            QueryOptions<UserFavoriteMedia> options = new QueryOptions<UserFavoriteMedia>
+            {
+                Where = m => m.MediaTypeID == (int)UserAppAccount.MediaTypeID.Film,
+                OrderBy = m => m.MediaID,
+                OrderByDirection = orderByDirection
+            };
+
+            List<UserFavoriteMedia> sortedFavorites = DataFunctions.Sort(_favorites, options) ?? [];
+
+            List<TMDB_Movie> favorites = [];
+            List<TMDB_Movie> unfavorites = [];
+
             foreach (TMDB_Movie movie in _movies)
             {
-                // If that movie is a favorite,
-                if (_favorites.Any(f => f.MediaPlatID == movie.ID.ToString()))
+                // If movie is in favorites,
+                if (sortedFavorites.Any(f => f.MediaPlatID == movie.ID.ToString()))
                 {
-                    // Add it to the favorite list.
-                    favoriteMovieList.Add(movie);
+                    // Add it.
+                    favorites.Add(movie);
                 }
-                // Else,
                 else
                 {
-                    // Add to the unfavorite list.
-                    unfavoriteMovieList.Add(movie);
+                    // Add to unfavorite list.
+                    unfavorites.Add(movie);
                 }
             }
 
-            // If the order is asc,
-            if (orderByDirection == "asc")
-            {
-                // Add list together so that the favorite is first.
-                favoriteTvShowList.AddRange(unfavoriteTvShowList);
-                favoriteMovieList.AddRange(unfavoriteMovieList);
-
-                return (favoriteTvShowList, favoriteMovieList);
-            }
-            // If the order is desc,
-            else if (orderByDirection == "desc")
-            {
-                // Add list together so that the favorite is last.
-                unfavoriteTvShowList.AddRange(favoriteTvShowList);
-                unfavoriteMovieList.AddRange(favoriteMovieList);
-
-                return (unfavoriteTvShowList, unfavoriteMovieList);
-            }
-            else
-            {
-                return ([], []);
-            }
+            return DataFunctions.SortFavorite(orderByDirection, favorites, unfavorites);
         }
 
         private async void linkButton_Click(object sender, EventArgs e)
@@ -491,7 +731,7 @@ namespace media_tracker_desktop.Forms
             // Ensure user is logged in.
             if (!UserAppAccount.UserLoggedIn)
             {
-                MessageBox.Show("Please Sign-In first.");
+                MessageBox.Show("Please Sign-In first.", "Not Signed-In", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
 
@@ -510,13 +750,14 @@ namespace media_tracker_desktop.Forms
                     if (sessionId != null)
                     {
                         // Add third party id.
-                        (bool added, string message) = await UserAppAccount.AddThirdPartyId(UserAppAccount.TMDBPlatformID, sessionId);
+                        (bool added, string message) = await Add3rdPartyIDFunction.AddThirdPartyId(UserAppAccount.TMDBPlatformID, sessionId);
 
                         // If added,
                         if (added)
                         {
-                            // Load display.
-                            await LoadTmdbAsync();
+                            pnlLink.Visible = false;
+
+                            MessageBox.Show("Account linked successfully!\n\nChoose an option from the TMDB menu to display data.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
                         }
                         else
                         {
@@ -540,7 +781,7 @@ namespace media_tracker_desktop.Forms
             {
                 if (error.StatusCode == System.Net.HttpStatusCode.Unauthorized)
                 {
-                    MessageBox.Show("Permission denied.");
+                    MessageBox.Show("Permission was not granted.", "Unauthorized", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
             catch (Exception error)

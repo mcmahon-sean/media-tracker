@@ -186,8 +186,12 @@ require_once 'src/php/config.php';
               <p>TMDB ID: Please add your TMDB account</p>
             <?php endif; ?>
 
-            <button onclick="window.location.href='src/php/views/add_edit_3rd_party.php'">Add/Edit Platforms</button>
-            <button onclick="window.location.href='src/php/authentication/logout.php'">Logout</button>
+            <button class="btn bg-dark-secondary text-white" onclick="window.location.href='src/php/views/add_edit_3rd_party.php'">
+              Add/Edit Platforms
+            </button>
+            <button class="btn bg-dark-secondary text-white" onclick="window.location.href='src/php/authentication/logout.php'">
+              Logout
+            </button>
           <?php else: ?>
             <h3>Not signed in!</h3>
             <p class="lead">Sign in to use the Media Tracker</p>

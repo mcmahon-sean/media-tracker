@@ -53,6 +53,10 @@ namespace media_tracker_desktop.Models.Steam
         [JsonProperty("playtime_disconnected")]
         public int PlaytimeDisconnected { get; }
 
+        public float GetPlaytimeHours()
+        {
+            return this.PlaytimeForever / 60;
+        }
 
         [JsonConstructor]
         public Steam_Game(int appId, string name, int playtimeForever, string imgIconUrl, bool hasCommunityStats, int playtimeWindows, int playtimeMac, int playtimeLinux, int playtimeDeck, int rtimeLastPlayed, int playtimeDisconnected)

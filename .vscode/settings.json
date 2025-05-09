@@ -15,5 +15,6 @@
         "useraccounts",
         "userfavorites",
         "usernamevar"
-    ]
+    ],
+    "cmake.sourceDirectory": "C:/Users/Amand/Downloads/media-tracker/Mobile/media_tracker_mobile/linux"
 }

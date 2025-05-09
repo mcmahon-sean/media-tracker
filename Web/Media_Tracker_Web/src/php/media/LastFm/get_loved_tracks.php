@@ -33,6 +33,7 @@ if(isset($_SESSION['signed_in']) && $_SESSION['signed_in'] === true) {
 
             $lovedTracks = array_map(fn($item) => new LastFmTrack($item), $trackList);
         }
+
     }
     
 } else {
