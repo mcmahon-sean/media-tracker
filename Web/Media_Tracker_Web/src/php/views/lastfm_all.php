@@ -292,7 +292,7 @@ $top_artists_filt = ($filter_category == "name" && $filter_string != "") ? "hide
                                             <?php endforeach; ?>
                                         <?php else: ?>
                                             <tr>
-                                                <td colspan="3" class="lead text-center">No items match the filter</td>
+                                                <td colspan="4" class="lead text-center">No items match the filter</td>
                                             </tr>
                                         <?php endif; ?>
                                     </tbody>

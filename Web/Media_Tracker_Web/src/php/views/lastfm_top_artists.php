@@ -183,7 +183,7 @@ $top_artists_filt = sortBy(filter($topArtists, "name", $filter_string), $sort_fi
                                         <?php endforeach; ?>
                                     <?php else: ?>
                                         <tr>
-                                            <td colspan="3" class="lead text-center">No items match the filter</td>
+                                            <td colspan="4" class="lead text-center">No items match the filter</td>
                                         </tr>
                                     <?php endif; ?>
                                 </tbody>

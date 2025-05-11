@@ -194,7 +194,7 @@ $rated_shows_filt = sortBy(filter($ratedTvShows, "name", $filter_string, $movie 
                                         <?php endforeach; ?>
                                     <?php else: ?>
                                         <tr>
-                                            <td colspan="3" class="lead text-center">No items match the filter</td>
+                                            <td colspan="7" class="lead text-center">No items match the filter</td>
                                         </tr>
                                     <?php endif; ?>
                                 </tbody>
