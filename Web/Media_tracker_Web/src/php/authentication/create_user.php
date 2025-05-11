@@ -16,7 +16,9 @@
         $stmt = $pdo->prepare("SELECT public.\"CreateUser\"(?, ?, ?, ?, ?)");
         $stmt->execute([$username, $first, $last, $email, $password]);
 
-        echo "User created!";
+        
+        header("Location: ../../../index.php?created=true");
+        exit;
         } else {
             echo "Required fields are missing.";
         }

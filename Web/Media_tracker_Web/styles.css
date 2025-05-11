@@ -115,13 +115,3 @@ a.sort-link {
 .card {
     border-radius: 10px;
 }
-
-/* Favorite Star */
-.favorite-icon {
-    cursor: pointer;
-    font-size: 1.5rem;
-    color: white;
-}
-.favorite-icon.favorited {
-    color: gold;
-}
