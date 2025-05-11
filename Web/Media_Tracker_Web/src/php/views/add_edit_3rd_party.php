@@ -22,14 +22,6 @@
                     <a class="btn btn-dark w-100" id="btn-home" href="../../../index.php" role="button">
                         Home
                     </a>
-                    <a
-                        class="btn btn-dark w-100 mt-2"
-                        id="btn-home"
-                        href="./manage_user.php"
-                        role="button"
-                    >
-                        Manager user
-                    </a>
                 </div>
                 <hr>
                 <div class="dropdown">
@@ -121,14 +113,6 @@
                             const platform = document.getElementById("platform_id").value;
                             const user_plat_id = document.getElementById("user_plat_id").value;
                             const username = document.querySelector("input[name='username']").value;
-                            const userLabel = document.getElementById("usrLabel");
-
-                            if (platform == "1") {
-                                userLabel.innerHTML = "Enter Steam ID:";
-                            }
-                            else {
-                                userLabel.innerHTML = "Enter Username:";
-                            }
 
                             switch (platform) {
                                 case "3":

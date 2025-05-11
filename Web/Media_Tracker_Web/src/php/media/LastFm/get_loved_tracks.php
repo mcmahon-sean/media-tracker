@@ -4,38 +4,29 @@
 require_once '../config.php';
 require_once '../models/Last.FM/LastFmTrack.php';
 
-$lovedTracks = [];
-
 // Username and API from config file
 $apiKey = LASTFM_API_KEY;
 
 if(isset($_SESSION['signed_in']) && $_SESSION['signed_in'] === true) {
+    $username = $_SESSION['user_platform_ids']['lastfm'];
 
-    if(!isset($_SESSION['user_platform_ids']['lastfm'])) {
-        $error = 'Last.fm Id is missing.';
+    // URL for the API request
+    $url = "https://ws.audioscrobbler.com/2.0/?method=user.getlovedtracks&user=$username&api_key=$apiKey&format=json&limit=10";
+
+    // Fetch the data from the API
+    $response = @file_get_contents($url);
+
+    $tracks = [];
+    $error = null;
+
+    if ($response === false) {
+        $error = "Failed to retrieve data from Last.fm.";
     } else {
-        $username = $_SESSION['user_platform_ids']['lastfm'];
+        $data = json_decode($response, true);
+        $trackList = $data['lovedtracks']['track'] ?? [];
 
-        // URL for the API request
-        $url = "https://ws.audioscrobbler.com/2.0/?method=user.getlovedtracks&user=$username&api_key=$apiKey&format=json";
-
-        // Fetch the data from the API
-        $response = @file_get_contents($url);
-
-        $tracks = [];
-        $error = null;
-
-        if ($response === false) {
-            $error = "Failed to retrieve data from Last.fm.";
-        } else {
-            $data = json_decode($response, true);
-            $trackList = $data['lovedtracks']['track'] ?? [];
-
-            $lovedTracks = array_map(fn($item) => new LastFmTrack($item, 'lovedtracks'), $trackList);
-        }
-
+        $lovedTracks = array_map(fn($item) => new LastFmTrack($item), $trackList);
     }
-    
 } else {
     $error = "Please login to view.";
 }
