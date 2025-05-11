@@ -1,6 +1,5 @@
 <?php
-require_once '../db.php';
-require_once '../tools.php';
+require '../db.php';
 
 try {
     if (
@@ -13,13 +12,13 @@ try {
         isset($_POST['username'])
     ) {
         // Assign POST variables individually
-        $platform_id = sanitizeInt($_POST['platform_id']);
-        $media_type_id = sanitizeInt($_POST['media_type_id']);
-        $media_plat_id = sanitizeInt($_POST['media_plat_id']);
-        $title = sanitizeString($_POST['title']);
-        $album = sanitizeString($_POST['album']);
-        $artist = sanitizeString($_POST['artist']);
-        $username = sanitizeString($_POST['username']);
+        $platform_id = $_POST['platform_id'];
+        $media_type_id = $_POST['media_type_id'];
+        $media_plat_id = $_POST['media_plat_id'];
+        $title = $_POST['title'];
+        $album = $_POST['album'];
+        $artist = $_POST['artist'];
+        $username = $_POST['username'];
 
         // Prepare and execute the stored function
         $stmt = $pdo->prepare("SELECT public.initial_media_fav(?, ?, ?, ?, ?, ?, ?)");

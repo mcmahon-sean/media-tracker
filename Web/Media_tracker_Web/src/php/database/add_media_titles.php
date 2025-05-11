@@ -1,6 +1,5 @@
 <?php
-require_once '../db.php';
-require_once '../tools.php';
+require '../db.php';
 
 try {
     // Check if all required POST data is set
@@ -12,12 +11,12 @@ try {
         isset($_POST['artist'])) {
 
         // Assign POST variables individually
-        $platform_id = sanitizeInt($_POST['platform_id']);
-        $media_type_id = sanitizeInt($_POST['media_type_id']);
-        $media_plat_id = sanitizeInt($_POST['media_plat_id']);
-        $title = sanitizeString($_POST['title']);
-        $album = sanitizeString($_POST['album']);
-        $artist = sanitizeString($_POST['artist']);
+        $platform_id = $_POST['platform_id'];
+        $media_type_id = $_POST['media_type_id'];
+        $media_plat_id = $_POST['media_plat_id'];
+        $title = $_POST['title'];
+        $album = $_POST['album'];
+        $artist = $_POST['artist'];
 
         // Prepare the SQL statement to call the function
         $stmt = $pdo->prepare("SELECT public.add_media_titles(?, ?, ?, ?, ?, ?)");

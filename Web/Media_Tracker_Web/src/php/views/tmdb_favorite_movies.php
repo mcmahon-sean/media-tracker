@@ -43,14 +43,6 @@
                     <a class="btn btn-dark w-100" id="btn-home" href="../../../index.php" role="button">
                         Home
                     </a>
-                    <a
-                        class="btn btn-dark w-100 mt-2"
-                        id="btn-home"
-                        href="./manage_user.php"
-                        role="button"
-                    >
-                        Manager user
-                    </a>
                 </div>
                 <hr>
                 <div class="dropdown">
@@ -136,45 +128,41 @@
                     </div>
                 </div>
                 
-                <?php if (isset($_SESSION['user_platform_ids']['tmdb'])): ?>
-                    <div class="table-responsive">
-                        <h3>Favorite Movies</h3>
-                        <?php if (isset($error)): ?>
-                            <p><?php echo $error; ?></p>
-                        <?php else: ?>
-                            <table class="table table-dark table-hover">
-                                <thead>
-                                    <tr>
-                                        <th><a class="sort-link"<?php echo sortLink($sort_field, $sort_dir, "id", $filtUrl) ?>>
-                                            ID
-                                        </a></th>
-                                        <th><a class="sort-link"<?php echo sortLink($sort_field, $sort_dir, "title", $filtUrl) ?>>
-                                            Title
-                                        </a></th>
-                                        <th>Overview</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php if (count($fav_movies_filt) > 0): ?>
-                                        <?php foreach ($fav_movies_filt as $movie): ?>
-                                            <tr>
-                                                <td><?php echo htmlspecialchars($movie->id); ?></td>
-                                                <td><?php echo htmlspecialchars($movie->title); ?></td>
-                                                <td><?php echo htmlspecialchars($movie->overview); ?></td>
-                                            </tr>
-                                        <?php endforeach; ?>
-                                    <?php else: ?>
+                <div class="table-responsive">
+                    <h3>Favorite Movies</h3>
+                    <?php if (isset($error)): ?>
+                        <p><?php echo $error; ?></p>
+                    <?php else: ?>
+                        <table class="table table-dark table-hover">
+                            <thead>
+                                <tr>
+                                    <th><a class="sort-link"<?php echo sortLink($sort_field, $sort_dir, "id", $filtUrl) ?>>
+                                        ID
+                                    </a></th>
+                                    <th><a class="sort-link"<?php echo sortLink($sort_field, $sort_dir, "title", $filtUrl) ?>>
+                                        Title
+                                    </a></th>
+                                    <th>Overview</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php if (count($fav_movies_filt) > 0): ?>
+                                    <?php foreach ($fav_movies_filt as $movie): ?>
                                         <tr>
-                                            <td colspan="3" class="lead text-center">No items match the filter</td>
+                                            <td><?php echo htmlspecialchars($movie->id); ?></td>
+                                            <td><?php echo htmlspecialchars($movie->title); ?></td>
+                                            <td><?php echo htmlspecialchars($movie->overview); ?></td>
                                         </tr>
-                                    <?php endif; ?>
-                                </tbody>
-                            </table>
-                        <?php endif; ?>
-                    </div>
-                <?php else: ?>
-                    <h1>Please add your TMDB account</h1>
-                <?php endif; ?>
+                                    <?php endforeach; ?>
+                                <?php else: ?>
+                                    <tr>
+                                        <td colspan="3" class="lead text-center">No items match the filter</td>
+                                    </tr>
+                                <?php endif; ?>
+                            </tbody>
+                        </table>
+                    <?php endif; ?>
+                </div>
             </main>
         </div>
     </div>

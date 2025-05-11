@@ -3,11 +3,10 @@
     try{
         
         require_once "../db.php";
-        require_once "../tools.php";
 
         if(isset($_POST['username']) && isset($_POST['password'])){
-            $username = sanitizeString($_POST['username']);
-            $password = sanitizeString($_POST['password']);
+            $username = $_POST['username'];
+            $password = $_POST['password'];
 
             $stmt = $pdo->prepare("SELECT public.\"AuthenticateUser\"(?, ?)");
             $stmt->execute([$username, $password]);
@@ -19,16 +18,6 @@
                 session_start();
                 $_SESSION['username'] = $username;
                 $_SESSION['signed_in'] = true;
-
-                $userStmt = $pdo->prepare("SELECT first_name, last_name, email FROM users WHERE username = ?");
-                $userStmt->execute([$username]);
-                $user = $userStmt->fetch(PDO::FETCH_ASSOC);
-
-                if($user){
-                    $_SESSION['firstName'] = $user['first_name'];
-                    $_SESSION['lastName'] = $user['last_name'];
-                    $_SESSION['email'] = $user['email'];
-                }
 
                 // Fetch the user_platform_ids for all platforms
                 $idStmt = $pdo->prepare("SELECT platform_id, user_platform_id FROM useraccounts WHERE username = ?");
@@ -56,8 +45,7 @@
                 header("Location: ../../../index.php");
                 exit;
             } else {
-                header("Location: http://localhost/media-tracker/Web/Media_Tracker_Web/src/php/views/user_login.php?invalid=true");
-                exit;
+                echo "Invalid username or password";
             }
         } else {
             echo "Username and password required";

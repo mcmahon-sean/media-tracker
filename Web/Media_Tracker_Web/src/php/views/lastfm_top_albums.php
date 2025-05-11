@@ -20,8 +20,8 @@
         $sort_field = $split[0];
         $sort_dir = $split[1];
     } else {
-        $sort_field = "playcount";
-        $sort_dir = "desc";
+        $sort_field = "name";
+        $sort_dir = "asc";
     }
 
     $top_albums_filt = sortBy(filter($topAlbums, $filter_category, $filter_string), $sort_field, $sort_dir);
@@ -44,14 +44,6 @@
                 <div>
                     <a class="btn btn-dark w-100" id="btn-home" href="../../../index.php" role="button">
                         Home
-                    </a>
-                    <a
-                        class="btn btn-dark w-100 mt-2"
-                        id="btn-home"
-                        href="./manage_user.php"
-                        role="button"
-                    >
-                        Manager user
                     </a>
                 </div>
                 <hr>
@@ -144,50 +136,46 @@
                         <?php endif; ?>
                     </div>
                 </div>
-                
-                <?php if (isset($_SESSION['user_platform_ids']['lastfm'])): ?>
-                    <div class="table-responsive">
-                        <h3>Top Albums</h3>
-                        <?php if (isset($error)): ?>
-                            <p><?php echo $error; ?></p>
-                        <?php else: ?>
-                            <table class="table table-dark table-hover" id="top-albums">
-                                <thead>
-                                    <tr>
-                                        <th><a class="sort-link"<?php echo sortLink($sort_field, $sort_dir, "playcount", $filtUrl) ?>>
-                                            Playcount
-                                        </a></th>
-                                        <th><a class="sort-link"<?php echo sortLink($sort_field, $sort_dir, "name", $filtUrl) ?>>
-                                            Album Name
-                                        </a></th>
-                                        <th><a class="sort-link"<?php echo sortLink($sort_field, $sort_dir, "artist", $filtUrl) ?>>
-                                            Artist Name
-                                        </a></th>
-                                        <th>URL</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php if (count($top_albums_filt) > 0): ?>
-                                        <?php foreach ($top_albums_filt as $album): ?>
-                                            <tr>
-                                                <td><?php echo htmlspecialchars($album->playCount); ?></td>
-                                                <td><?php echo htmlspecialchars($album->name); ?></td>
-                                                <td><?php echo htmlspecialchars($album->artist); ?></td>
-                                                <td><a href="<?php echo htmlspecialchars($album->url); ?>" target="_blank">View</a></td>
-                                            </tr>
-                                        <?php endforeach; ?>
-                                    <?php else: ?>
+
+                <div class="table-responsive">
+                    <h3>Top Albums</h3>
+                    <?php if (isset($error)): ?>
+                        <p><?php echo $error; ?></p>
+                    <?php else: ?>
+                        <table class="table table-dark table-hover" id="top-albums">
+                            <thead>
+                                <tr>
+                                    <th><a class="sort-link"<?php echo sortLink($sort_field, $sort_dir, "playcount", $filtUrl) ?>>
+                                        Playcount
+                                    </a></th>
+                                    <th><a class="sort-link"<?php echo sortLink($sort_field, $sort_dir, "name", $filtUrl) ?>>
+                                        Album Name
+                                    </a></th>
+                                    <th><a class="sort-link"<?php echo sortLink($sort_field, $sort_dir, "artist", $filtUrl) ?>>
+                                        Artist Name
+                                    </a></th>
+                                    <th>URL</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php if (count($top_albums_filt) > 0): ?>
+                                    <?php foreach ($top_albums_filt as $album): ?>
                                         <tr>
-                                            <td colspan="4" class="lead text-center">No items match the filter</td>
+                                            <td><?php echo htmlspecialchars($album->playCount); ?></td>
+                                            <td><?php echo htmlspecialchars($album->name); ?></td>
+                                            <td><?php echo htmlspecialchars($album->artist); ?></td>
+                                            <td><a href="<?php echo htmlspecialchars($album->url); ?>" target="_blank">View</a></td>
                                         </tr>
-                                    <?php endif; ?>
-                                </tbody>
-                            </table>
-                        <?php endif; ?>
-                    </div>
-                <?php else: ?>
-                    <h1>Please add your Last.fm account</h1>
-                <?php endif; ?>
+                                    <?php endforeach; ?>
+                                <?php else: ?>
+                                    <tr>
+                                        <td colspan="4" class="lead text-center">No items match the filter</td>
+                                    </tr>
+                                <?php endif; ?>
+                            </tbody>
+                        </table>
+                    <?php endif; ?>
+                </div>
             </main>
         </div>
     </div>

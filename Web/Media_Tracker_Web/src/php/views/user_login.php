@@ -12,11 +12,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="../../../styles.css">
-
-    <?php if(isset($_GET['invalid']) && $_GET['invalid'] == 'true'): ?>
-        <script>alert('Invalid username or password.');</script>
-    <?php endif; ?>
+    <link rel="stylesheet" href="../../../styles.css"> 
 </head>
 <body  class="bg-dark-primary">
     <div class="container-fluid">
@@ -25,14 +21,6 @@
                 <div>
                     <a class="btn btn-dark w-100" id="btn-home" href="../../../index.php" role="button">
                         Home
-                    </a>
-                    <a
-                        class="btn btn-dark w-100 mt-2"
-                        id="btn-home"
-                        href="./manage_user.php"
-                        role="button"
-                    >
-                        Manager user
                     </a>
                 </div>
                 <hr>

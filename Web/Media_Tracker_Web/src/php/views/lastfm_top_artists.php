@@ -1,56 +1,50 @@
 <?php
 
-    // Start session
-    session_start();
+// Start session
+session_start();
 
-    // Required
-    require_once '../media/LastFm/get_top_artists.php';
-    require_once '../filter_functions.php';
+// Required
+require_once '../media/LastFm/get_top_artists.php';
+require_once '../filter_functions.php';
 
-    $has_filter = isset($_GET["searchString"]) && $_GET["searchString"] != "";
-    // Grab the input string and selected category for searching from the post array
-    $filter_string = $_GET["searchString"] ?? "";
+$has_filter = isset($_GET["searchString"]) && $_GET["searchString"] != "";
+// Grab the input string and selected category for searching from the post array
+$filter_string = $_GET["searchString"] ?? "";
 
-    $filtUrl = $has_filter ? "searchString=$filter_string" : "";
+$filtUrl = $has_filter ? "searchString=$filter_string" : "";
 
-    // Get sort options from URL
-    if (isset($_GET["sort"])){
-        $split = explode('_', $_GET["sort"]);
-        $sort_field = $split[0];
-        $sort_dir = $split[1];
-    } else {
-        $sort_field = "playcount";
-        $sort_dir = "desc";
-    }
+// Get sort options from URL
+if (isset($_GET["sort"])) {
+    $split = explode('_', $_GET["sort"]);
+    $sort_field = $split[0];
+    $sort_dir = $split[1];
+} else {
+    $sort_field = "name";
+    $sort_dir = "asc";
+}
 
-    $top_artists_filt = sortBy(filter($topArtists, "name", $filter_string), $sort_field, $sort_dir);
+$top_artists_filt = sortBy(filter($topArtists, "name", $filter_string), $sort_field, $sort_dir);
 
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Top Artists</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="../../../styles.css"> 
+    <link rel="stylesheet" href="../../../styles.css">
 </head>
-<body  class="bg-dark-primary">
+
+<body class="bg-dark-primary">
     <div class="container-fluid">
         <div class="row">
-        <nav class="col-md-2 d-none d-md-block sidebar bg-dark-secondary">
+            <nav class="col-md-2 d-none d-md-block sidebar bg-dark-secondary">
                 <div>
                     <a class="btn btn-dark w-100" id="btn-home" href="../../../index.php" role="button">
                         Home
-                    </a>
-                    <a
-                        class="btn btn-dark w-100 mt-2"
-                        id="btn-home"
-                        href="./manage_user.php"
-                        role="button"
-                    >
-                        Manager user
                     </a>
                 </div>
                 <hr>
@@ -69,7 +63,7 @@
                     </ul>
                 </div>
 
-                
+
                 <div class="dropdown mt-2">
                     <a class="btn btn-dark dropdown-toggle w-100 media-tab" href="#" role="button" data-bs-toggle="dropdown">
                         <img src="../../assets/images/icons/icon_movies.svg" class="tab-icon me-2">
@@ -83,7 +77,7 @@
                     </ul>
                 </div>
 
-                
+
                 <div class="dropdown mt-2">
                     <a class="btn btn-dark dropdown-toggle w-100 media-tab" href="#" role="button" data-bs-toggle="dropdown">
                         <img src="../../assets/images/icons/icon_games.svg" class="tab-icon me-2">
@@ -93,7 +87,7 @@
                         <li><a class="dropdown-item" href="steam_owned_games.php">Owned Games</a></li>
                     </ul>
                 </div>
-                
+
             </nav>
 
             <main class="col-md-10 ms-sm-auto px-4">
@@ -115,15 +109,14 @@
                             <?php endif; ?>
                             <div class="col-9 col-md-10">
                                 <div class="input-group">
-                                    <input name="searchString" type="text" class="form-control" placeholder="Search..." 
-                                        <?php echo ($filter_string != "") ? 'value="'.$filter_string.'"' : "" ?>
-                                    />
+                                    <input name="searchString" type="text" class="form-control" placeholder="Search..."
+                                        <?php echo ($filter_string != "") ? 'value="' . $filter_string . '"' : "" ?> />
                                     <span class="input-group-text search-select pe-3">Artists</span>
                                 </div>
                             </div>
                             <button type="submit" class="btn bg-dark-secondary text-white col-3 col-md-2">Search</button>
                         </form>
-                        <?php if($has_filter): ?>
+                        <?php if ($has_filter): ?>
                             <form method="get" class="row mt-2 ms-1 filter-label">
                                 <?php if (isset($_GET["sort"])): ?>
                                     <input type="hidden" name="sort" value="<?php echo $_GET["sort"] ?>" />
@@ -137,47 +130,58 @@
                     </div>
                 </div>
 
-                <?php if (isset($_SESSION['user_platform_ids']['lastfm'])): ?>
-                    <div class="table-responsive">
-                        <h3>Top Artists</h3>
-                        <?php if (isset($error)): ?>
-                            <p><?php echo $error; ?></p>
-                        <?php else: ?>
-                            <table class="table table-dark table-hover" id="top-artists">
-                                <thead>
-                                    <tr>
-                                        <th><a class="sort-link"<?php echo sortLink($sort_field, $sort_dir, "playcount", $filtUrl) ?>>
+                <div class="table-responsive">
+                    <h3>Top Artists</h3>
+                    <?php if (isset($error)): ?>
+                        <p><?php echo $error; ?></p>
+                    <?php else: ?>
+                        <table class="table table-dark table-hover" id="top-artists">
+                            <thead>
+                                <tr>
+                                    <th><a class="sort-link" <?php echo sortLink($sort_field, $sort_dir, "playcount", $filtUrl) ?>>
                                             Playcount
                                         </a></th>
-                                        <th><a class="sort-link"<?php echo sortLink($sort_field, $sort_dir, "name", $filtUrl) ?>>
+                                    <th><a class="sort-link" <?php echo sortLink($sort_field, $sort_dir, "name", $filtUrl) ?>>
                                             Artist Name
-                                        </th>
-                                        <th>URL</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php if (count($top_artists_filt) > 0): ?>
-                                        <?php foreach ($top_artists_filt as $artist): ?>
-                                            <tr>
-                                                <td><?php echo htmlspecialchars($artist->playCount); ?></td>
-                                                <td><?php echo htmlspecialchars($artist->name); ?></td>
-                                                <td>
-                                                    <a href="<?php echo htmlspecialchars($artist->url); ?>" target="_blank">View</a>
-                                                </td>
-                                            </tr>
-                                        <?php endforeach; ?>
-                                    <?php else: ?>
+                                    </th>
+                                    <th>URL</th>
+                                    <th>Favorite</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php if (count($top_artists_filt) > 0): ?>
+                                    <?php foreach ($top_artists_filt as $artist): ?>
                                         <tr>
-                                            <td colspan="3" class="lead text-center">No items match the filter</td>
+                                            <td><?php echo htmlspecialchars($artist->playCount); ?></td>
+                                            <td><?php echo htmlspecialchars($artist->name); ?></td>
+                                            <td>
+                                                <a href="<?php echo htmlspecialchars($artist->url); ?>" target="_blank">View</a>
+                                            </td>
+                                            <td>
+                                                <span
+                                                    class="favorite-icon ms-3"
+                                                    role="button"
+                                                    data-platform_id="2"
+                                                    data-media_type_id="6"
+                                                    data-media_plat_id="<?php echo htmlspecialchars($artist->name); ?>"
+                                                    data-title="<?php echo htmlspecialchars($artist->name); ?>"
+                                                    data-album=""
+                                                    data-artist="<?php echo htmlspecialchars($artist->name); ?>"
+                                                    data-username="<?php echo $_SESSION['username']; ?>">
+                                                    ☆
+                                                </span>
+                                            </td>
                                         </tr>
-                                    <?php endif; ?>
-                                </tbody>
-                            </table>
-                        <?php endif; ?>
-                    </div>
-                <?php else: ?>
-                    <h1>Please add your Last.fm account</h1>
-                <?php endif; ?>
+                                    <?php endforeach; ?>
+                                <?php else: ?>
+                                    <tr>
+                                        <td colspan="3" class="lead text-center">No items match the filter</td>
+                                    </tr>
+                                <?php endif; ?>
+                            </tbody>
+                        </table>
+                    <?php endif; ?>
+                </div>
             </main>
         </div>
     </div>
@@ -187,4 +191,5 @@
     <script src="../../../script.js" type="module"></script>
 
 </body>
+
 </html>

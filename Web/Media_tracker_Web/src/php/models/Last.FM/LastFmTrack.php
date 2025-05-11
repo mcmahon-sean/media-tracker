@@ -11,17 +11,13 @@ class LastFmTrack {
     public ?string $rank;
     public ?string $imageUrl;
 
-    public function __construct(array $json, string $call) {
+    public function __construct(array $json) {
         $imageList = array_filter($json['image'] ?? [], fn($img) => !empty($img['#text']));
         $image = end($imageList);
         $image = $image ?: ['#text' => null];
     
         $this->name = $json['name'];
-        if($call == 'recenttracks') {
-            $this->artist = $json['artist']['#text'] ?? '';
-        } else {
-            $this->artist = $json['artist']['name'] ?? '';
-        }
+        $this->artist = $json['artist']['#text'] ?? '';
         $this->album = $json['album']['#text'] ?? '';
         $this->playCount = intval($json['playcount'] ?? 0);
         $this->url = $json['url'];
