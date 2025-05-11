@@ -9,21 +9,23 @@
         if (isset($_SESSION['username']) && isset($_SESSION['user_platform_ids'])) {
             $username = $_SESSION['username']; // Get the username from the session
 
-            // Check if platform_id and user_plat_id are available in the session
-            $platformId = null;
-            $userPlatId = null;
 
-            // Check if the session has the user platform IDs set for various platforms
-            if (isset($_SESSION['user_platform_ids']['steam'])) {
-                $platformId = 1; // Steam
-                $userPlatId = $_SESSION['user_platform_ids']['steam'];
-            } elseif (isset($_SESSION['user_platform_ids']['lastfm'])) {
-                $platformId = 2; // Last.fm
-                $userPlatId = $_SESSION['user_platform_ids']['lastfm'];
-            } elseif (isset($_SESSION['user_platform_ids']['tmdb'])) {
-                $platformId = 3; // TMDb
-                $userPlatId = $_SESSION['user_platform_ids']['tmdb'];
+            if (isset($_POST['platform_id'])) {
+                $platformId = $_POST['platform_id'];
             }
+
+            switch($platformId) {
+                case 1:
+                    $userPlatId = $_SESSION['user_platform_ids']['steam'];
+                    break;
+                case 2:
+                    $userPlatId = $_SESSION['user_platform_ids']['lastfm'];
+                    break;
+                case 3:
+                    $userPlatId = $_SESSION['user_platform_ids']['tmdb'];
+                    break;
+            }
+
 
             if ($platformId && $userPlatId) {
                 // Prepare and execute the delete statement using values from the session
