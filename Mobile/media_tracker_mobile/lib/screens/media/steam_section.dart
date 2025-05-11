@@ -33,7 +33,7 @@ class _SteamSectionState extends ConsumerState<SteamSection> {
   Widget build(BuildContext context) {
     final auth = ref.watch(authProvider);
     final favorites = ref.watch(favoritesProvider);
-    //print('Favorites: $favorites'); // DEBUGGING
+    print('Favorites: $favorites'); // DEBUGGING
 
     final displayGames =
         widget.steamGames.map((game) {
@@ -41,7 +41,7 @@ class _SteamSectionState extends ConsumerState<SteamSection> {
             isFavorite: favorites.any(
               (fav) =>
                   fav['media']['platform_id'] == 1 &&
-                  fav['media']['media_plat_id'] == game.name &&
+                  fav['media']['media_plat_id'] == game.appId.toString() &&
                   fav['favorites'] == true,
             ),
           );
@@ -78,7 +78,7 @@ class _SteamSectionState extends ConsumerState<SteamSection> {
               final success = await UserAccountServices().toggleFavoriteMedia(
                 platformId: 1, // Steam
                 mediaTypeId: 1, // Game
-                mediaPlatId: game.name,
+                mediaPlatId: game.appId.toString(),
                 title: game.name,
                 username: auth.username!,
               );

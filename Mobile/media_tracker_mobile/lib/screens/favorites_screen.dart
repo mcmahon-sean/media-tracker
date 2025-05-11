@@ -40,7 +40,7 @@ class FavoritesScreen extends ConsumerWidget {
               (game) => favorites.any(
                 (fav) =>
                     fav['media']['platform_id'] == 1 &&
-                    fav['media']['media_plat_id'] == game.name &&
+                    fav['media']['media_plat_id'] == game.appId.toString() &&
                     fav['favorites'] == true,
               ),
             )
