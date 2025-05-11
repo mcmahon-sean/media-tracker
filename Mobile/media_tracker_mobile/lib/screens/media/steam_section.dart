@@ -33,7 +33,7 @@ class _SteamSectionState extends ConsumerState<SteamSection> {
   Widget build(BuildContext context) {
     final auth = ref.watch(authProvider);
     final favorites = ref.watch(favoritesProvider);
-    print('Favorites: $favorites'); // DEBUGGING
+    //print('Favorites: $favorites'); // DEBUGGING
 
     final displayGames =
         widget.steamGames.map((game) {
