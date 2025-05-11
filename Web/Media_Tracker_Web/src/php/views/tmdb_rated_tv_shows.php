@@ -44,6 +44,14 @@
                     <a class="btn btn-dark w-100" id="btn-home" href="../../../index.php" role="button">
                         Home
                     </a>
+                    <a
+                        class="btn btn-dark w-100 mt-2"
+                        id="btn-home"
+                        href="./manage_user.php"
+                        role="button"
+                    >
+                        Manager user
+                    </a>
                 </div>
                 <hr>
                 <div class="dropdown">
@@ -129,54 +137,58 @@
                     </div>
                 </div>
                 
-                <h3>Rated TV Shows</h3>
-                <div class="table-responsive">
-                    <?php if (isset($error)): ?>
-                        <p><?php echo $error; ?></p>
-                    <?php else: ?>
-                        <table class="table table-dark table-hover">
-                            <thead>
-                                <tr>
-                                <th><a class="sort-link"<?php echo sortLink($sort_field, $sort_dir, "id", $filtUrl) ?>>
-                                        ID
-                                    </a></th>
-                                    <th><a class="sort-link"<?php echo sortLink($sort_field, $sort_dir, "name", $filtUrl) ?>>
-                                        Name
-                                    </a></th>
-                                    <th><a class="sort-link"<?php echo sortLink($sort_field, $sort_dir, "userRating", $filtUrl) ?>>
-                                        Your Rating
-                                    </a></th>
-                                    <th><a class="sort-link"<?php echo sortLink($sort_field, $sort_dir, "avgRating", $filtUrl) ?>>
-                                        Average Rating
-                                    </a></th>
-                                    <th><a class="sort-link"<?php echo sortLink($sort_field, $sort_dir, "votes", $filtUrl) ?>>
-                                        Vote Count
-                                    </a></th>
-                                    <th>Overview</th>
-
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php if (count($rated_shows_filt) > 0): ?>
-                                    <?php foreach ($rated_shows_filt as $show): ?>
-                                        <tr>
-                                            <td><?php echo htmlspecialchars($show->id); ?></td>
-                                            <td><?php echo htmlspecialchars($show->name); ?></td>
-                                            <td><?php echo htmlspecialchars($show->user_rating); ?></td>
-                                            <td><?php echo htmlspecialchars($show->average_rating); ?></td>
-                                            <td><?php echo htmlspecialchars($show->vote_count); ?></td>
-                                            <td><?php echo htmlspecialchars($show->overview); ?></td>
-                                        </tr>
-                                    <?php endforeach; ?>
-                                <?php else: ?>
+                <?php if (isset($_SESSION['user_platform_ids']['tmdb'])): ?>
+                    <h3>Rated TV Shows</h3>
+                    <div class="table-responsive">
+                        <?php if (isset($error)): ?>
+                            <p><?php echo $error; ?></p>
+                        <?php else: ?>
+                            <table class="table table-dark table-hover">
+                                <thead>
                                     <tr>
-                                        <td colspan="3" class="lead text-center">No items match the filter</td>
+                                    <th><a class="sort-link"<?php echo sortLink($sort_field, $sort_dir, "id", $filtUrl) ?>>
+                                            ID
+                                        </a></th>
+                                        <th><a class="sort-link"<?php echo sortLink($sort_field, $sort_dir, "name", $filtUrl) ?>>
+                                            Name
+                                        </a></th>
+                                        <th><a class="sort-link"<?php echo sortLink($sort_field, $sort_dir, "userRating", $filtUrl) ?>>
+                                            Your Rating
+                                        </a></th>
+                                        <th><a class="sort-link"<?php echo sortLink($sort_field, $sort_dir, "avgRating", $filtUrl) ?>>
+                                            Average Rating
+                                        </a></th>
+                                        <th><a class="sort-link"<?php echo sortLink($sort_field, $sort_dir, "votes", $filtUrl) ?>>
+                                            Vote Count
+                                        </a></th>
+                                        <th>Overview</th>
+
                                     </tr>
-                                <?php endif; ?>
-                            </tbody>
-                        </table>
-                    <?php endif; ?>
-                </div>
+                                </thead>
+                                <tbody>
+                                    <?php if (count($rated_shows_filt) > 0): ?>
+                                        <?php foreach ($rated_shows_filt as $show): ?>
+                                            <tr>
+                                                <td><?php echo htmlspecialchars($show->id); ?></td>
+                                                <td><?php echo htmlspecialchars($show->name); ?></td>
+                                                <td><?php echo htmlspecialchars($show->user_rating); ?></td>
+                                                <td><?php echo htmlspecialchars($show->average_rating); ?></td>
+                                                <td><?php echo htmlspecialchars($show->vote_count); ?></td>
+                                                <td><?php echo htmlspecialchars($show->overview); ?></td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    <?php else: ?>
+                                        <tr>
+                                            <td colspan="3" class="lead text-center">No items match the filter</td>
+                                        </tr>
+                                    <?php endif; ?>
+                                </tbody>
+                            </table>
+                        <?php endif; ?>
+                    </div>
+                <?php else: ?>
+                    <h1>Please add your TMDB account</h1>
+                <?php endif; ?>
             </main>
         </div>
     </div>

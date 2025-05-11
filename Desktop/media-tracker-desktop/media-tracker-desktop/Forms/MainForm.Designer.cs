@@ -21,99 +21,146 @@ namespace media_tracker_desktop.Forms
 
         private void InitializeComponent()
         {
-            this.pnlSidebar = new System.Windows.Forms.Panel();
-            this.btnLinkTmdb = new System.Windows.Forms.Button();
-            this.btnLinkLastFM = new System.Windows.Forms.Button();
-            this.btnLinkSteam = new System.Windows.Forms.Button();
-            this.btnHome = new System.Windows.Forms.Button();
-            this.lblTitle = new System.Windows.Forms.Label();
-            this.pnlContent = new System.Windows.Forms.Panel();
-
-            this.pnlSidebar.SuspendLayout();
-            this.SuspendLayout();
-
-            // MainForm
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackColor = System.Drawing.Color.FromArgb(45, 45, 48);
-            this.ClientSize = new System.Drawing.Size(1000, 650);
-            this.Controls.Add(this.pnlContent);
-            this.Controls.Add(this.lblTitle);
-            this.Controls.Add(this.pnlSidebar);
-            this.Name = "MainForm";
-            this.Text = "Media Tracker";
-
+            pnlSidebar = new Panel();
+            btnLinkSteam = new Button();
+            label1 = new Label();
+            btnLinkTmdb = new Button();
+            btnLinkLastFM = new Button();
+            btnHome = new Button();
+            lblTitle = new Label();
+            pnlContent = new Panel();
+            pnlSidebar.SuspendLayout();
+            SuspendLayout();
+            // 
             // pnlSidebar
-            this.pnlSidebar.BackColor = System.Drawing.Color.FromArgb(60, 60, 60);
-            this.pnlSidebar.Controls.Add(this.btnLinkTmdb);
-            this.pnlSidebar.Controls.Add(this.btnLinkLastFM);
-            this.pnlSidebar.Controls.Add(this.btnLinkSteam);
-            this.pnlSidebar.Controls.Add(this.btnHome);
-            this.pnlSidebar.Dock = System.Windows.Forms.DockStyle.Left;
-            this.pnlSidebar.Location = new System.Drawing.Point(0, 0);
-            this.pnlSidebar.Name = "pnlSidebar";
-            this.pnlSidebar.Size = new System.Drawing.Size(200, 650);
-
-            // btnHome
-            this.btnHome.BackColor = System.Drawing.Color.FromArgb(60, 60, 60);
-            this.btnHome.Dock = System.Windows.Forms.DockStyle.Top;
-            this.btnHome.FlatAppearance.BorderSize = 0;
-            this.btnHome.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnHome.ForeColor = System.Drawing.Color.White;
-            this.btnHome.Size = new System.Drawing.Size(200, 50);
-            this.btnHome.Text = "Home";
-            this.btnHome.UseVisualStyleBackColor = false;
-            this.btnHome.Click += new System.EventHandler(this.btnHome_Click);
-
+            // 
+            pnlSidebar.BackColor = Color.FromArgb(16, 16, 16);
+            pnlSidebar.Controls.Add(btnLinkSteam);
+            pnlSidebar.Controls.Add(label1);
+            pnlSidebar.Controls.Add(btnLinkTmdb);
+            pnlSidebar.Controls.Add(btnLinkLastFM);
+            pnlSidebar.Controls.Add(btnHome);
+            pnlSidebar.Dock = DockStyle.Left;
+            pnlSidebar.Location = new Point(0, 0);
+            pnlSidebar.Margin = new Padding(2, 2, 2, 2);
+            pnlSidebar.Name = "pnlSidebar";
+            pnlSidebar.Size = new Size(140, 390);
+            pnlSidebar.TabIndex = 2;
+            // 
             // btnLinkSteam
-            this.btnLinkSteam.BackColor = System.Drawing.Color.FromArgb(60, 60, 60);
-            this.btnLinkSteam.Dock = System.Windows.Forms.DockStyle.Top;
-            this.btnLinkSteam.FlatAppearance.BorderSize = 0;
-            this.btnLinkSteam.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnLinkSteam.ForeColor = System.Drawing.Color.White;
-            this.btnLinkSteam.Size = new System.Drawing.Size(200, 50);
-            this.btnLinkSteam.Text = "Steam";
-            this.btnLinkSteam.UseVisualStyleBackColor = false;
-            this.btnLinkSteam.Click += new System.EventHandler(this.btnLinkSteam_Click);
-
-            // btnLinkLastFM
-            this.btnLinkLastFM.BackColor = System.Drawing.Color.FromArgb(60, 60, 60);
-            this.btnLinkLastFM.Dock = System.Windows.Forms.DockStyle.Top;
-            this.btnLinkLastFM.FlatAppearance.BorderSize = 0;
-            this.btnLinkLastFM.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnLinkLastFM.ForeColor = System.Drawing.Color.White;
-            this.btnLinkLastFM.Size = new System.Drawing.Size(200, 50);
-            this.btnLinkLastFM.Text = "Last.fm";
-            this.btnLinkLastFM.UseVisualStyleBackColor = false;
-            this.btnLinkLastFM.Click += new System.EventHandler(this.btnLinkLastFM_Click);
-
+            // 
+            btnLinkSteam.BackColor = Color.FromArgb(34, 37, 41);
+            btnLinkSteam.FlatAppearance.BorderSize = 0;
+            btnLinkSteam.FlatStyle = FlatStyle.Popup;
+            btnLinkSteam.ForeColor = Color.White;
+            btnLinkSteam.Location = new Point(8, 97);
+            btnLinkSteam.Margin = new Padding(2, 2, 2, 2);
+            btnLinkSteam.Name = "btnLinkSteam";
+            btnLinkSteam.Size = new Size(119, 32);
+            btnLinkSteam.TabIndex = 2;
+            btnLinkSteam.Text = "Steam";
+            btnLinkSteam.TextAlign = ContentAlignment.MiddleRight;
+            btnLinkSteam.UseVisualStyleBackColor = false;
+            btnLinkSteam.Click += btnLinkSteam_Click;
+            // 
+            // label1
+            // 
+            label1.BackColor = Color.FromArgb(32, 32, 32);
+            label1.Location = new Point(10, 45);
+            label1.Margin = new Padding(0);
+            label1.Name = "label1";
+            label1.Size = new Size(117, 1);
+            label1.TabIndex = 4;
+            // 
             // btnLinkTmdb
-            this.btnLinkTmdb.BackColor = System.Drawing.Color.FromArgb(60, 60, 60);
-            this.btnLinkTmdb.Dock = System.Windows.Forms.DockStyle.Top;
-            this.btnLinkTmdb.FlatAppearance.BorderSize = 0;
-            this.btnLinkTmdb.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnLinkTmdb.ForeColor = System.Drawing.Color.White;
-            this.btnLinkTmdb.Size = new System.Drawing.Size(200, 50);
-            this.btnLinkTmdb.Text = "TMDB";
-            this.btnLinkTmdb.UseVisualStyleBackColor = false;
-            this.btnLinkTmdb.Click += new System.EventHandler(this.btnLinkTmdb_Click);
-
+            // 
+            btnLinkTmdb.BackColor = Color.FromArgb(34, 37, 41);
+            btnLinkTmdb.FlatAppearance.BorderSize = 0;
+            btnLinkTmdb.FlatStyle = FlatStyle.Popup;
+            btnLinkTmdb.ForeColor = Color.White;
+            btnLinkTmdb.Location = new Point(8, 140);
+            btnLinkTmdb.Margin = new Padding(2, 2, 2, 2);
+            btnLinkTmdb.Name = "btnLinkTmdb";
+            btnLinkTmdb.Size = new Size(119, 32);
+            btnLinkTmdb.TabIndex = 3;
+            btnLinkTmdb.Text = "TMDB";
+            btnLinkTmdb.TextAlign = ContentAlignment.MiddleRight;
+            btnLinkTmdb.UseVisualStyleBackColor = false;
+            btnLinkTmdb.Click += btnLinkTmdb_Click;
+            // 
+            // btnLinkLastFM
+            // 
+            btnLinkLastFM.BackColor = Color.FromArgb(34, 37, 41);
+            btnLinkLastFM.FlatAppearance.BorderSize = 0;
+            btnLinkLastFM.FlatStyle = FlatStyle.Popup;
+            btnLinkLastFM.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            btnLinkLastFM.ForeColor = Color.White;
+            btnLinkLastFM.ImageAlign = ContentAlignment.MiddleLeft;
+            btnLinkLastFM.Location = new Point(8, 54);
+            btnLinkLastFM.Margin = new Padding(2, 2, 2, 2);
+            btnLinkLastFM.Name = "btnLinkLastFM";
+            btnLinkLastFM.Size = new Size(119, 32);
+            btnLinkLastFM.TabIndex = 1;
+            btnLinkLastFM.Text = "Last.fm";
+            btnLinkLastFM.TextAlign = ContentAlignment.MiddleRight;
+            btnLinkLastFM.UseVisualStyleBackColor = false;
+            btnLinkLastFM.Click += btnLinkLastFM_Click;
+            // 
+            // btnHome
+            // 
+            btnHome.BackColor = Color.FromArgb(34, 37, 41);
+            btnHome.FlatAppearance.BorderSize = 0;
+            btnHome.FlatStyle = FlatStyle.Popup;
+            btnHome.ForeColor = Color.White;
+            btnHome.Location = new Point(8, 8);
+            btnHome.Margin = new Padding(2, 2, 2, 2);
+            btnHome.Name = "btnHome";
+            btnHome.Size = new Size(119, 32);
+            btnHome.TabIndex = 0;
+            btnHome.Text = "Home";
+            btnHome.UseVisualStyleBackColor = false;
+            btnHome.Click += btnHome_Click;
+            // 
             // lblTitle
-            this.lblTitle.AutoSize = true;
-            this.lblTitle.Font = new System.Drawing.Font("Segoe UI", 16F, System.Drawing.FontStyle.Bold);
-            this.lblTitle.ForeColor = System.Drawing.Color.White;
-            this.lblTitle.Location = new System.Drawing.Point(210, 10);
-            this.lblTitle.Text = "Media Tracker";
-
+            // 
+            lblTitle.AutoSize = true;
+            lblTitle.Font = new Font("Segoe UI", 16F, FontStyle.Bold);
+            lblTitle.ForeColor = Color.White;
+            lblTitle.Location = new Point(147, 6);
+            lblTitle.Margin = new Padding(2, 0, 2, 0);
+            lblTitle.Name = "lblTitle";
+            lblTitle.Size = new Size(160, 30);
+            lblTitle.TabIndex = 1;
+            lblTitle.Text = "Media Tracker";
+            // 
             // pnlContent
-            this.pnlContent.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pnlContent.Location = new System.Drawing.Point(200, 50);
-            this.pnlContent.Name = "pnlContent";
-            this.pnlContent.Size = new System.Drawing.Size(800, 600);
-
-            this.pnlSidebar.ResumeLayout(false);
-            this.ResumeLayout(false);
-            this.PerformLayout();
+            // 
+            pnlContent.BackColor = Color.FromArgb(32, 32, 32);
+            pnlContent.Dock = DockStyle.Fill;
+            pnlContent.Location = new Point(140, 0);
+            pnlContent.Margin = new Padding(2, 2, 2, 2);
+            pnlContent.Name = "pnlContent";
+            pnlContent.Size = new Size(560, 390);
+            pnlContent.TabIndex = 0;
+            // 
+            // MainForm
+            // 
+            AutoScaleDimensions = new SizeF(7F, 15F);
+            AutoScaleMode = AutoScaleMode.Font;
+            BackColor = Color.FromArgb(45, 45, 48);
+            ClientSize = new Size(700, 390);
+            Controls.Add(pnlContent);
+            Controls.Add(lblTitle);
+            Controls.Add(pnlSidebar);
+            Margin = new Padding(2, 2, 2, 2);
+            Name = "MainForm";
+            Text = "Media Tracker";
+            pnlSidebar.ResumeLayout(false);
+            ResumeLayout(false);
+            PerformLayout();
         }
- #endregion
+        #endregion
+
+        private Label label1;
     }
 }

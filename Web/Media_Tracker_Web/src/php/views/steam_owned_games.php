@@ -44,6 +44,14 @@
                     <a class="btn btn-dark w-100" id="btn-home" href="../../../index.php" role="button">
                         Home
                     </a>
+                    <a
+                        class="btn btn-dark w-100 mt-2"
+                        id="btn-home"
+                        href="./manage_user.php"
+                        role="button"
+                    >
+                        Manager user
+                    </a>
                 </div>
                 <hr>
                 <div class="dropdown">
@@ -129,49 +137,53 @@
                     </div>
                 </div>
 
-                <div class="table-responsive">
-                    <h3>Owned Games</h3>
-                    <?php if (isset($error)): ?>
-                        <p><?php echo $error; ?></p>
-                    <?php else: ?>
-                        <table class="table table-dark table-hover">
-                            <thead>
-                                <tr>
-                                    <th><a class="sort-link"<?php echo sortLink($sort_field, $sort_dir, "name", $filtUrl) ?>>
-                                        Game Title
-                                    </a></th>
-                                    <th><a class="sort-link"<?php echo sortLink($sort_field, $sort_dir, "playtime", $filtUrl) ?>>
-                                        Minutes Played
-                                    </a></th>
-                                    <th></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php if (count($owned_games_filt) > 0): ?>
-                                    <?php foreach ($owned_games_filt as $game): ?>
-                                        <tr>
-                                            <td>
-                                                <img 
-                                                    src="https://media.steampowered.com/steamcommunity/public/images/apps/<?php echo $game->appId; ?>/<?php echo $game->imgIconUrl; ?>.jpg" 
-                                                    alt="Icon for <?php echo htmlspecialchars($game->name); ?>" 
-                                                    class="game-icon" />
-                                                <strong><?php echo htmlspecialchars($game->name); ?></strong>
-                                            </td>
-                                            <td><?php echo $game->playtimeForever; ?> mins</td>
-                                            <td>
-                                                <a href="https://store.steampowered.com/app/<?php echo $game->appId; ?>" target="_blank">View In Store</a>
-                                            </td>
-                                        </tr>
-                                    <?php endforeach; ?>
-                                <?php else: ?>
+                <?php if (isset($_SESSION['user_platform_ids']['steam'])): ?>
+                    <div class="table-responsive">
+                        <h3>Owned Games</h3>
+                        <?php if (isset($error)): ?>
+                            <p><?php echo $error; ?></p>
+                        <?php else: ?>
+                            <table class="table table-dark table-hover">
+                                <thead>
                                     <tr>
-                                        <td colspan="3" class="lead text-center">No items match the filter</td>
+                                        <th><a class="sort-link"<?php echo sortLink($sort_field, $sort_dir, "name", $filtUrl) ?>>
+                                            Game Title
+                                        </a></th>
+                                        <th><a class="sort-link"<?php echo sortLink($sort_field, $sort_dir, "playtime", $filtUrl) ?>>
+                                            Minutes Played
+                                        </a></th>
+                                        <th></th>
                                     </tr>
-                                <?php endif; ?>
-                            </tbody>
-                        </table>
-                    <?php endif; ?>
-                </div>
+                                </thead>
+                                <tbody>
+                                    <?php if (count($owned_games_filt) > 0): ?>
+                                        <?php foreach ($owned_games_filt as $game): ?>
+                                            <tr>
+                                                <td>
+                                                    <img 
+                                                        src="https://media.steampowered.com/steamcommunity/public/images/apps/<?php echo $game->appId; ?>/<?php echo $game->imgIconUrl; ?>.jpg" 
+                                                        alt="Icon for <?php echo htmlspecialchars($game->name); ?>" 
+                                                        class="game-icon" />
+                                                    <strong><?php echo htmlspecialchars($game->name); ?></strong>
+                                                </td>
+                                                <td><?php echo $game->playtimeForever; ?> mins</td>
+                                                <td>
+                                                    <a href="https://store.steampowered.com/app/<?php echo $game->appId; ?>" target="_blank">View In Store</a>
+                                                </td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    <?php else: ?>
+                                        <tr>
+                                            <td colspan="3" class="lead text-center">No items match the filter</td>
+                                        </tr>
+                                    <?php endif; ?>
+                                </tbody>
+                            </table>
+                        <?php endif; ?>
+                    </div>
+                <?php else: ?>
+                    <h1>Please add your Steam account</h1>
+                <?php endif; ?>
             </main>
         </div>
     </div>

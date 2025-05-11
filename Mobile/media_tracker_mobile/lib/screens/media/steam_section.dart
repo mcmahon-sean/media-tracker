@@ -42,6 +42,7 @@ class _SteamSectionState extends ConsumerState<SteamSection> {
               (fav) =>
                   fav['media']['platform_id'] == 1 &&
                   fav['media']['media_plat_id'] == game.appId.toString() &&
+                  fav['media']['title'] == game.name &&
                   fav['favorites'] == true,
             ),
           );

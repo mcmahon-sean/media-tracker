@@ -23,7 +23,7 @@ namespace media_tracker_desktop.Forms
             // 
             // pnlLink
             // 
-            pnlLink.BackColor = Color.FromArgb(45, 45, 48);
+            pnlLink.BackColor = Color.FromArgb(35, 35, 35);
             pnlLink.Controls.Add(steamTextBox);
             pnlLink.Controls.Add(linkButton);
             pnlLink.Dock = DockStyle.Top;
@@ -35,7 +35,7 @@ namespace media_tracker_desktop.Forms
             // 
             // steamTextBox
             // 
-            steamTextBox.Location = new Point(17, 20);
+            steamTextBox.Location = new Point(22, 24);
             steamTextBox.Margin = new Padding(4, 5, 4, 5);
             steamTextBox.Name = "steamTextBox";
             steamTextBox.Size = new Size(427, 31);

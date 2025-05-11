@@ -6,26 +6,18 @@ using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using RestSharp;
 using Supabase;
-using System;
-using System.CodeDom;
-using System.Collections.Generic;
 using System.Configuration;
-using System.Linq;
-using System.Net;
-using System.Printing;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Media.Animation;
+
 
 namespace media_tracker_desktop
 {
     public static class UserAppAccount
     {
         // Stored Procedure Names
-        private const string CREATE_USER_SP_NAME = "CreateUser";
-        private const string AUTHENTICATE_USER_SP_NAME = "AuthenticateUser";
-        private const string ADD_THIRD_PARTY_ID = "add_3rd_party_id";
+        
+        private const string DELETE_USER_SP_NAME = "delete_user";
+        
+
         private const int STEAM_PLATFORM_ID = 1;
         private const int LASTFM_PLATFORM_ID = 2;
         private const int TMDB_PLATFORM_ID = 3;
@@ -120,6 +112,11 @@ namespace media_tracker_desktop
         {
             get { return _userTmdbSessionID; }
         }
+
+        public static Client GetConnection
+        {
+            get { return _connection; }
+        }
         // ----- Getter Methods END -----
 
         // Method: Connect to the DB using the passed connection.
@@ -139,134 +136,19 @@ namespace media_tracker_desktop
             return conn;
         }
 
-
-        /// <summary>
-        /// Method to create the user, which uses the CreateUser SP from the DB and passes a UserRegistrationParam as the parameter object.
-        /// </summary>
-        /// <param name="newUser">The object that represents the parameters for the CreateUser SP</param>
-        /// <returns>
-        /// Returns a (bool, string) tuple. Boolean indicates if the process of creating the user is successful. String is the message to help with debugging.
-        /// </returns>
-        public static async Task<(bool, string)> CreateUser(UserRegistrationParam newUser)
+        public static void UpdateUserSessionVariables(User user)
         {
-            // If the user object is null,
-            if (newUser == null)
-            {
-                return (false, "New user object is null.");
-            }
-
-            try
-            {
-                // Execute the stored procedure and wait for a response.
-                var response = await _connection.Rpc(CREATE_USER_SP_NAME, newUser);
-
-                // Convert the returned value from the stored procedure to a boolean.
-                bool returnedBool = Boolean.TryParse(response.Content, out bool userCreated);
-
-                // If the conversion failed,
-                if (!returnedBool)
-                {
-                    // Return result to indicate that the DB returned a non-boolean.
-                    return (returnedBool, "Database did not return a boolean value.");
-                }
-
-                // Message depends on whether or not the stored procedure successfully created the user.
-                string message;
-
-                if (userCreated)
-                {
-                    message = "Successfully created user.";
-                }
-                else
-                {
-                    message = "Failed to create user.";
-                }
-
-                // Return the result.
-                return (userCreated, message);
-            }
-            catch (Exception error)
-            {
-                return (false, error.Message);
-            }
-        }
-
-        /// <summary>
-        /// Method to authenticate the user, which uses the AuthenticateUser SP from the DB and passes a UserLoginParam as the parameter object.
-        /// </summary>
-        /// <param name="user">The object that represents the parameters for the AuthenticateUser SP</param>
-        /// <returns>Returns a (bool, string) tuple. Boolean indicates if the process of authenticating is successful. String is the message to help with debugging.</returns>
-        public static async Task<(bool, string)> AuthenticateUser(UserLoginParam user)
-        {
-            // Since we are attempting to log in a new user, current user is logged out.
-            LogOut();
-
-            // If the user object is null,
-            if (user == null)
-            {
-                return (false, "User object is null.");
-            }
-
-            try
-            {
-                // Execute the stored procedure and wait for a response.
-                var response = await _connection.Rpc(AUTHENTICATE_USER_SP_NAME, user);
-
-                // Convert the returned value from the stored procedure to a boolean.
-                bool returnedBool = Boolean.TryParse(response.Content, out bool userAuthenticated);
-
-                // If the conversion failed,
-                if (!returnedBool)
-                {
-                    // Return result to indicate that the DB returned a non-boolean.
-                    return (returnedBool, "Database did not return a boolean value.");
-                }
-
-                // Message depends on whether or not the stored procedure successfully created the user.
-                string message;
-
-                if (userAuthenticated)
-                {
-                    // Retrieve user details.
-                    // Filtered by username.
-                    var userQueryResult = await _connection.From<User>().Filter(u => u.Username, Supabase.Postgrest.Constants.Operator.Equals, user.Username).Get();
-
-                    // Retrieve user account(s).
-                    // Filtered by username.
-                    var userAccountQueryResult = await _connection.From<UserAccount>().Filter(u => u.Username, Supabase.Postgrest.Constants.Operator.Equals, user.Username).Get();
-
-                    // User record shouldn't be null since the user is logged in at this stage. Hence, (!).
-                    await UpdateUserSessionVariables(userQueryResult.Model!, userAccountQueryResult.Models);
-
-                    message = "Successfully logged in.";
-                    _userLoggedIn = true;
-                }
-                else
-                {
-                    message = "Failed to log in.";
-                }
-
-                // Return the result.
-                return (userAuthenticated, message);
-            }
-            catch (Exception error)
-            {
-                return (false, error.Message);
-            }
-        }
-
-        /// <summary>
-        /// Updates the session variables.
-        /// When a user is logged in, the session user api id variables are also updated, as well as the user's id in each api model.
-        /// </summary>
-        /// <param name="user">The user object of the logged in user.</param>
-        /// <param name="userAccounts">The list of user account objects that is associated with the user.</param>
-        private static async Task UpdateUserSessionVariables(User user, List<UserAccount> userAccounts)
-        {
+            if (!user.Username.IsNullOrEmpty()) { 
             _username = user.Username;
             _firstName = user.FirstName;
             _lastName = user.LastName;
             _email = user.Email;
+            _userLoggedIn = true; }
+        }
+
+        public static async Task UpdateUserSessionVariables(User user, List<UserAccount> userAccounts)
+        {
+            UpdateUserSessionVariables(user);
 
             // Foreach platform account that the user has,
             foreach (UserAccount userAccount in userAccounts)
@@ -286,25 +168,61 @@ namespace media_tracker_desktop
 
                         break;
                     case TMDB_PLATFORM_ID:
-                        _userTmdbSessionID = userAccount.UserPlatID.ToString();
-                        TmdbApi.SessionID = _userTmdbSessionID;
-
                         var (accountIDFound, accountID) = await GetTmdbAccountID(userAccount.UserPlatID.ToString());
 
+                        // Only update session variables for tmdb when both account and session are not null.
                         if (accountIDFound)
                         {
-                           _userTmdbAccountID = accountID;
-                           TmdbApi.AccountID = _userTmdbAccountID;
+                            _userTmdbSessionID = userAccount.UserPlatID.ToString();
+                            TmdbApi.SessionID = _userTmdbSessionID;
+
+                            _userTmdbAccountID = accountID;
+                            TmdbApi.AccountID = _userTmdbAccountID;
                         }
                         else
                         {
                             Console.WriteLine("Account Id Not Found");
                         }
-                        
+
                         break;
                     default:
                         break;
                 }
+            }
+        }
+
+        // Method: Delete user.
+        public static async Task<Dictionary<string, dynamic>> DeleteUser()
+        {
+            Dictionary<string, dynamic> deleteResult = new Dictionary<string, dynamic>
+            {
+                ["status"] = "",
+                ["statusMessage"] = ""
+            };
+
+            var deleteUserParam = new
+            {
+                username_input = _username
+            };        
+
+            // Execute the stored procedure and wait for a response.
+            var response = await _connection.Rpc(DELETE_USER_SP_NAME, deleteUserParam);
+
+            if (response.Content.Contains("User has been deleted"))
+            {
+                deleteResult["status"] = "success";
+                deleteResult["statusMessage"] = "Successfully deleted account.";
+
+                LogOut();
+
+                return deleteResult;
+            }
+            else
+            {
+                deleteResult["status"] = "error";
+                deleteResult["statusMessage"] = response.Content;
+
+                return deleteResult;
             }
         }
 
@@ -328,105 +246,53 @@ namespace media_tracker_desktop
             TmdbApi.Logout();
         }
 
-        /// <summary>
-        /// When adding an api id, the session variables for user's api ids are also updated.
-        /// In addition, the user's id in each api models are also updated.
-        /// </summary>
-        /// <param name="PlatformId"></param>
-        /// <param name="UserPlatformId">Steam: the steam ID. LastFM: the lastFM username. TMDB: the TMDB session ID.</param>
-        /// <returns></returns>
-        public static async Task<(bool, string)> AddThirdPartyId(int? PlatformId, string UserPlatformId)
+
+        // Method: Retrieve the user's platform ID based on the platform ID passed.
+        public static string GetUserPlatformID(int platformID)
         {
-            var parameters = new{
-                username_input = _username,
-                platform_id_input = PlatformId,
-                user_plat_id_input = UserPlatformId
-            };
-
-            if (!_userLoggedIn)
+            switch (platformID)
             {
-                return (false, "User is not logged in.");
-            }
-
-            if (!PlatformId.HasValue)
-            {
-                return (false, "Platform ID is null.");
-            }
-
-            if (string.IsNullOrEmpty(UserPlatformId))
-            {
-                return (false, "User Platform ID is null.");
-            }
-
-            if (string.IsNullOrEmpty(_username))
-            {
-                return (false, "Username is null.");
-            }
-
-            if (_connection == null)
-            {
-                return (false, "Connection is null.");
-            }
-
-            try{
-                var response = await _connection.Rpc(ADD_THIRD_PARTY_ID, parameters);
-
-                string returnedString = response.Content != null ? response.Content.ToString() : string.Empty;
-
-                if (returnedString.IsNullOrEmpty()){
-                    return (false, "Database did not return a string value.");
-                }
-
-                // Update the corresponding user api id session variables and for each api model.
-                switch (PlatformId)
-                {
-                    case STEAM_PLATFORM_ID:
-                        _userSteamID = UserPlatformId;
-                        SteamApi.SteamID = _userSteamID;
-
-                        break;
-                    case LASTFM_PLATFORM_ID:
-                        _userLastFmID = UserPlatformId;
-                        LastFMApi.User = _userLastFmID;
-
-                        break;
-                    case TMDB_PLATFORM_ID:
-                        _userTmdbSessionID = UserPlatformId;
-                        TmdbApi.SessionID = _userTmdbSessionID;
-
-                        (bool accountIDFound, string accountID) = await GetTmdbAccountID(_userTmdbSessionID);
-
-                        if (accountIDFound)
-                        {
-                            _userTmdbAccountID = accountID;
-                            TmdbApi.AccountID = _userTmdbAccountID;
-                        }
-                        else
-                        {
-                            Console.WriteLine("Account Id Not Found");
-                        }
-
-                        break;
-                    default:
-                        break;
-                }
-
-                return (true, returnedString);
-            }
-            catch (Exception error)
-            {
-                return (false, error.Message);
-
+                case STEAM_PLATFORM_ID:
+                    return _userSteamID;
+                case LASTFM_PLATFORM_ID:
+                    return _userLastFmID;
+                case TMDB_PLATFORM_ID:
+                    return _userTmdbSessionID;
+                default:
+                    return "Invalid platform ID.";
             }
         }
+        // Method: Log out the user from the specified platform.
+        public static void LogOutPlatform(int platformID)
+        {
+            switch (platformID)
+            {
+                case STEAM_PLATFORM_ID:
+                    _userSteamID = "";
 
+                    SteamApi.Logout();
+                    break;
+                case LASTFM_PLATFORM_ID:
+                    _userLastFmID = "";
+
+                    LastFMApi.Logout();
+                    break;
+                case TMDB_PLATFORM_ID:
+                    _userTmdbSessionID = "";
+                    _userTmdbAccountID = "";
+
+                    TmdbApi.Logout();
+                    break;
+                default:
+                    break;
+            }
+        }
         private static async Task<(bool, string)> GetTmdbAccountID(string sessionID)
         {
             string tmdbBaseUrl = ConfigurationManager.AppSettings["TMDBApiBaseUrl"];
-            string tmdbAuthToken = ConfigurationManager.AppSettings["TMDBNathanAuthToken"];
+            string tmdbApiKey = ConfigurationManager.AppSettings["TMDBApiKey"];
 
-            string tmdbUrl = $"{tmdbBaseUrl}/account/account_id?session_id={sessionID}";
-
+            string tmdbUrl = $"{tmdbBaseUrl}/account/account_id";
 
             // initialize client
             var client = new RestClient();
@@ -434,10 +300,11 @@ namespace media_tracker_desktop
             // pass the url to request
             var request = new RestRequest(tmdbUrl);
 
-            request.AddHeader("Authorization", $"Bearer {tmdbAuthToken}");
+            request.AddParameter("api_key", tmdbApiKey);
+            request.AddParameter("session_id", sessionID);
 
             // retrieve the response
-            var response = await client.ExecuteAsync(request);
+            var response = await client.GetAsync(request);
 
             try
             {
@@ -465,43 +332,8 @@ namespace media_tracker_desktop
             }
         }
 
-        /// <summary>
-        /// Update the user's platform ID. Used when the user is allowed to update their api IDs (lastFM username, steamID, tmdb session ID).
-        /// </summary>
-        /// <param name="platformID">The ID for the platform (lastFM, steam, tmdb).</param>
-        /// <param name="newUserPlatformID">The user's platform ID (lastFM username, steam ID, tmdb session ID)</param>
-        /// <returns>(bool, string) bool to indicate success and string for the message (error/success).</returns>
-        public static async Task<(bool, string)> UpdateUserPlatformID(int platformID, string newUserPlatformID)
-        {
-            // Retrieve the platform name, for display purposes.
-            string platformName = GetPlatformName(platformID);
-
-            // If there is no new user platform ID,
-            if (string.IsNullOrEmpty(newUserPlatformID))
-            {
-                // Return false.
-                return (false, $"New User {platformName} ID is null.");
-            }
-            // Else,
-            else
-            {
-                // Update the user's platform ID.
-                // The SP updates/adds the user's platform ID.
-                (bool updateSuccess, string message) = await AddThirdPartyId(platformID, newUserPlatformID);
-                
-                if (updateSuccess)
-                {
-                    return (true, $"User {platformName} ID updated.");
-                }
-                else
-                {
-                    return (false, $"Unable to update user {platformName} ID");
-                }
-            }
-        }
-
         // Method: Retrieve the platform name based on the ID.
-        private static string GetPlatformName(int platformID)
+        public static string GetPlatformName(int platformID)
         {
             string platformName = string.Empty;
 
