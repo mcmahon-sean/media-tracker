@@ -1,45 +1,47 @@
 <?php
 
-    // Start session
-    session_start();
+// Start session
+session_start();
 
-    // Required
-    require_once '../media/TMDB/get_rated_tv_shows.php';
-    require_once '../filter_functions.php';
+// Required
+require_once '../media/TMDB/get_rated_tv_shows.php';
+require_once '../filter_functions.php';
 
-    $has_filter = isset($_GET["searchString"]) && $_GET["searchString"] != "";
-    // Grab the input string and selected category for searching from the post array
-    $filter_string = $_GET["searchString"] ?? "";
-    
-    $filtUrl = $has_filter ? "searchString=$filter_string" : "";
+$has_filter = isset($_GET["searchString"]) && $_GET["searchString"] != "";
+// Grab the input string and selected category for searching from the post array
+$filter_string = $_GET["searchString"] ?? "";
 
-    // Get sort options from URL
-    if (isset($_GET["sort"])){
-        $split = explode('_', $_GET["sort"]);
-        $sort_field = $split[0];
-        $sort_dir = $split[1];
-    } else {
-        $sort_field = "name";
-        $sort_dir = "asc";
-    }
+$filtUrl = $has_filter ? "searchString=$filter_string" : "";
 
-    $rated_shows_filt = sortBy(filter($ratedTvShows, "name", $filter_string, $movie = true), $sort_field, $sort_dir);
+// Get sort options from URL
+if (isset($_GET["sort"])) {
+    $split = explode('_', $_GET["sort"]);
+    $sort_field = $split[0];
+    $sort_dir = $split[1];
+} else {
+    $sort_field = "name";
+    $sort_dir = "asc";
+}
+
+$rated_shows_filt = sortBy(filter($ratedTvShows, "name", $filter_string, $movie = true), $sort_field, $sort_dir);
 
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rated Shows</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="../../../styles.css"> 
+    <link rel="stylesheet" href="../../../styles.css">
 </head>
-<body  class="bg-dark-primary">
+
+<body class="bg-dark-primary">
     <div class="container-fluid">
         <div class="row">
-        <nav class="col-md-2 d-none d-md-block sidebar bg-dark-secondary">
+            <nav class="col-md-2 d-none d-md-block sidebar bg-dark-secondary">
                 <div>
                     <a class="btn btn-dark w-100" id="btn-home" href="../../../index.php" role="button">
                         Home
@@ -48,8 +50,7 @@
                         class="btn btn-dark w-100 mt-2"
                         id="btn-home"
                         href="./manage_user.php"
-                        role="button"
-                    >
+                        role="button">
                         Manager user
                     </a>
                 </div>
@@ -69,7 +70,7 @@
                     </ul>
                 </div>
 
-                
+
                 <div class="dropdown mt-2">
                     <a class="btn btn-dark dropdown-toggle w-100 media-tab" href="#" role="button" data-bs-toggle="dropdown">
                         <img src="../../assets/images/icons/icon_movies.svg" class="tab-icon me-2">
@@ -83,7 +84,7 @@
                     </ul>
                 </div>
 
-                
+
                 <div class="dropdown mt-2">
                     <a class="btn btn-dark dropdown-toggle w-100 media-tab" href="#" role="button" data-bs-toggle="dropdown">
                         <img src="../../assets/images/icons/icon_games.svg" class="tab-icon me-2">
@@ -93,7 +94,7 @@
                         <li><a class="dropdown-item" href="steam_owned_games.php">Owned Games</a></li>
                     </ul>
                 </div>
-                
+
             </nav>
 
             <main class="col-md-10 ms-sm-auto px-4">
@@ -115,15 +116,14 @@
                             <?php endif; ?>
                             <div class="col-9 col-md-10">
                                 <div class="input-group">
-                                    <input name="searchString" type="text" class="form-control" placeholder="Search..." 
-                                        <?php echo ($filter_string != "") ? 'value="'.$filter_string.'"' : "" ?>
-                                    />
+                                    <input name="searchString" type="text" class="form-control" placeholder="Search..."
+                                        <?php echo ($filter_string != "") ? 'value="' . $filter_string . '"' : "" ?> />
                                     <span class="input-group-text search-select pe-3">Titles</span>
                                 </div>
                             </div>
                             <button type="submit" class="btn bg-dark-secondary text-white col-3 col-md-2">Search</button>
                         </form>
-                        <?php if($has_filter): ?>
+                        <?php if ($has_filter): ?>
                             <form method="get" class="row mt-2 ms-1 filter-label">
                                 <?php if (isset($_GET["sort"])): ?>
                                     <input type="hidden" name="sort" value="<?php echo $_GET["sort"] ?>" />
@@ -136,7 +136,7 @@
                         <?php endif; ?>
                     </div>
                 </div>
-                
+
                 <?php if (isset($_SESSION['user_platform_ids']['tmdb'])): ?>
                     <h3>Rated TV Shows</h3>
                     <div class="table-responsive">
@@ -146,21 +146,22 @@
                             <table class="table table-dark table-hover">
                                 <thead>
                                     <tr>
-                                    <th><a class="sort-link"<?php echo sortLink($sort_field, $sort_dir, "id", $filtUrl) ?>>
-                                            ID
-                                        </a></th>
-                                        <th><a class="sort-link"<?php echo sortLink($sort_field, $sort_dir, "name", $filtUrl) ?>>
-                                            Name
-                                        </a></th>
-                                        <th><a class="sort-link"<?php echo sortLink($sort_field, $sort_dir, "userRating", $filtUrl) ?>>
-                                            Your Rating
-                                        </a></th>
-                                        <th><a class="sort-link"<?php echo sortLink($sort_field, $sort_dir, "avgRating", $filtUrl) ?>>
-                                            Average Rating
-                                        </a></th>
-                                        <th><a class="sort-link"<?php echo sortLink($sort_field, $sort_dir, "votes", $filtUrl) ?>>
-                                            Vote Count
-                                        </a></th>
+                                        <th>Favorite</th>
+                                        <th><a class="sort-link" <?php echo sortLink($sort_field, $sort_dir, "id", $filtUrl) ?>>
+                                                ID
+                                            </a></th>
+                                        <th><a class="sort-link" <?php echo sortLink($sort_field, $sort_dir, "name", $filtUrl) ?>>
+                                                Name
+                                            </a></th>
+                                        <th><a class="sort-link" <?php echo sortLink($sort_field, $sort_dir, "userRating", $filtUrl) ?>>
+                                                Your Rating
+                                            </a></th>
+                                        <th><a class="sort-link" <?php echo sortLink($sort_field, $sort_dir, "avgRating", $filtUrl) ?>>
+                                                Average Rating
+                                            </a></th>
+                                        <th><a class="sort-link" <?php echo sortLink($sort_field, $sort_dir, "votes", $filtUrl) ?>>
+                                                Vote Count
+                                            </a></th>
                                         <th>Overview</th>
 
                                     </tr>
@@ -169,6 +170,20 @@
                                     <?php if (count($rated_shows_filt) > 0): ?>
                                         <?php foreach ($rated_shows_filt as $show): ?>
                                             <tr>
+                                                <td>
+                                                    <span
+                                                        class="favorite-icon ms-3"
+                                                        role="button"
+                                                        data-platform_id="3"
+                                                        data-media_type_id="2"
+                                                        data-media_plat_id="<?php echo $show->id; ?>"
+                                                        data-title="<?php echo htmlspecialchars($show->name); ?>"
+                                                        data-album=""
+                                                        data-artist=""
+                                                        data-username="<?php echo $_SESSION['username']; ?>">
+                                                        ☆
+                                                    </span>
+                                                </td>
                                                 <td><?php echo htmlspecialchars($show->id); ?></td>
                                                 <td><?php echo htmlspecialchars($show->name); ?></td>
                                                 <td><?php echo htmlspecialchars($show->user_rating); ?></td>
@@ -198,4 +213,5 @@
     <script src="../../../script.js" type="module"></script>
 
 </body>
+
 </html>
